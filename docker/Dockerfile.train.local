@@ -1,0 +1,24 @@
+FROM rocm/7.0:rocm7.0_ubuntu22.04_py3.10_pytorch_release_2.8.0_rc1
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+        "transformers>=5.0.0" \
+        "peft>=0.14.0" \
+        "datasets>=3.0.0" \
+        "accelerate>=1.2.0" \
+        "trl>=0.13.0" \
+        "deepspeed>=0.16.0" \
+        "safetensors>=0.4.0" \
+        "sentencepiece>=0.2.0" \
+        "tokenizers>=0.21.0" \
+        "wandb>=0.19.0" \
+        "scipy>=1.14.0"
+
+WORKDIR /workspace
+ENV HIP_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+ENV ROCM_PATH=/opt/rocm
+ENV HSA_FORCE_FINE_GRAIN_PCIE=1
+
+CMD ["bash"]

@@ -1,0 +1,37 @@
+FROM rocm/pytorch-training:v25.11
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+        "transformers>=5.0.0" \
+        "peft>=0.14.0" \
+        "datasets>=3.0.0" \
+        "accelerate>=1.2.0" \
+        "trl>=0.13.0" \
+        "deepspeed>=0.16.0" \
+        "safetensors>=0.4.0" \
+        "sentencepiece>=0.2.0" \
+        "tokenizers>=0.21.0" \
+        "wandb>=0.19.0" \
+        "tensorboard>=2.18.0" \
+        "scipy>=1.14.0" \
+        "scikit-learn>=1.6.0"
+
+RUN cd /tmp && \
+    git clone https://github.com/THUDM/MoELoRA_Riemannian.git && \
+    cd MoELoRA_Riemannian && \
+    pip install --no-cache-dir -r requirements.txt 2>/dev/null || true && \
+    cp moe_lora.py custom_optimizer.py /usr/local/lib/python*/dist-packages/ 2>/dev/null || \
+    cp moe_lora.py custom_optimizer.py /opt/conda/lib/python*/site-packages/ 2>/dev/null || true && \
+    cd / && rm -rf /tmp/MoELoRA_Riemannian
+
+WORKDIR /workspace
+ENV HIP_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+ENV ROCM_PATH=/opt/rocm
+ENV HSA_FORCE_FINE_GRAIN_PCIE=1
+
+COPY train_lora.py /workspace/train_lora.py
+COPY ds_config_zero2.json /workspace/ds_config_zero2.json
+
+CMD ["bash"]
