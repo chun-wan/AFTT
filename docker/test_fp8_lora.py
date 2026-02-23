@@ -48,18 +48,28 @@ print(f"FP8 target modules: {fp8_count}")
 
 # Dequantize FP8 target modules to BF16
 if fp8_count > 0:
-    print(f"Dequantizing {fp8_count} FP8 modules to BF16...")
+    print(f"Dequantizing {fp8_count} FP8 modules to BF16 with block-scaling...")
     sys.stdout.flush()
+    BLOCK_SIZE = 128
     deq = 0
     for name, module in model.named_modules():
         short = name.split(".")[-1]
         if short in targets and isinstance(module, torch.nn.Linear):
             if module.weight.dtype in (torch.float8_e4m3fn, torch.float8_e4m3fnuz,
                                         torch.float8_e5m2, torch.float8_e5m2fnuz):
-                old_dtype = module.weight.dtype
-                module.weight.data = module.weight.data.to(torch.bfloat16)
+                w = module.weight.data.to(torch.float32)
+                if hasattr(module, "weight_scale_inv"):
+                    scale = module.weight_scale_inv
+                    for r in range(0, w.shape[0], BLOCK_SIZE):
+                        for c in range(0, w.shape[1], BLOCK_SIZE):
+                            rb = min(r + BLOCK_SIZE, w.shape[0])
+                            cb = min(c + BLOCK_SIZE, w.shape[1])
+                            sr, sc = r // BLOCK_SIZE, c // BLOCK_SIZE
+                            if sr < scale.shape[0] and sc < scale.shape[1]:
+                                w[r:rb, c:cb] *= scale[sr, sc]
+                module.weight = torch.nn.Parameter(w.to(torch.bfloat16), requires_grad=False)
                 deq += 1
-    print(f"Dequantized {deq} modules")
+    print(f"Dequantized {deq} modules with block-scaling")
     sys.stdout.flush()
 
 from peft import LoraConfig, get_peft_model, TaskType

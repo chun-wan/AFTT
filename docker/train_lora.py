@@ -145,21 +145,39 @@ def main():
     target_modules = lora_args.target_modules.split(",")
     resolved_targets = find_target_modules(model, target_modules)
 
-    # Dequantize FP8 LoRA target modules to BF16 for training compatibility
+    # Dequantize FP8 LoRA target modules to BF16 with proper block-scaling
     dequantized = 0
+    block_size = 128
     for name, module in model.named_modules():
         short_name = name.split(".")[-1]
         if short_name in resolved_targets and isinstance(module, torch.nn.Linear):
             if module.weight.dtype in (torch.float8_e4m3fn, torch.float8_e4m3fnuz,
                                         torch.float8_e5m2, torch.float8_e5m2fnuz):
-                module.weight.data = module.weight.data.to(torch.bfloat16)
+                w = module.weight.data.to(torch.float32)
                 if hasattr(module, "weight_scale_inv"):
                     scale = module.weight_scale_inv
-                    module.weight.data = module.weight.data * scale
-                    delattr(module, "weight_scale_inv")
+                    for r in range(0, w.shape[0], block_size):
+                        for c in range(0, w.shape[1], block_size):
+                            rb = min(r + block_size, w.shape[0])
+                            cb = min(c + block_size, w.shape[1])
+                            sr, sc = r // block_size, c // block_size
+                            if sr < scale.shape[0] and sc < scale.shape[1]:
+                                w[r:rb, c:cb] *= scale[sr, sc]
+                module.weight = torch.nn.Parameter(w.to(torch.bfloat16), requires_grad=False)
                 dequantized += 1
     if dequantized:
         logger.info("Dequantized %d FP8 modules to BF16 for LoRA training", dequantized)
+
+    # Remove quantization config to bypass Trainer's FP8 training block.
+    # FP8 base weights are frozen; only BF16 LoRA adapters are trained.
+    for cfg in [model.config, getattr(model, "base_model", model).config if hasattr(model, "base_model") else None]:
+        if cfg is not None and hasattr(cfg, "quantization_config"):
+            delattr(cfg, "quantization_config")
+    if hasattr(model, "is_quantized"):
+        model.is_quantized = False
+    import transformers.trainer_utils as _tu
+    _tu.validate_quantization_for_training = lambda *a, **kw: None
+    logger.info("Bypassed FP8 training validation (LoRA adapters are BF16)")
 
     if hasattr(model, "gradient_checkpointing_enable"):
         model.gradient_checkpointing_enable()
@@ -212,7 +230,7 @@ def main():
         args=training_args,
         train_dataset=tokenized_train,
         eval_dataset=tokenized_eval,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
     )
 
     logger.info("Starting training...")

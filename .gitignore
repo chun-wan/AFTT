@@ -36,3 +36,11 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Training output (checkpoints, models)
+output/
+
+# Large training data (regenerate with collectors/data_augmentor*.py)
+db/training_data/augmented_*.jsonl
+db/training_data/merged_*.jsonl
+db/training_data/final_*.jsonl
