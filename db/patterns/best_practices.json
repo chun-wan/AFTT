@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "description": "Best practices and optimization patterns for AMDGPU kernels, derived from aiter/CK and AMD optimization guides",
+  "patterns": [
+    {
+      "pattern_id": "BP001",
+      "name": "Double Buffering / Ping-Pong LDS",
+      "category": "pipeline",
+      "description": "Use two LDS buffers alternately: while computing on buffer A, prefetch next data into buffer B. This overlaps memory latency with computation, maximizing pipeline utilization.",
+      "applicable_to": ["GEMM", "Convolution", "Attention"],
+      "asm_indicators": ["ds_write.*offset:0", "ds_write.*offset:\\d{4,}", "ds_read.*ping", "ds_read.*pong"],
+      "performance_impact": "Can improve GEMM performance by 30-60% by hiding memory latency.",
+      "reference": "aiter CK gemm_pipeline_ag_bg_cr_comp_v4.hpp",
+      "implementation_notes": "Allocate 2x LDS space. Use s_waitcnt lgkmcnt carefully to synchronize buffer swaps. The CK comp_v4 pipeline uses DoubleSmemBuffer=true."
+    },
+    {
+      "pattern_id": "BP002",
+      "name": "Software Pipelining (Async Load + Compute Overlap)",
+      "category": "pipeline",
+      "description": "Structure the main loop so that loads for iteration N+1 are issued before computing iteration N. The hardware can overlap outstanding memory requests with ALU execution.",
+      "applicable_to": ["GEMM", "Reduction", "Attention", "All memory-bound kernels"],
+      "asm_indicators": ["global_load", "s_waitcnt vmcnt\\([1-9]"],
+      "performance_impact": "Reduces effective memory latency from ~300 cycles to near-zero for compute-bound kernels.",
+      "reference": "aiter CK gemm_pipeline_ag_bg_cr_comp_async.hpp",
+      "implementation_notes": "Issue loads early in the loop iteration. Use partial s_waitcnt (vmcnt(N) where N>0) to wait only for the loads you need now."
+    },
+    {
+      "pattern_id": "BP003",
+      "name": "MFMA Accumulator Chaining",
+      "category": "compute",
+      "description": "Chain multiple MFMA instructions that write to the same accumulator registers. The hardware can pipeline consecutive MFMAs, achieving near-peak throughput.",
+      "applicable_to": ["GEMM", "Batched GEMM"],
+      "asm_indicators": ["v_mfma.*a\\[0:", "v_mfma.*a\\[0:"],
+      "performance_impact": "Sustained MFMA throughput approaches theoretical peak when properly chained.",
+      "reference": "AMD CDNA3 ISA manual; aiter CK block_gemm patterns",
+      "implementation_notes": "Issue MFMA instructions back-to-back on the same accumulator registers. Interleave MFMA with data movement to hide AccVGPR read latency."
+    },
+    {
+      "pattern_id": "BP004",
+      "name": "Vectorized Global Memory Access (128-bit)",
+      "category": "memory",
+      "description": "Use 128-bit (dwordx4) global loads and stores to maximize memory bandwidth utilization. Each 128-bit load moves 4x more data per instruction.",
+      "applicable_to": ["All kernels with contiguous memory access"],
+      "asm_indicators": ["global_load_dwordx4", "buffer_load_dwordx4"],
+      "performance_impact": "Up to 4x reduction in memory instruction count. Better utilization of cache lines.",
+      "reference": "AMD memory optimization guide",
+      "implementation_notes": "Use float4/half8 types. Ensure addresses are 16-byte aligned. The compiler auto-vectorizes with -O3 in many cases."
+    },
+    {
+      "pattern_id": "BP005",
+      "name": "LDS Padding for Bank Conflict Avoidance",
+      "category": "memory",
+      "description": "Add +1 padding to shared memory array dimensions to avoid bank conflicts. LDS has 32 banks; stride-32 access causes all threads to collide.",
+      "applicable_to": ["Matrix Transpose", "GEMM with LDS", "Any LDS-heavy kernel"],
+      "asm_indicators": ["ds_read", "ds_write"],
+      "performance_impact": "Eliminates LDS bank conflicts, can improve LDS-bound kernels by 10-32x.",
+      "reference": "AMD LDS banking documentation; aiter CK shared memory layouts",
+      "implementation_notes": "Change float smem[N][M] to float smem[N][M+1] (or M+PADDING). The padding offset distributes bank accesses."
+    },
+    {
+      "pattern_id": "BP006",
+      "name": "Occupancy-Aware Register Usage",
+      "category": "resource",
+      "description": "Balance register usage against occupancy. On CDNA3, each SIMD has 512 VGPRs. Using <=64 VGPRs allows 8 waves/SIMD (max occupancy).",
+      "applicable_to": ["All kernels"],
+      "asm_indicators": [".vgpr_count"],
+      "performance_impact": "Higher occupancy helps hide memory latency for memory-bound kernels. Compute-bound kernels may benefit from more registers.",
+      "reference": "AMD Occupancy Calculator; rocprof-compute occupancy analysis",
+      "implementation_notes": "Use __launch_bounds__(block_size, min_blocks) to hint the compiler. Trade off between register spilling and occupancy."
+    },
+    {
+      "pattern_id": "BP007",
+      "name": "Stream-K Scheduling for Load Balancing",
+      "category": "scheduling",
+      "description": "Instead of assigning fixed tiles to blocks, use stream-K scheduling where blocks dynamically pick up work from a global counter. This ensures all CUs stay busy even when work is unevenly distributed.",
+      "applicable_to": ["GEMM", "Batched GEMM", "Convolution"],
+      "asm_indicators": ["global_atomic_add", "s_load.*workgroup_counter"],
+      "performance_impact": "10-30% improvement for non-square or irregular-shaped GEMMs.",
+      "reference": "aiter CK gemm_streamk/; CUTLASS Stream-K paper",
+      "implementation_notes": "Each block atomically increments a global tile counter, processes the assigned tile, then loops for the next. Requires careful handling of partial tiles at boundaries."
+    },
+    {
+      "pattern_id": "BP008",
+      "name": "Warp-Specialized Pipeline (Producer-Consumer)",
+      "category": "pipeline",
+      "description": "Assign different roles to different warps within a block: some warps load data (producers), others compute (consumers). This enables persistent pipelining.",
+      "applicable_to": ["GEMM", "Large kernels with complex data movement"],
+      "asm_indicators": ["s_cmp.*warp_role", "s_cbranch"],
+      "performance_impact": "Can improve utilization on complex pipelines with heterogeneous operations.",
+      "reference": "CUTLASS warp-specialized GEMM; aiter advanced pipeline patterns",
+      "implementation_notes": "Requires careful synchronization between producer and consumer warps via LDS barriers or flags."
+    }
+  ]
+}

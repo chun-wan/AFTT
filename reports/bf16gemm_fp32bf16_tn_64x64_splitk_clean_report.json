@@ -1,0 +1,150 @@
+{
+  "kernel": "bf16gemm_fp32bf16_tn_64x64_splitk_clean",
+  "kernel_name": "_ZN5aiter39bf16gemm_fp32bf16_tn_64x64_splitk_cleanE",
+  "arch": "gfx942",
+  "original_co": "/home/root123/aiter/hsa/gfx942/bf16gemm/bf16gemm_fp32bf16_tn_64x64_splitk_clean.co",
+  "modified_co": "/home/root123/asm-kernel-advisor/reports/bf16gemm_fp32bf16_tn_64x64_splitk_clean_optimized.co",
+  "instruction_count": 2052,
+  "optimization": {
+    "edits_applied": 4,
+    "edits_skipped": 0,
+    "edits_detail": [
+      {
+        "index": 1386,
+        "address": "0x00004E24",
+        "original": "s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)",
+        "replacement": "s_waitcnt vmcnt(1) expcnt(0) lgkmcnt(0)",
+        "comment": "Relax vmcnt(0)->vmcnt(1): 16 loads in-flight, allows more latency hiding",
+        "old_bytes": "00008cbf",
+        "new_bytes": "01008cbf"
+      },
+      {
+        "index": 238,
+        "address": "0x00002F40",
+        "original": "s_nop 1",
+        "replacement": "s_nop 0",
+        "comment": "Reduce s_nop 1 -> s_nop 0: not adjacent to MFMA hazard",
+        "old_bytes": "010080bf",
+        "new_bytes": "000080bf"
+      },
+      {
+        "index": 240,
+        "address": "0x00002F48",
+        "original": "s_nop 3",
+        "replacement": "s_nop 0",
+        "comment": "Reduce s_nop 3 -> s_nop 0: not adjacent to MFMA hazard",
+        "old_bytes": "030080bf",
+        "new_bytes": "000080bf"
+      },
+      {
+        "index": 242,
+        "address": "0x00002F50",
+        "original": "s_nop 3",
+        "replacement": "s_nop 0",
+        "comment": "Reduce s_nop 3 -> s_nop 0: not adjacent to MFMA hazard",
+        "old_bytes": "030080bf",
+        "new_bytes": "000080bf"
+      }
+    ],
+    "recommendations": [
+      {
+        "type": "prefetch_depth",
+        "description": "Low prefetch depth: 0 loads before first wait. Production average is 7.8. Consider issuing more loads earlier.",
+        "current_depth": 0,
+        "target_depth": 8
+      }
+    ]
+  },
+  "cycle_estimate": {
+    "original": {
+      "total_cycles": 6719,
+      "mfma_cycles": 12288,
+      "valu_cycles": 475,
+      "vmem_cycles": 313,
+      "lds_cycles": 194,
+      "salu_cycles": 844,
+      "wait_stall_cycles": 1720,
+      "barrier_stall_cycles": 1450,
+      "nop_cycles": 12,
+      "instruction_count": 2052,
+      "mfma_count": 192,
+      "vmem_count": 313,
+      "lds_count": 194,
+      "compute_intensity": 1.829,
+      "bottleneck": "MFMA (compute-bound)"
+    },
+    "modified": {
+      "total_cycles": 6698,
+      "mfma_cycles": 12288,
+      "valu_cycles": 475,
+      "vmem_cycles": 313,
+      "lds_cycles": 194,
+      "salu_cycles": 844,
+      "wait_stall_cycles": 1706,
+      "barrier_stall_cycles": 1450,
+      "nop_cycles": 5,
+      "instruction_count": 2052,
+      "mfma_count": 192,
+      "vmem_count": 313,
+      "lds_count": 194,
+      "compute_intensity": 1.835,
+      "bottleneck": "MFMA (compute-bound)"
+    },
+    "comparison": {
+      "original_cycles": 6719,
+      "modified_cycles": 6698,
+      "cycle_reduction": 21,
+      "improvement_pct": 0.31,
+      "original_bottleneck": "MFMA (compute-bound)",
+      "modified_bottleneck": "MFMA (compute-bound)",
+      "details": {
+        "mfma_diff": 0,
+        "wait_stall_diff": 14,
+        "nop_diff": 7,
+        "instr_count_diff": 0
+      }
+    }
+  },
+  "verification": {
+    "original_instructions": 2052,
+    "modified_instructions": 2052,
+    "count_match": true,
+    "differences": [
+      {
+        "index": 238,
+        "address": "0x00002F40",
+        "original": "s_nop 1",
+        "modified": "s_nop 0"
+      },
+      {
+        "index": 240,
+        "address": "0x00002F48",
+        "original": "s_nop 3",
+        "modified": "s_nop 0"
+      },
+      {
+        "index": 242,
+        "address": "0x00002F50",
+        "original": "s_nop 3",
+        "modified": "s_nop 0"
+      },
+      {
+        "index": 1386,
+        "address": "0x00004E24",
+        "original": "s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)",
+        "modified": "s_waitcnt vmcnt(1) expcnt(0) lgkmcnt(0)"
+      }
+    ],
+    "difference_count": 4
+  },
+  "stats": {
+    "total_instructions": 2052,
+    "s_waitcnt_count": 34,
+    "s_nop_count": 5,
+    "mfma_count": 192,
+    "vmem_load_count": 241,
+    "lds_count": 194,
+    "edits_proposed": 4,
+    "recommendations_count": 1
+  }
+}

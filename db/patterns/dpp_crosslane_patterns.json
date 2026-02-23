@@ -1,0 +1,278 @@
+{
+  "title": "DPP and Cross-Lane Pattern Catalog from 2660 Production Kernels",
+  "source": "aiter gfx942/gfx950 production disassembly analysis",
+  "total_dpp_instructions": 364323,
+  "total_crosslane_instructions": 52826,
+  "categories": {
+    "dpp_modifiers": {
+      "row_newbcast": {
+        "count": 309814,
+        "percentage": 85.0,
+        "description": "Broadcast value from lane N within a 16-lane row to all lanes in the row",
+        "primary_use": "FP8/INT8 block-scale dequantization after MFMA",
+        "kernels_using": ["gemm/fp8gemm*", "gemm/I8gemm*", "gemm/a8w8*", "moe/fmoe_*Fp8*", "moe/fmoe_*Int8*"],
+        "pattern": {
+          "instruction": "v_mul_f32_dpp dst, scale_reg, mfma_result row_newbcast:N row_mask:0xf bank_mask:0xf",
+          "explanation": "MFMA produces 16 results per row. Each row needs a different scale factor. row_newbcast:N takes the value from lane N in the source row and broadcasts it to all 16 lanes, so all lanes in a row get the same scale. This avoids LDS entirely for intra-wavefront scale distribution.",
+          "typical_sequence": [
+            "v_mfma_f32_32x32x16_fp8_fp8 v[148:163], a[0:1], v[20:21], v[148:163]",
+            "...(compute scale in v118 from loaded scale factors)...",
+            "v_add_f32_dpp v128, v118, v180 row_newbcast:0",
+            "v_add_f32_dpp v129, v118, v181 row_newbcast:1",
+            "v_add_f32_dpp v130, v118, v182 row_newbcast:2",
+            "v_add_f32_dpp v131, v118, v183 row_newbcast:3"
+          ],
+          "why_fast": "Without DPP: ds_write scale -> s_barrier -> ds_read scale (LDS round-trip = 20-40 cycles). With DPP: single cycle for broadcast within wavefront. Saves ~38 cycles per scale application."
+        }
+      },
+      "quad_perm": {
+        "count": 38258,
+        "percentage": 10.5,
+        "description": "Arbitrary permutation within each 4-lane quad (lanes 0-3, 4-7, 8-11, 12-15 of each row)",
+        "primary_use": "Softmax derivative computation in FMHA backward pass",
+        "kernels_using": ["fmha/bwd_*"],
+        "pattern": {
+          "instruction": "v_mov_b32_dpp dst, src quad_perm:[N,N,N,N]",
+          "explanation": "quad_perm:[0,0,0,0] broadcasts lane 0 to all 4 lanes in each quad. [1,0,3,2] swaps pairs. Used for computing dSoftmax = P * (dP - rowsum(P*dP)) where the rowsum needs to be broadcast across the quad.",
+          "typical_sequence": [
+            "v_mov_b32_dpp v127, v124 quad_perm:[3,3,3,3]  // broadcast lane 3 of each quad",
+            "v_mov_b32_dpp v126, v124 quad_perm:[2,2,2,2]  // broadcast lane 2",
+            "v_mov_b32_dpp v125, v124 quad_perm:[1,1,1,1]  // broadcast lane 1",
+            "v_mov_b32_dpp v124, v124 quad_perm:[0,0,0,0]  // broadcast lane 0",
+            "// Then use these broadcast values for per-element softmax gradient:",
+            "v_subrev_f32_dpp v72, v150, v72 quad_perm:[0,0,0,0]",
+            "v_subrev_f32_dpp v73, v150, v73 quad_perm:[1,1,1,1]"
+          ],
+          "why_fast": "Replaces 4 LDS writes + barrier + 4 LDS reads (per quad) with direct register-level shuffle. Saves ~100 cycles per softmax gradient computation."
+        }
+      },
+      "row_shr": {
+        "count": 7935,
+        "description": "Shift lanes right by N positions within a 16-lane row",
+        "primary_use": "Butterfly reduction for wavefront-level sum/max/prefix-scan",
+        "kernels_using": ["topk/*", "norm/layer_norm*"],
+        "pattern": {
+          "instruction": "v_mov_b32_dpp tmp, val row_shr:N",
+          "explanation": "Butterfly reduction pattern: shift by 1,2,4,8 and accumulate. After 4 steps, every lane in a 16-lane row has the reduction result.",
+          "typical_sequence_prefix_sum": [
+            "v_mov_b32_dpp v31, v7 row_shr:1   // get value from lane+1",
+            "v_cndmask_b32 v31, 0, v31, vcc     // mask: only lanes > 0 participate",
+            "v_add_u32 v7, v31, v7              // accumulate",
+            "v_mov_b32_dpp v31, v7 row_shr:2   // get value from lane+2",
+            "v_add_u32 v7, v7, v31",
+            "v_mov_b32_dpp v31, v7 row_shr:4   // get value from lane+4",
+            "v_add_u32 v7, v7, v31",
+            "v_mov_b32_dpp v31, v7 row_shr:8   // get value from lane+8",
+            "v_add_u32 v7, v7, v31              // now v7 has prefix sum within 16-lane row"
+          ],
+          "typical_sequence_reduction_layernorm": [
+            "v_mov_b32_dpp v208, v16 row_ror:8  // rotate by 8",
+            "v_add_f32 v16, v208, v16           // sum with rotated value",
+            "v_mov_b32_dpp v208, v16 row_ror:4",
+            "v_add_f32 v16, v208, v16",
+            "v_mov_b32_dpp v208, v16 row_ror:2",
+            "v_add_f32 v16, v208, v16",
+            "v_mov_b32_dpp v208, v16 row_ror:1",
+            "v_add_f32 v16, v208, v16           // all 16 lanes have same sum",
+            "v_rsq_f32 v14, v14                 // reciprocal sqrt for normalization"
+          ]
+        }
+      },
+      "row_shl": {
+        "count": 6699,
+        "description": "Shift lanes left by N positions within a 16-lane row",
+        "primary_use": "Parallel prefix OR / popcount for topk sorting",
+        "kernels_using": ["topk/*"],
+        "pattern": {
+          "instruction": "v_or_b32_dpp v7, v8, v8 row_shl:1 bound_ctrl:1",
+          "explanation": "Parallel prefix OR: shift left and OR for bitmask propagation. bound_ctrl:1 prevents wrapping (out-of-range lanes get 0). Used for bitonic sort within wavefront."
+        }
+      },
+      "row_bcast": {
+        "count": 1114,
+        "description": "Broadcast lane 15 or 31 to subsequent rows for cross-row communication",
+        "primary_use": "Cross-row reduction step in topk (after intra-row reduction via row_shr)",
+        "kernels_using": ["topk/*"],
+        "pattern": {
+          "typical_sequence": [
+            "// After intra-row reduction with row_shr:1,2,4,8:",
+            "v_mov_b32_dpp v30, v7 row_bcast:15  // broadcast row0.lane15 to row1",
+            "v_add_u32 v7, v7, v30",
+            "v_mov_b32_dpp v30, v7 row_bcast:31  // broadcast row1.lane15 to rows 2-3",
+            "v_add_u32 v7, v7, v30               // now all 64 lanes have full sum"
+          ]
+        }
+      },
+      "row_ror": {
+        "count": 503,
+        "description": "Rotate lanes within a row",
+        "primary_use": "Alternative butterfly reduction in layernorm",
+        "kernels_using": ["norm/layer_norm*"]
+      },
+      "wave_shl": {
+        "count": 4,
+        "description": "Shift between halves of 64-lane wavefront",
+        "primary_use": "Final step of wavefront-wide reduction",
+        "kernels_using": ["topk/*"]
+      },
+      "row_mirror": {
+        "count": 4,
+        "description": "Mirror lane order within each row",
+        "primary_use": "Used with wave_shl for full wavefront reduction"
+      }
+    },
+    "crosslane_instructions": {
+      "v_readlane_b32": {
+        "count": 50073,
+        "description": "Read specific VGPR lane into SGPR",
+        "primary_use": "Extract wavefront reduction results into scalar registers",
+        "pattern": {
+          "typical_sequence": [
+            "// In layernorm: extract partial sums from different lanes into SGPRs",
+            "v_readlane_b32 s9, v235, 1    // read lane 1 -> s9",
+            "v_readlane_b32 s8, v235, 0    // read lane 0 -> s8",
+            "// ... repeat for lanes 2-15",
+            "// Then do scalar arithmetic to combine partial sums"
+          ]
+        }
+      },
+      "v_readfirstlane_b32": {
+        "count": 2753,
+        "description": "Read lane 0 of VGPR into SGPR",
+        "primary_use": "Get uniform values (workgroup ID, thread count) into scalar path"
+      },
+      "ds_bpermute_b32": {
+        "description": "Arbitrary cross-lane permute within workgroup via LDS hardware",
+        "primary_use": "Distribute computed scale factors to arbitrary lanes in paged attention",
+        "pattern": {
+          "typical_sequence": [
+            "// Compute per-token quantization scale via max reduction:",
+            "v_max3_f32 v92, |v8|, |v9|, v92     // tree max across registers",
+            "ds_write_b32 v118, v92 offset:1280   // write local max to LDS",
+            "s_barrier                             // sync workgroup",
+            "ds_read_b32 v76, v119 offset:1280    // read other lanes' maxes",
+            "// ... reduce across lanes ...",
+            "v_rcp_f32 v92, v92                    // reciprocal of global max",
+            "// Compute target lane index:",
+            "v_lshlrev_b32 v74, 2, v74            // lane * 4 (byte address)",
+            "ds_bpermute_b32 v72, v74, v92         // send scale to target lane",
+            "s_waitcnt lgkmcnt(0)",
+            "v_mul_f32 v8, v8, v72                 // apply scale",
+            "v_cvt_pk_fp8_f32 v8, v8, v9           // convert to FP8"
+          ]
+        }
+      }
+    }
+  },
+  "optimization_techniques_by_kernel_type": {
+    "gemm_bf16": {
+      "dpp_used": false,
+      "key_techniques": [
+        "Direct-to-LDS loading (buffer_load_dword ... lds)",
+        "Triple buffering (pf3 = prefetch depth 3)",
+        "MFMA-load interleaving (MFMA -> buffer_load_lds + ds_read_b128 -> MFMA)",
+        "Precise partial waits (s_waitcnt vmcnt(20) lgkmcnt(0))",
+        "AGPRs for MFMA operands, VGPRs for accumulation",
+        "ds_read_b128 for 128-bit vectorized LDS reads",
+        "v_perm_b32 for BF16 byte layout transformation"
+      ],
+      "scheduling_pattern": "48 MFMAs interleaved with 40 buffer_loads and 28 ds_reads per loop iteration",
+      "registered_pressure": "87 VGPRs, 57 SGPRs, 110 AGPRs"
+    },
+    "gemm_fp8_blockscale": {
+      "dpp_used": true,
+      "dpp_type": "row_newbcast for scale broadcast",
+      "key_techniques": [
+        "All bf16 GEMM techniques plus:",
+        "DPP row_newbcast for per-block dequantization (avoids LDS for scale distribution)",
+        "v_pk_fma_f32 for packed FP32 FMA with scale",
+        "buffer_load_dwordx4 for vectorized AGPR loading"
+      ]
+    },
+    "fmha_backward": {
+      "dpp_used": true,
+      "dpp_type": "quad_perm for softmax gradient broadcast",
+      "key_techniques": [
+        "DPP quad_perm for intra-quad value broadcast (softmax derivative)",
+        "v_subrev_f32_dpp for fused subtract-and-permute",
+        "v_perm_b32 for BF16/FP16 packing",
+        "Multiple s_barrier pairs for ping-pong double buffering"
+      ]
+    },
+    "paged_attention": {
+      "dpp_used": false,
+      "crosslane_used": true,
+      "key_techniques": [
+        "ds_bpermute_b32 for cross-lane scale distribution",
+        "v_max3_f32 tree reduction for dynamic quantization range",
+        "v_rcp_f32 for reciprocal scaling",
+        "v_cvt_pk_fp8_f32 for FP8 conversion",
+        "Heavy s_barrier usage (40+ per kernel) for workgroup sync"
+      ]
+    },
+    "layernorm": {
+      "dpp_used": true,
+      "dpp_type": "row_ror for butterfly reduction",
+      "key_techniques": [
+        "DPP row_ror:8,4,2,1 butterfly reduction for wavefront-level sum",
+        "v_readlane_b32 for extracting partial sums to SGPRs",
+        "v_rsq_f32 for fast reciprocal sqrt",
+        "v_pk_mul_f32 for packed normalization"
+      ]
+    },
+    "topk_sorting": {
+      "dpp_used": true,
+      "dpp_type": "row_shr/shl for prefix scan, row_bcast for cross-row",
+      "key_techniques": [
+        "DPP row_shr:1,2,4,8 for prefix sum within 16-lane row",
+        "DPP row_bcast:15,31 for cross-row accumulation",
+        "DPP wave_shl:1 + row_mirror for full wavefront reduction",
+        "ds_bpermute_b32 for final cross-wavefront shuffle",
+        "v_cndmask_b32 for conditional participation in reduction"
+      ]
+    },
+    "moe_fused": {
+      "dpp_used": true,
+      "dpp_type": "row_newbcast for scale broadcast",
+      "key_techniques": [
+        "Same DPP row_newbcast pattern as FP8 GEMM",
+        "Fused GEMM + quantization in single kernel",
+        "v_max3_f32 tree reduction for output quantization",
+        "672 DPP instructions per kernel (highest density)"
+      ]
+    }
+  },
+  "anti_patterns": {
+    "lds_when_dpp_possible": {
+      "description": "Using LDS write + barrier + LDS read for intra-wavefront communication when DPP can do it in 1 cycle",
+      "symptom": "ds_write -> s_barrier -> ds_read pattern for values that only need broadcast within a wavefront",
+      "fix": "Replace with v_*_dpp using row_newbcast or quad_perm",
+      "cycle_savings": "20-40 cycles per occurrence (LDS latency + barrier cost)"
+    },
+    "scalar_loads_instead_of_vectorized": {
+      "description": "Using buffer_load_dword x4 instead of buffer_load_dwordx4",
+      "symptom": "4 consecutive scalar loads to contiguous addresses",
+      "fix": "Merge into single dwordx4 load",
+      "cycle_savings": "3 issue slots saved"
+    },
+    "full_wait_instead_of_partial": {
+      "description": "Using vmcnt(0) when only the most recent load is needed",
+      "symptom": "s_waitcnt vmcnt(0) with many loads in flight",
+      "fix": "Use vmcnt(N-1) where N is loads in flight",
+      "cycle_savings": "Proportional to load latency hiding opportunity"
+    },
+    "reduction_via_lds_within_wavefront": {
+      "description": "Using LDS for wavefront-level reductions instead of DPP butterfly",
+      "symptom": "ds_write_b32 + s_barrier + ds_read_b32 x16 for reduction within single wavefront",
+      "fix": "DPP row_shr:1,2,4,8 + row_bcast:15,31 butterfly reduction",
+      "cycle_savings": "~50-100 cycles (avoids LDS round-trip + barrier)"
+    }
+  },
+  "wavefront_synchronization": {
+    "implicit_sync": "All lanes in a wavefront execute in lockstep (SIMT). No explicit sync needed within a single wavefront.",
+    "s_barrier": "Synchronizes all wavefronts within a workgroup. Required before reading LDS written by other wavefronts.",
+    "s_waitcnt": "Waits for outstanding async operations (VMEM loads, LDS ops, exports). Not a sync primitive per se, but ensures data availability.",
+    "ds_bpermute": "Implicit LDS hardware sync - waits for the permute to complete (appears as lgkmcnt dependency).",
+    "key_insight": "DPP operates within a single wavefront and requires NO synchronization. LDS operations between wavefronts require s_barrier. This is why DPP is preferred for intra-wavefront communication."
+  }
+}

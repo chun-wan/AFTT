@@ -1,0 +1,2713 @@
+{
+  "comparisons": [
+    {
+      "comparison": "O0_vs_O3",
+      "description": "Effect of optimization level: no optimization vs aggressive optimization",
+      "template": "bank_conflict_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O0"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 146,
+        "removed_lines": 2138,
+        "baseline_counts": {
+          "total_lines": 1775,
+          "instructions": 1476,
+          "v_instructions": 739,
+          "s_instructions": 736,
+          "ds_instructions": 0,
+          "global_instructions": 1,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 81,
+          "barriers": 4,
+          "branches": 25
+        },
+        "variant_counts": {
+          "total_lines": 171,
+          "instructions": 68,
+          "v_instructions": 16,
+          "s_instructions": 48,
+          "ds_instructions": 2,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 1,
+          "branches": 0
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 1775,
+            "variant": 171,
+            "delta": -1604,
+            "pct_change": -90.4
+          },
+          "instructions": {
+            "baseline": 1476,
+            "variant": 68,
+            "delta": -1408,
+            "pct_change": -95.4
+          },
+          "v_instructions": {
+            "baseline": 739,
+            "variant": 16,
+            "delta": -723,
+            "pct_change": -97.8
+          },
+          "s_instructions": {
+            "baseline": 736,
+            "variant": 48,
+            "delta": -688,
+            "pct_change": -93.5
+          },
+          "ds_instructions": {
+            "baseline": 0,
+            "variant": 2,
+            "delta": 2,
+            "pct_change": 200.0
+          },
+          "global_instructions": {
+            "baseline": 1,
+            "variant": 2,
+            "delta": 1,
+            "pct_change": 100.0
+          },
+          "waitcnt": {
+            "baseline": 81,
+            "variant": 3,
+            "delta": -78,
+            "pct_change": -96.3
+          },
+          "barriers": {
+            "baseline": 4,
+            "variant": 1,
+            "delta": -3,
+            "pct_change": -75.0
+          },
+          "branches": {
+            "baseline": 25,
+            "variant": 0,
+            "delta": -25,
+            "pct_change": -100.0
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O0_vs_O3",
+      "description": "Effect of optimization level: no optimization vs aggressive optimization",
+      "template": "gemm_naive",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O0"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 228,
+        "removed_lines": 2131,
+        "baseline_counts": {
+          "total_lines": 1839,
+          "instructions": 1519,
+          "v_instructions": 812,
+          "s_instructions": 706,
+          "ds_instructions": 0,
+          "global_instructions": 1,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 69,
+          "barriers": 0,
+          "branches": 18
+        },
+        "variant_counts": {
+          "total_lines": 235,
+          "instructions": 120,
+          "v_instructions": 35,
+          "s_instructions": 82,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 1839,
+            "variant": 235,
+            "delta": -1604,
+            "pct_change": -87.2
+          },
+          "instructions": {
+            "baseline": 1519,
+            "variant": 120,
+            "delta": -1399,
+            "pct_change": -92.1
+          },
+          "v_instructions": {
+            "baseline": 812,
+            "variant": 35,
+            "delta": -777,
+            "pct_change": -95.7
+          },
+          "s_instructions": {
+            "baseline": 706,
+            "variant": 82,
+            "delta": -624,
+            "pct_change": -88.4
+          },
+          "global_instructions": {
+            "baseline": 1,
+            "variant": 3,
+            "delta": 2,
+            "pct_change": 200.0
+          },
+          "waitcnt": {
+            "baseline": 69,
+            "variant": 3,
+            "delta": -66,
+            "pct_change": -95.7
+          },
+          "branches": {
+            "baseline": 18,
+            "variant": 3,
+            "delta": -15,
+            "pct_change": -83.3
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O0_vs_O3",
+      "description": "Effect of optimization level: no optimization vs aggressive optimization",
+      "template": "gemm_tiled",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O0"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 346,
+        "removed_lines": 3383,
+        "baseline_counts": {
+          "total_lines": 2920,
+          "instructions": 2563,
+          "v_instructions": 1328,
+          "s_instructions": 1234,
+          "ds_instructions": 0,
+          "global_instructions": 1,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 94,
+          "barriers": 4,
+          "branches": 48
+        },
+        "variant_counts": {
+          "total_lines": 350,
+          "instructions": 235,
+          "v_instructions": 72,
+          "s_instructions": 146,
+          "ds_instructions": 14,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 9,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 2920,
+            "variant": 350,
+            "delta": -2570,
+            "pct_change": -88.0
+          },
+          "instructions": {
+            "baseline": 2563,
+            "variant": 235,
+            "delta": -2328,
+            "pct_change": -90.8
+          },
+          "v_instructions": {
+            "baseline": 1328,
+            "variant": 72,
+            "delta": -1256,
+            "pct_change": -94.6
+          },
+          "s_instructions": {
+            "baseline": 1234,
+            "variant": 146,
+            "delta": -1088,
+            "pct_change": -88.2
+          },
+          "ds_instructions": {
+            "baseline": 0,
+            "variant": 14,
+            "delta": 14,
+            "pct_change": 1400.0
+          },
+          "global_instructions": {
+            "baseline": 1,
+            "variant": 3,
+            "delta": 2,
+            "pct_change": 200.0
+          },
+          "waitcnt": {
+            "baseline": 94,
+            "variant": 9,
+            "delta": -85,
+            "pct_change": -90.4
+          },
+          "barriers": {
+            "baseline": 4,
+            "variant": 2,
+            "delta": -2,
+            "pct_change": -50.0
+          },
+          "branches": {
+            "baseline": 48,
+            "variant": 7,
+            "delta": -41,
+            "pct_change": -85.4
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O0_vs_O3",
+      "description": "Effect of optimization level: no optimization vs aggressive optimization",
+      "template": "layernorm",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O0"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 381,
+        "removed_lines": 3660,
+        "baseline_counts": {
+          "total_lines": 3217,
+          "instructions": 2816,
+          "v_instructions": 1404,
+          "s_instructions": 1411,
+          "ds_instructions": 0,
+          "global_instructions": 1,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 113,
+          "barriers": 4,
+          "branches": 52
+        },
+        "variant_counts": {
+          "total_lines": 395,
+          "instructions": 280,
+          "v_instructions": 92,
+          "s_instructions": 172,
+          "ds_instructions": 10,
+          "global_instructions": 6,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 3217,
+            "variant": 395,
+            "delta": -2822,
+            "pct_change": -87.7
+          },
+          "instructions": {
+            "baseline": 2816,
+            "variant": 280,
+            "delta": -2536,
+            "pct_change": -90.1
+          },
+          "v_instructions": {
+            "baseline": 1404,
+            "variant": 92,
+            "delta": -1312,
+            "pct_change": -93.4
+          },
+          "s_instructions": {
+            "baseline": 1411,
+            "variant": 172,
+            "delta": -1239,
+            "pct_change": -87.8
+          },
+          "ds_instructions": {
+            "baseline": 0,
+            "variant": 10,
+            "delta": 10,
+            "pct_change": 1000.0
+          },
+          "global_instructions": {
+            "baseline": 1,
+            "variant": 6,
+            "delta": 5,
+            "pct_change": 500.0
+          },
+          "waitcnt": {
+            "baseline": 113,
+            "variant": 12,
+            "delta": -101,
+            "pct_change": -89.4
+          },
+          "barriers": {
+            "baseline": 4,
+            "variant": 6,
+            "delta": 2,
+            "pct_change": 50.0
+          },
+          "branches": {
+            "baseline": 52,
+            "variant": 16,
+            "delta": -36,
+            "pct_change": -69.2
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O0_vs_O3",
+      "description": "Effect of optimization level: no optimization vs aggressive optimization",
+      "template": "matrix_transpose",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O0"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 548,
+        "removed_lines": 3011,
+        "baseline_counts": {
+          "total_lines": 2551,
+          "instructions": 2214,
+          "v_instructions": 1171,
+          "s_instructions": 1042,
+          "ds_instructions": 0,
+          "global_instructions": 1,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 91,
+          "barriers": 4,
+          "branches": 39
+        },
+        "variant_counts": {
+          "total_lines": 543,
+          "instructions": 436,
+          "v_instructions": 121,
+          "s_instructions": 299,
+          "ds_instructions": 8,
+          "global_instructions": 8,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 1,
+          "branches": 8
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 2551,
+            "variant": 543,
+            "delta": -2008,
+            "pct_change": -78.7
+          },
+          "instructions": {
+            "baseline": 2214,
+            "variant": 436,
+            "delta": -1778,
+            "pct_change": -80.3
+          },
+          "v_instructions": {
+            "baseline": 1171,
+            "variant": 121,
+            "delta": -1050,
+            "pct_change": -89.7
+          },
+          "s_instructions": {
+            "baseline": 1042,
+            "variant": 299,
+            "delta": -743,
+            "pct_change": -71.3
+          },
+          "ds_instructions": {
+            "baseline": 0,
+            "variant": 8,
+            "delta": 8,
+            "pct_change": 800.0
+          },
+          "global_instructions": {
+            "baseline": 1,
+            "variant": 8,
+            "delta": 7,
+            "pct_change": 700.0
+          },
+          "waitcnt": {
+            "baseline": 91,
+            "variant": 5,
+            "delta": -86,
+            "pct_change": -94.5
+          },
+          "barriers": {
+            "baseline": 4,
+            "variant": 1,
+            "delta": -3,
+            "pct_change": -75.0
+          },
+          "branches": {
+            "baseline": 39,
+            "variant": 8,
+            "delta": -31,
+            "pct_change": -79.5
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O0_vs_O3",
+      "description": "Effect of optimization level: no optimization vs aggressive optimization",
+      "template": "reduction_sum",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O0"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 216,
+        "removed_lines": 2490,
+        "baseline_counts": {
+          "total_lines": 2104,
+          "instructions": 1791,
+          "v_instructions": 874,
+          "s_instructions": 916,
+          "ds_instructions": 0,
+          "global_instructions": 1,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 87,
+          "barriers": 4,
+          "branches": 37
+        },
+        "variant_counts": {
+          "total_lines": 232,
+          "instructions": 129,
+          "v_instructions": 30,
+          "s_instructions": 92,
+          "ds_instructions": 5,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 2104,
+            "variant": 232,
+            "delta": -1872,
+            "pct_change": -89.0
+          },
+          "instructions": {
+            "baseline": 1791,
+            "variant": 129,
+            "delta": -1662,
+            "pct_change": -92.8
+          },
+          "v_instructions": {
+            "baseline": 874,
+            "variant": 30,
+            "delta": -844,
+            "pct_change": -96.6
+          },
+          "s_instructions": {
+            "baseline": 916,
+            "variant": 92,
+            "delta": -824,
+            "pct_change": -90.0
+          },
+          "ds_instructions": {
+            "baseline": 0,
+            "variant": 5,
+            "delta": 5,
+            "pct_change": 500.0
+          },
+          "global_instructions": {
+            "baseline": 1,
+            "variant": 2,
+            "delta": 1,
+            "pct_change": 100.0
+          },
+          "waitcnt": {
+            "baseline": 87,
+            "variant": 5,
+            "delta": -82,
+            "pct_change": -94.3
+          },
+          "barriers": {
+            "baseline": 4,
+            "variant": 2,
+            "delta": -2,
+            "pct_change": -50.0
+          },
+          "branches": {
+            "baseline": 37,
+            "variant": 7,
+            "delta": -30,
+            "pct_change": -81.1
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O0_vs_O3",
+      "description": "Effect of optimization level: no optimization vs aggressive optimization",
+      "template": "softmax",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O0"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 372,
+        "removed_lines": 3594,
+        "baseline_counts": {
+          "total_lines": 3157,
+          "instructions": 2774,
+          "v_instructions": 1369,
+          "s_instructions": 1404,
+          "ds_instructions": 0,
+          "global_instructions": 1,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 115,
+          "barriers": 4,
+          "branches": 52
+        },
+        "variant_counts": {
+          "total_lines": 391,
+          "instructions": 288,
+          "v_instructions": 105,
+          "s_instructions": 169,
+          "ds_instructions": 10,
+          "global_instructions": 4,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 3157,
+            "variant": 391,
+            "delta": -2766,
+            "pct_change": -87.6
+          },
+          "instructions": {
+            "baseline": 2774,
+            "variant": 288,
+            "delta": -2486,
+            "pct_change": -89.6
+          },
+          "v_instructions": {
+            "baseline": 1369,
+            "variant": 105,
+            "delta": -1264,
+            "pct_change": -92.3
+          },
+          "s_instructions": {
+            "baseline": 1404,
+            "variant": 169,
+            "delta": -1235,
+            "pct_change": -88.0
+          },
+          "ds_instructions": {
+            "baseline": 0,
+            "variant": 10,
+            "delta": 10,
+            "pct_change": 1000.0
+          },
+          "global_instructions": {
+            "baseline": 1,
+            "variant": 4,
+            "delta": 3,
+            "pct_change": 300.0
+          },
+          "waitcnt": {
+            "baseline": 115,
+            "variant": 12,
+            "delta": -103,
+            "pct_change": -89.6
+          },
+          "barriers": {
+            "baseline": 4,
+            "variant": 6,
+            "delta": 2,
+            "pct_change": 50.0
+          },
+          "branches": {
+            "baseline": 52,
+            "variant": 16,
+            "delta": -36,
+            "pct_change": -69.2
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O0_vs_O3",
+      "description": "Effect of optimization level: no optimization vs aggressive optimization",
+      "template": "uncoalesced_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O0"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 164,
+        "removed_lines": 1880,
+        "baseline_counts": {
+          "total_lines": 1637,
+          "instructions": 1338,
+          "v_instructions": 685,
+          "s_instructions": 652,
+          "ds_instructions": 0,
+          "global_instructions": 1,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 67,
+          "barriers": 0,
+          "branches": 17
+        },
+        "variant_counts": {
+          "total_lines": 187,
+          "instructions": 80,
+          "v_instructions": 22,
+          "s_instructions": 56,
+          "ds_instructions": 0,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 1637,
+            "variant": 187,
+            "delta": -1450,
+            "pct_change": -88.6
+          },
+          "instructions": {
+            "baseline": 1338,
+            "variant": 80,
+            "delta": -1258,
+            "pct_change": -94.0
+          },
+          "v_instructions": {
+            "baseline": 685,
+            "variant": 22,
+            "delta": -663,
+            "pct_change": -96.8
+          },
+          "s_instructions": {
+            "baseline": 652,
+            "variant": 56,
+            "delta": -596,
+            "pct_change": -91.4
+          },
+          "global_instructions": {
+            "baseline": 1,
+            "variant": 2,
+            "delta": 1,
+            "pct_change": 100.0
+          },
+          "waitcnt": {
+            "baseline": 67,
+            "variant": 3,
+            "delta": -64,
+            "pct_change": -95.5
+          },
+          "branches": {
+            "baseline": 17,
+            "variant": 3,
+            "delta": -14,
+            "pct_change": -82.4
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O0_vs_O3",
+      "description": "Effect of optimization level: no optimization vs aggressive optimization",
+      "template": "vector_add",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O0"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 158,
+        "removed_lines": 1712,
+        "baseline_counts": {
+          "total_lines": 1478,
+          "instructions": 1187,
+          "v_instructions": 604,
+          "s_instructions": 582,
+          "ds_instructions": 0,
+          "global_instructions": 1,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 66,
+          "barriers": 0,
+          "branches": 9
+        },
+        "variant_counts": {
+          "total_lines": 178,
+          "instructions": 71,
+          "v_instructions": 17,
+          "s_instructions": 51,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 2,
+          "barriers": 0,
+          "branches": 1
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 1478,
+            "variant": 178,
+            "delta": -1300,
+            "pct_change": -88.0
+          },
+          "instructions": {
+            "baseline": 1187,
+            "variant": 71,
+            "delta": -1116,
+            "pct_change": -94.0
+          },
+          "v_instructions": {
+            "baseline": 604,
+            "variant": 17,
+            "delta": -587,
+            "pct_change": -97.2
+          },
+          "s_instructions": {
+            "baseline": 582,
+            "variant": 51,
+            "delta": -531,
+            "pct_change": -91.2
+          },
+          "global_instructions": {
+            "baseline": 1,
+            "variant": 3,
+            "delta": 2,
+            "pct_change": 200.0
+          },
+          "waitcnt": {
+            "baseline": 66,
+            "variant": 2,
+            "delta": -64,
+            "pct_change": -97.0
+          },
+          "branches": {
+            "baseline": 9,
+            "variant": 1,
+            "delta": -8,
+            "pct_change": -88.9
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O2_vs_O3",
+      "description": "Marginal improvement from O2 to O3",
+      "template": "bank_conflict_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O2"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 171,
+          "instructions": 68,
+          "v_instructions": 16,
+          "s_instructions": 48,
+          "ds_instructions": 2,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 1,
+          "branches": 0
+        },
+        "variant_counts": {
+          "total_lines": 171,
+          "instructions": 68,
+          "v_instructions": 16,
+          "s_instructions": 48,
+          "ds_instructions": 2,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 1,
+          "branches": 0
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O2_vs_O3",
+      "description": "Marginal improvement from O2 to O3",
+      "template": "gemm_naive",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O2"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 235,
+          "instructions": 120,
+          "v_instructions": 35,
+          "s_instructions": 82,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "variant_counts": {
+          "total_lines": 235,
+          "instructions": 120,
+          "v_instructions": 35,
+          "s_instructions": 82,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O2_vs_O3",
+      "description": "Marginal improvement from O2 to O3",
+      "template": "gemm_tiled",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O2"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 350,
+          "instructions": 235,
+          "v_instructions": 72,
+          "s_instructions": 146,
+          "ds_instructions": 14,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 9,
+          "barriers": 2,
+          "branches": 7
+        },
+        "variant_counts": {
+          "total_lines": 350,
+          "instructions": 235,
+          "v_instructions": 72,
+          "s_instructions": 146,
+          "ds_instructions": 14,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 9,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O2_vs_O3",
+      "description": "Marginal improvement from O2 to O3",
+      "template": "layernorm",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O2"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 395,
+          "instructions": 280,
+          "v_instructions": 92,
+          "s_instructions": 172,
+          "ds_instructions": 10,
+          "global_instructions": 6,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "variant_counts": {
+          "total_lines": 395,
+          "instructions": 280,
+          "v_instructions": 92,
+          "s_instructions": 172,
+          "ds_instructions": 10,
+          "global_instructions": 6,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O2_vs_O3",
+      "description": "Marginal improvement from O2 to O3",
+      "template": "matrix_transpose",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O2"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 543,
+          "instructions": 436,
+          "v_instructions": 121,
+          "s_instructions": 299,
+          "ds_instructions": 8,
+          "global_instructions": 8,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 1,
+          "branches": 8
+        },
+        "variant_counts": {
+          "total_lines": 543,
+          "instructions": 436,
+          "v_instructions": 121,
+          "s_instructions": 299,
+          "ds_instructions": 8,
+          "global_instructions": 8,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 1,
+          "branches": 8
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O2_vs_O3",
+      "description": "Marginal improvement from O2 to O3",
+      "template": "reduction_sum",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O2"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 232,
+          "instructions": 129,
+          "v_instructions": 30,
+          "s_instructions": 92,
+          "ds_instructions": 5,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 2,
+          "branches": 7
+        },
+        "variant_counts": {
+          "total_lines": 232,
+          "instructions": 129,
+          "v_instructions": 30,
+          "s_instructions": 92,
+          "ds_instructions": 5,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O2_vs_O3",
+      "description": "Marginal improvement from O2 to O3",
+      "template": "softmax",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O2"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 391,
+          "instructions": 288,
+          "v_instructions": 105,
+          "s_instructions": 169,
+          "ds_instructions": 10,
+          "global_instructions": 4,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "variant_counts": {
+          "total_lines": 391,
+          "instructions": 288,
+          "v_instructions": 105,
+          "s_instructions": 169,
+          "ds_instructions": 10,
+          "global_instructions": 4,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O2_vs_O3",
+      "description": "Marginal improvement from O2 to O3",
+      "template": "uncoalesced_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O2"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 187,
+          "instructions": 80,
+          "v_instructions": 22,
+          "s_instructions": 56,
+          "ds_instructions": 0,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "variant_counts": {
+          "total_lines": 187,
+          "instructions": 80,
+          "v_instructions": 22,
+          "s_instructions": 56,
+          "ds_instructions": 0,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O2_vs_O3",
+      "description": "Marginal improvement from O2 to O3",
+      "template": "vector_add",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O2"
+      ],
+      "variant_flags": [
+        "-O3"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 178,
+          "instructions": 71,
+          "v_instructions": 17,
+          "s_instructions": 51,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 2,
+          "barriers": 0,
+          "branches": 1
+        },
+        "variant_counts": {
+          "total_lines": 178,
+          "instructions": 71,
+          "v_instructions": 17,
+          "s_instructions": 51,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 2,
+          "barriers": 0,
+          "branches": 1
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_Ofast",
+      "description": "Effect of -Ofast (enables unsafe math optimizations)",
+      "template": "bank_conflict_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-Ofast"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 171,
+          "instructions": 68,
+          "v_instructions": 16,
+          "s_instructions": 48,
+          "ds_instructions": 2,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 1,
+          "branches": 0
+        },
+        "variant_counts": {
+          "total_lines": 171,
+          "instructions": 68,
+          "v_instructions": 16,
+          "s_instructions": 48,
+          "ds_instructions": 2,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 1,
+          "branches": 0
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_Ofast",
+      "description": "Effect of -Ofast (enables unsafe math optimizations)",
+      "template": "gemm_naive",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-Ofast"
+      ],
+      "analysis": {
+        "added_lines": 114,
+        "removed_lines": 47,
+        "baseline_counts": {
+          "total_lines": 235,
+          "instructions": 120,
+          "v_instructions": 35,
+          "s_instructions": 82,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "variant_counts": {
+          "total_lines": 293,
+          "instructions": 178,
+          "v_instructions": 58,
+          "s_instructions": 115,
+          "ds_instructions": 0,
+          "global_instructions": 5,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 0,
+          "branches": 11
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 235,
+            "variant": 293,
+            "delta": 58,
+            "pct_change": 24.7
+          },
+          "instructions": {
+            "baseline": 120,
+            "variant": 178,
+            "delta": 58,
+            "pct_change": 48.3
+          },
+          "v_instructions": {
+            "baseline": 35,
+            "variant": 58,
+            "delta": 23,
+            "pct_change": 65.7
+          },
+          "s_instructions": {
+            "baseline": 82,
+            "variant": 115,
+            "delta": 33,
+            "pct_change": 40.2
+          },
+          "global_instructions": {
+            "baseline": 3,
+            "variant": 5,
+            "delta": 2,
+            "pct_change": 66.7
+          },
+          "waitcnt": {
+            "baseline": 3,
+            "variant": 5,
+            "delta": 2,
+            "pct_change": 66.7
+          },
+          "branches": {
+            "baseline": 3,
+            "variant": 11,
+            "delta": 8,
+            "pct_change": 266.7
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O3_vs_Ofast",
+      "description": "Effect of -Ofast (enables unsafe math optimizations)",
+      "template": "gemm_tiled",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-Ofast"
+      ],
+      "analysis": {
+        "added_lines": 35,
+        "removed_lines": 35,
+        "baseline_counts": {
+          "total_lines": 350,
+          "instructions": 235,
+          "v_instructions": 72,
+          "s_instructions": 146,
+          "ds_instructions": 14,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 9,
+          "barriers": 2,
+          "branches": 7
+        },
+        "variant_counts": {
+          "total_lines": 350,
+          "instructions": 235,
+          "v_instructions": 72,
+          "s_instructions": 146,
+          "ds_instructions": 14,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 9,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_Ofast",
+      "description": "Effect of -Ofast (enables unsafe math optimizations)",
+      "template": "layernorm",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-Ofast"
+      ],
+      "analysis": {
+        "added_lines": 34,
+        "removed_lines": 52,
+        "baseline_counts": {
+          "total_lines": 395,
+          "instructions": 280,
+          "v_instructions": 92,
+          "s_instructions": 172,
+          "ds_instructions": 10,
+          "global_instructions": 6,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "variant_counts": {
+          "total_lines": 377,
+          "instructions": 262,
+          "v_instructions": 73,
+          "s_instructions": 173,
+          "ds_instructions": 10,
+          "global_instructions": 6,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 13,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 395,
+            "variant": 377,
+            "delta": -18,
+            "pct_change": -4.6
+          },
+          "instructions": {
+            "baseline": 280,
+            "variant": 262,
+            "delta": -18,
+            "pct_change": -6.4
+          },
+          "v_instructions": {
+            "baseline": 92,
+            "variant": 73,
+            "delta": -19,
+            "pct_change": -20.7
+          },
+          "s_instructions": {
+            "baseline": 172,
+            "variant": 173,
+            "delta": 1,
+            "pct_change": 0.6
+          },
+          "waitcnt": {
+            "baseline": 12,
+            "variant": 13,
+            "delta": 1,
+            "pct_change": 8.3
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O3_vs_Ofast",
+      "description": "Effect of -Ofast (enables unsafe math optimizations)",
+      "template": "matrix_transpose",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-Ofast"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 543,
+          "instructions": 436,
+          "v_instructions": 121,
+          "s_instructions": 299,
+          "ds_instructions": 8,
+          "global_instructions": 8,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 1,
+          "branches": 8
+        },
+        "variant_counts": {
+          "total_lines": 543,
+          "instructions": 436,
+          "v_instructions": 121,
+          "s_instructions": 299,
+          "ds_instructions": 8,
+          "global_instructions": 8,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 1,
+          "branches": 8
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_Ofast",
+      "description": "Effect of -Ofast (enables unsafe math optimizations)",
+      "template": "reduction_sum",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-Ofast"
+      ],
+      "analysis": {
+        "added_lines": 20,
+        "removed_lines": 20,
+        "baseline_counts": {
+          "total_lines": 232,
+          "instructions": 129,
+          "v_instructions": 30,
+          "s_instructions": 92,
+          "ds_instructions": 5,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 2,
+          "branches": 7
+        },
+        "variant_counts": {
+          "total_lines": 232,
+          "instructions": 129,
+          "v_instructions": 30,
+          "s_instructions": 92,
+          "ds_instructions": 5,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_Ofast",
+      "description": "Effect of -Ofast (enables unsafe math optimizations)",
+      "template": "softmax",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-Ofast"
+      ],
+      "analysis": {
+        "added_lines": 50,
+        "removed_lines": 82,
+        "baseline_counts": {
+          "total_lines": 391,
+          "instructions": 288,
+          "v_instructions": 105,
+          "s_instructions": 169,
+          "ds_instructions": 10,
+          "global_instructions": 4,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "variant_counts": {
+          "total_lines": 359,
+          "instructions": 256,
+          "v_instructions": 78,
+          "s_instructions": 164,
+          "ds_instructions": 10,
+          "global_instructions": 4,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 11,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 391,
+            "variant": 359,
+            "delta": -32,
+            "pct_change": -8.2
+          },
+          "instructions": {
+            "baseline": 288,
+            "variant": 256,
+            "delta": -32,
+            "pct_change": -11.1
+          },
+          "v_instructions": {
+            "baseline": 105,
+            "variant": 78,
+            "delta": -27,
+            "pct_change": -25.7
+          },
+          "s_instructions": {
+            "baseline": 169,
+            "variant": 164,
+            "delta": -5,
+            "pct_change": -3.0
+          },
+          "waitcnt": {
+            "baseline": 12,
+            "variant": 11,
+            "delta": -1,
+            "pct_change": -8.3
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O3_vs_Ofast",
+      "description": "Effect of -Ofast (enables unsafe math optimizations)",
+      "template": "uncoalesced_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-Ofast"
+      ],
+      "analysis": {
+        "added_lines": 113,
+        "removed_lines": 48,
+        "baseline_counts": {
+          "total_lines": 187,
+          "instructions": 80,
+          "v_instructions": 22,
+          "s_instructions": 56,
+          "ds_instructions": 0,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "variant_counts": {
+          "total_lines": 243,
+          "instructions": 136,
+          "v_instructions": 44,
+          "s_instructions": 89,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 0,
+          "branches": 11
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 187,
+            "variant": 243,
+            "delta": 56,
+            "pct_change": 29.9
+          },
+          "instructions": {
+            "baseline": 80,
+            "variant": 136,
+            "delta": 56,
+            "pct_change": 70.0
+          },
+          "v_instructions": {
+            "baseline": 22,
+            "variant": 44,
+            "delta": 22,
+            "pct_change": 100.0
+          },
+          "s_instructions": {
+            "baseline": 56,
+            "variant": 89,
+            "delta": 33,
+            "pct_change": 58.9
+          },
+          "global_instructions": {
+            "baseline": 2,
+            "variant": 3,
+            "delta": 1,
+            "pct_change": 50.0
+          },
+          "waitcnt": {
+            "baseline": 3,
+            "variant": 5,
+            "delta": 2,
+            "pct_change": 66.7
+          },
+          "branches": {
+            "baseline": 3,
+            "variant": 11,
+            "delta": 8,
+            "pct_change": 266.7
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O3_vs_Ofast",
+      "description": "Effect of -Ofast (enables unsafe math optimizations)",
+      "template": "vector_add",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-Ofast"
+      ],
+      "analysis": {
+        "added_lines": 20,
+        "removed_lines": 20,
+        "baseline_counts": {
+          "total_lines": 178,
+          "instructions": 71,
+          "v_instructions": 17,
+          "s_instructions": 51,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 2,
+          "barriers": 0,
+          "branches": 1
+        },
+        "variant_counts": {
+          "total_lines": 178,
+          "instructions": 71,
+          "v_instructions": 17,
+          "s_instructions": 51,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 2,
+          "barriers": 0,
+          "branches": 1
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_fast_math",
+      "description": "Effect of -ffast-math flag",
+      "template": "bank_conflict_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-ffast-math"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 171,
+          "instructions": 68,
+          "v_instructions": 16,
+          "s_instructions": 48,
+          "ds_instructions": 2,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 1,
+          "branches": 0
+        },
+        "variant_counts": {
+          "total_lines": 171,
+          "instructions": 68,
+          "v_instructions": 16,
+          "s_instructions": 48,
+          "ds_instructions": 2,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 1,
+          "branches": 0
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_fast_math",
+      "description": "Effect of -ffast-math flag",
+      "template": "gemm_naive",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-ffast-math"
+      ],
+      "analysis": {
+        "added_lines": 114,
+        "removed_lines": 47,
+        "baseline_counts": {
+          "total_lines": 235,
+          "instructions": 120,
+          "v_instructions": 35,
+          "s_instructions": 82,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "variant_counts": {
+          "total_lines": 293,
+          "instructions": 178,
+          "v_instructions": 58,
+          "s_instructions": 115,
+          "ds_instructions": 0,
+          "global_instructions": 5,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 0,
+          "branches": 11
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 235,
+            "variant": 293,
+            "delta": 58,
+            "pct_change": 24.7
+          },
+          "instructions": {
+            "baseline": 120,
+            "variant": 178,
+            "delta": 58,
+            "pct_change": 48.3
+          },
+          "v_instructions": {
+            "baseline": 35,
+            "variant": 58,
+            "delta": 23,
+            "pct_change": 65.7
+          },
+          "s_instructions": {
+            "baseline": 82,
+            "variant": 115,
+            "delta": 33,
+            "pct_change": 40.2
+          },
+          "global_instructions": {
+            "baseline": 3,
+            "variant": 5,
+            "delta": 2,
+            "pct_change": 66.7
+          },
+          "waitcnt": {
+            "baseline": 3,
+            "variant": 5,
+            "delta": 2,
+            "pct_change": 66.7
+          },
+          "branches": {
+            "baseline": 3,
+            "variant": 11,
+            "delta": 8,
+            "pct_change": 266.7
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O3_vs_fast_math",
+      "description": "Effect of -ffast-math flag",
+      "template": "gemm_tiled",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-ffast-math"
+      ],
+      "analysis": {
+        "added_lines": 35,
+        "removed_lines": 35,
+        "baseline_counts": {
+          "total_lines": 350,
+          "instructions": 235,
+          "v_instructions": 72,
+          "s_instructions": 146,
+          "ds_instructions": 14,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 9,
+          "barriers": 2,
+          "branches": 7
+        },
+        "variant_counts": {
+          "total_lines": 350,
+          "instructions": 235,
+          "v_instructions": 72,
+          "s_instructions": 146,
+          "ds_instructions": 14,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 9,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_fast_math",
+      "description": "Effect of -ffast-math flag",
+      "template": "layernorm",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-ffast-math"
+      ],
+      "analysis": {
+        "added_lines": 34,
+        "removed_lines": 52,
+        "baseline_counts": {
+          "total_lines": 395,
+          "instructions": 280,
+          "v_instructions": 92,
+          "s_instructions": 172,
+          "ds_instructions": 10,
+          "global_instructions": 6,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "variant_counts": {
+          "total_lines": 377,
+          "instructions": 262,
+          "v_instructions": 73,
+          "s_instructions": 173,
+          "ds_instructions": 10,
+          "global_instructions": 6,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 13,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 395,
+            "variant": 377,
+            "delta": -18,
+            "pct_change": -4.6
+          },
+          "instructions": {
+            "baseline": 280,
+            "variant": 262,
+            "delta": -18,
+            "pct_change": -6.4
+          },
+          "v_instructions": {
+            "baseline": 92,
+            "variant": 73,
+            "delta": -19,
+            "pct_change": -20.7
+          },
+          "s_instructions": {
+            "baseline": 172,
+            "variant": 173,
+            "delta": 1,
+            "pct_change": 0.6
+          },
+          "waitcnt": {
+            "baseline": 12,
+            "variant": 13,
+            "delta": 1,
+            "pct_change": 8.3
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O3_vs_fast_math",
+      "description": "Effect of -ffast-math flag",
+      "template": "matrix_transpose",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-ffast-math"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 543,
+          "instructions": 436,
+          "v_instructions": 121,
+          "s_instructions": 299,
+          "ds_instructions": 8,
+          "global_instructions": 8,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 1,
+          "branches": 8
+        },
+        "variant_counts": {
+          "total_lines": 543,
+          "instructions": 436,
+          "v_instructions": 121,
+          "s_instructions": 299,
+          "ds_instructions": 8,
+          "global_instructions": 8,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 1,
+          "branches": 8
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_fast_math",
+      "description": "Effect of -ffast-math flag",
+      "template": "reduction_sum",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-ffast-math"
+      ],
+      "analysis": {
+        "added_lines": 20,
+        "removed_lines": 20,
+        "baseline_counts": {
+          "total_lines": 232,
+          "instructions": 129,
+          "v_instructions": 30,
+          "s_instructions": 92,
+          "ds_instructions": 5,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 2,
+          "branches": 7
+        },
+        "variant_counts": {
+          "total_lines": 232,
+          "instructions": 129,
+          "v_instructions": 30,
+          "s_instructions": 92,
+          "ds_instructions": 5,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_fast_math",
+      "description": "Effect of -ffast-math flag",
+      "template": "softmax",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-ffast-math"
+      ],
+      "analysis": {
+        "added_lines": 50,
+        "removed_lines": 82,
+        "baseline_counts": {
+          "total_lines": 391,
+          "instructions": 288,
+          "v_instructions": 105,
+          "s_instructions": 169,
+          "ds_instructions": 10,
+          "global_instructions": 4,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "variant_counts": {
+          "total_lines": 359,
+          "instructions": 256,
+          "v_instructions": 78,
+          "s_instructions": 164,
+          "ds_instructions": 10,
+          "global_instructions": 4,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 11,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 391,
+            "variant": 359,
+            "delta": -32,
+            "pct_change": -8.2
+          },
+          "instructions": {
+            "baseline": 288,
+            "variant": 256,
+            "delta": -32,
+            "pct_change": -11.1
+          },
+          "v_instructions": {
+            "baseline": 105,
+            "variant": 78,
+            "delta": -27,
+            "pct_change": -25.7
+          },
+          "s_instructions": {
+            "baseline": 169,
+            "variant": 164,
+            "delta": -5,
+            "pct_change": -3.0
+          },
+          "waitcnt": {
+            "baseline": 12,
+            "variant": 11,
+            "delta": -1,
+            "pct_change": -8.3
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O3_vs_fast_math",
+      "description": "Effect of -ffast-math flag",
+      "template": "uncoalesced_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-ffast-math"
+      ],
+      "analysis": {
+        "added_lines": 113,
+        "removed_lines": 48,
+        "baseline_counts": {
+          "total_lines": 187,
+          "instructions": 80,
+          "v_instructions": 22,
+          "s_instructions": 56,
+          "ds_instructions": 0,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "variant_counts": {
+          "total_lines": 243,
+          "instructions": 136,
+          "v_instructions": 44,
+          "s_instructions": 89,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 0,
+          "branches": 11
+        },
+        "count_diffs": {
+          "total_lines": {
+            "baseline": 187,
+            "variant": 243,
+            "delta": 56,
+            "pct_change": 29.9
+          },
+          "instructions": {
+            "baseline": 80,
+            "variant": 136,
+            "delta": 56,
+            "pct_change": 70.0
+          },
+          "v_instructions": {
+            "baseline": 22,
+            "variant": 44,
+            "delta": 22,
+            "pct_change": 100.0
+          },
+          "s_instructions": {
+            "baseline": 56,
+            "variant": 89,
+            "delta": 33,
+            "pct_change": 58.9
+          },
+          "global_instructions": {
+            "baseline": 2,
+            "variant": 3,
+            "delta": 1,
+            "pct_change": 50.0
+          },
+          "waitcnt": {
+            "baseline": 3,
+            "variant": 5,
+            "delta": 2,
+            "pct_change": 66.7
+          },
+          "branches": {
+            "baseline": 3,
+            "variant": 11,
+            "delta": 8,
+            "pct_change": 266.7
+          }
+        }
+      }
+    },
+    {
+      "comparison": "O3_vs_fast_math",
+      "description": "Effect of -ffast-math flag",
+      "template": "vector_add",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-ffast-math"
+      ],
+      "analysis": {
+        "added_lines": 20,
+        "removed_lines": 20,
+        "baseline_counts": {
+          "total_lines": 178,
+          "instructions": 71,
+          "v_instructions": 17,
+          "s_instructions": 51,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 2,
+          "barriers": 0,
+          "branches": 1
+        },
+        "variant_counts": {
+          "total_lines": 178,
+          "instructions": 71,
+          "v_instructions": 17,
+          "s_instructions": 51,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 2,
+          "barriers": 0,
+          "branches": 1
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_unroll",
+      "description": "Effect of aggressive loop unrolling",
+      "template": "bank_conflict_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-funroll-loops"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 171,
+          "instructions": 68,
+          "v_instructions": 16,
+          "s_instructions": 48,
+          "ds_instructions": 2,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 1,
+          "branches": 0
+        },
+        "variant_counts": {
+          "total_lines": 171,
+          "instructions": 68,
+          "v_instructions": 16,
+          "s_instructions": 48,
+          "ds_instructions": 2,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 1,
+          "branches": 0
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_unroll",
+      "description": "Effect of aggressive loop unrolling",
+      "template": "gemm_naive",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-funroll-loops"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 235,
+          "instructions": 120,
+          "v_instructions": 35,
+          "s_instructions": 82,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "variant_counts": {
+          "total_lines": 235,
+          "instructions": 120,
+          "v_instructions": 35,
+          "s_instructions": 82,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_unroll",
+      "description": "Effect of aggressive loop unrolling",
+      "template": "gemm_tiled",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-funroll-loops"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 350,
+          "instructions": 235,
+          "v_instructions": 72,
+          "s_instructions": 146,
+          "ds_instructions": 14,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 9,
+          "barriers": 2,
+          "branches": 7
+        },
+        "variant_counts": {
+          "total_lines": 350,
+          "instructions": 235,
+          "v_instructions": 72,
+          "s_instructions": 146,
+          "ds_instructions": 14,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 9,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_unroll",
+      "description": "Effect of aggressive loop unrolling",
+      "template": "layernorm",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-funroll-loops"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 395,
+          "instructions": 280,
+          "v_instructions": 92,
+          "s_instructions": 172,
+          "ds_instructions": 10,
+          "global_instructions": 6,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "variant_counts": {
+          "total_lines": 395,
+          "instructions": 280,
+          "v_instructions": 92,
+          "s_instructions": 172,
+          "ds_instructions": 10,
+          "global_instructions": 6,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_unroll",
+      "description": "Effect of aggressive loop unrolling",
+      "template": "matrix_transpose",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-funroll-loops"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 543,
+          "instructions": 436,
+          "v_instructions": 121,
+          "s_instructions": 299,
+          "ds_instructions": 8,
+          "global_instructions": 8,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 1,
+          "branches": 8
+        },
+        "variant_counts": {
+          "total_lines": 543,
+          "instructions": 436,
+          "v_instructions": 121,
+          "s_instructions": 299,
+          "ds_instructions": 8,
+          "global_instructions": 8,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 1,
+          "branches": 8
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_unroll",
+      "description": "Effect of aggressive loop unrolling",
+      "template": "reduction_sum",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-funroll-loops"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 232,
+          "instructions": 129,
+          "v_instructions": 30,
+          "s_instructions": 92,
+          "ds_instructions": 5,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 2,
+          "branches": 7
+        },
+        "variant_counts": {
+          "total_lines": 232,
+          "instructions": 129,
+          "v_instructions": 30,
+          "s_instructions": 92,
+          "ds_instructions": 5,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 5,
+          "barriers": 2,
+          "branches": 7
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_unroll",
+      "description": "Effect of aggressive loop unrolling",
+      "template": "softmax",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-funroll-loops"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 391,
+          "instructions": 288,
+          "v_instructions": 105,
+          "s_instructions": 169,
+          "ds_instructions": 10,
+          "global_instructions": 4,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "variant_counts": {
+          "total_lines": 391,
+          "instructions": 288,
+          "v_instructions": 105,
+          "s_instructions": 169,
+          "ds_instructions": 10,
+          "global_instructions": 4,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 12,
+          "barriers": 6,
+          "branches": 16
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_unroll",
+      "description": "Effect of aggressive loop unrolling",
+      "template": "uncoalesced_bad",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-funroll-loops"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 187,
+          "instructions": 80,
+          "v_instructions": 22,
+          "s_instructions": 56,
+          "ds_instructions": 0,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "variant_counts": {
+          "total_lines": 187,
+          "instructions": 80,
+          "v_instructions": 22,
+          "s_instructions": 56,
+          "ds_instructions": 0,
+          "global_instructions": 2,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 3,
+          "barriers": 0,
+          "branches": 3
+        },
+        "count_diffs": {}
+      }
+    },
+    {
+      "comparison": "O3_vs_unroll",
+      "description": "Effect of aggressive loop unrolling",
+      "template": "vector_add",
+      "arch": "gfx942",
+      "baseline_flags": [
+        "-O3"
+      ],
+      "variant_flags": [
+        "-O3",
+        "-funroll-loops"
+      ],
+      "analysis": {
+        "added_lines": 19,
+        "removed_lines": 19,
+        "baseline_counts": {
+          "total_lines": 178,
+          "instructions": 71,
+          "v_instructions": 17,
+          "s_instructions": 51,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 2,
+          "barriers": 0,
+          "branches": 1
+        },
+        "variant_counts": {
+          "total_lines": 178,
+          "instructions": 71,
+          "v_instructions": 17,
+          "s_instructions": 51,
+          "ds_instructions": 0,
+          "global_instructions": 3,
+          "buffer_instructions": 0,
+          "mfma_instructions": 0,
+          "waitcnt": 2,
+          "barriers": 0,
+          "branches": 1
+        },
+        "count_diffs": {}
+      }
+    }
+  ],
+  "arch": "gfx942"
+}

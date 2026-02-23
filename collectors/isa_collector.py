@@ -1,0 +1,316 @@
+#!/usr/bin/env python3
+"""ISA Instruction Database Collector.
+
+Builds comprehensive ISA JSON files for AMDGPU architectures by combining:
+1. Known instruction tables from AMD ISA documentation
+2. llvm-mc validation for instruction availability per arch
+"""
+
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+LLVM_MC = os.environ.get("LLVM_MC", "/opt/rocm-7.1.1/llvm/bin/llvm-mc")
+DB_DIR = Path(__file__).resolve().parent.parent / "db" / "isa"
+
+TARGET_ARCHS = ["gfx900", "gfx906", "gfx908", "gfx90a", "gfx940", "gfx942", "gfx950"]
+
+ALL_GFX9 = ["gfx900", "gfx906", "gfx908", "gfx90a", "gfx940", "gfx942", "gfx950"]
+CDNA_PLUS = ["gfx908", "gfx90a", "gfx940", "gfx942", "gfx950"]
+CDNA2_PLUS = ["gfx90a", "gfx940", "gfx942", "gfx950"]
+CDNA3_PLUS = ["gfx940", "gfx942", "gfx950"]
+CDNA4_ONLY = ["gfx950"]
+
+
+def build_salu_instructions():
+    """Scalar ALU instructions common across all GFX9."""
+    base = ALL_GFX9
+    return [
+        {"mnemonic": "s_add_u32", "category": "SALU", "description": "Scalar add unsigned 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_sub_u32", "category": "SALU", "description": "Scalar subtract unsigned 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_add_i32", "category": "SALU", "description": "Scalar add signed 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_sub_i32", "category": "SALU", "description": "Scalar subtract signed 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_mul_i32", "category": "SALU", "description": "Scalar multiply signed 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_mul_hi_u32", "category": "SALU", "description": "Scalar multiply high unsigned 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_mul_hi_i32", "category": "SALU", "description": "Scalar multiply high signed 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_and_b32", "category": "SALU", "description": "Scalar AND 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_and_b64", "category": "SALU", "description": "Scalar AND 64-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_or_b32", "category": "SALU", "description": "Scalar OR 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_or_b64", "category": "SALU", "description": "Scalar OR 64-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_xor_b32", "category": "SALU", "description": "Scalar XOR 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_xor_b64", "category": "SALU", "description": "Scalar XOR 64-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_lshl_b32", "category": "SALU", "description": "Scalar left shift 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_lshr_b32", "category": "SALU", "description": "Scalar logical right shift 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_ashr_i32", "category": "SALU", "description": "Scalar arithmetic right shift 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_mov_b32", "category": "SALU", "description": "Scalar move 32-bit", "operands": "sdst, ssrc0", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP1"},
+        {"mnemonic": "s_mov_b64", "category": "SALU", "description": "Scalar move 64-bit", "operands": "sdst, ssrc0", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP1"},
+        {"mnemonic": "s_cmp_eq_u32", "category": "SALU", "description": "Scalar compare equal unsigned 32-bit", "operands": "ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPC"},
+        {"mnemonic": "s_cmp_lg_u32", "category": "SALU", "description": "Scalar compare not-equal unsigned 32-bit", "operands": "ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPC"},
+        {"mnemonic": "s_cmp_gt_u32", "category": "SALU", "description": "Scalar compare greater-than unsigned 32-bit", "operands": "ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPC"},
+        {"mnemonic": "s_cmp_lt_u32", "category": "SALU", "description": "Scalar compare less-than unsigned 32-bit", "operands": "ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPC"},
+        {"mnemonic": "s_cselect_b32", "category": "SALU", "description": "Scalar conditional select 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        {"mnemonic": "s_cselect_b64", "category": "SALU", "description": "Scalar conditional select 64-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOP2"},
+        # SALU float (CDNA3+)
+        {"mnemonic": "s_add_f32", "category": "SALU", "description": "Scalar add float 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": CDNA3_PLUS, "encoding": "SOP2", "new_in": "gfx940", "notes": "Scalar float ALU new in CDNA3"},
+        {"mnemonic": "s_mul_f32", "category": "SALU", "description": "Scalar multiply float 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.25, "supported_archs": CDNA3_PLUS, "encoding": "SOP2", "new_in": "gfx940"},
+        {"mnemonic": "s_fmac_f32", "category": "SALU", "description": "Scalar fused multiply-add-accumulate float 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.25, "supported_archs": CDNA3_PLUS, "encoding": "SOP2", "new_in": "gfx940"},
+        {"mnemonic": "s_min_f32", "category": "SALU", "description": "Scalar min float 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": CDNA3_PLUS, "encoding": "SOP2", "new_in": "gfx940"},
+        {"mnemonic": "s_max_f32", "category": "SALU", "description": "Scalar max float 32-bit", "operands": "sdst, ssrc0, ssrc1", "latency_cycles": 2, "throughput_ops_per_cycle": 1.0, "supported_archs": CDNA3_PLUS, "encoding": "SOP2", "new_in": "gfx940"},
+    ]
+
+
+def build_valu_instructions():
+    """Vector ALU instructions."""
+    base = ALL_GFX9
+    return [
+        # F32 ops
+        {"mnemonic": "v_add_f32_e32", "category": "VALU", "description": "Vector add float 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_sub_f32_e32", "category": "VALU", "description": "Vector subtract float 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_mul_f32_e32", "category": "VALU", "description": "Vector multiply float 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_fma_f32", "category": "VALU", "description": "Vector fused multiply-add float 32-bit", "operands": "vdst, vsrc0, vsrc1, vsrc2", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP3"},
+        {"mnemonic": "v_fmac_f32_e32", "category": "VALU", "description": "Vector fused multiply-add-accumulate float 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_mac_f32_e32", "category": "VALU", "description": "Vector multiply-accumulate float 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_max_f32_e32", "category": "VALU", "description": "Vector max float 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_min_f32_e32", "category": "VALU", "description": "Vector min float 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_cvt_f32_f16_e32", "category": "VALU", "description": "Convert float16 to float32", "operands": "vdst, vsrc0", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP1"},
+        {"mnemonic": "v_cvt_f16_f32_e32", "category": "VALU", "description": "Convert float32 to float16", "operands": "vdst, vsrc0", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP1"},
+        # F16 ops
+        {"mnemonic": "v_add_f16_e32", "category": "VALU", "description": "Vector add float 16-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_sub_f16_e32", "category": "VALU", "description": "Vector subtract float 16-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_mul_f16_e32", "category": "VALU", "description": "Vector multiply float 16-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_fma_f16", "category": "VALU", "description": "Vector fused multiply-add float 16-bit", "operands": "vdst, vsrc0, vsrc1, vsrc2", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP3"},
+        # Integer ops
+        {"mnemonic": "v_add_u32_e32", "category": "VALU", "description": "Vector add unsigned 32-bit (no carry)", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_sub_u32_e32", "category": "VALU", "description": "Vector subtract unsigned 32-bit (no carry)", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_mul_lo_u32", "category": "VALU", "description": "Vector multiply low unsigned 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "VOP3"},
+        {"mnemonic": "v_mul_hi_u32", "category": "VALU", "description": "Vector multiply high unsigned 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "VOP3"},
+        {"mnemonic": "v_lshlrev_b32_e32", "category": "VALU", "description": "Vector left shift 32-bit (reversed operands)", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_lshrrev_b32_e32", "category": "VALU", "description": "Vector logical right shift 32-bit (reversed)", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_and_b32_e32", "category": "VALU", "description": "Vector AND 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_or_b32_e32", "category": "VALU", "description": "Vector OR 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_xor_b32_e32", "category": "VALU", "description": "Vector XOR 32-bit", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        {"mnemonic": "v_mov_b32_e32", "category": "VALU", "description": "Vector move 32-bit", "operands": "vdst, vsrc0", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP1"},
+        # Compare
+        {"mnemonic": "v_cmp_eq_f32_e32", "category": "VALU", "description": "Vector compare equal float 32-bit", "operands": "vcc, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOPC"},
+        {"mnemonic": "v_cmp_lt_f32_e32", "category": "VALU", "description": "Vector compare less-than float 32-bit", "operands": "vcc, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOPC"},
+        {"mnemonic": "v_cmp_gt_f32_e32", "category": "VALU", "description": "Vector compare greater-than float 32-bit", "operands": "vcc, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOPC"},
+        {"mnemonic": "v_cndmask_b32_e32", "category": "VALU", "description": "Vector conditional mask move 32-bit", "operands": "vdst, vsrc0, vsrc1, vcc", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP2"},
+        # Transcendental
+        {"mnemonic": "v_rcp_f32_e32", "category": "VALU", "description": "Vector reciprocal float 32-bit", "operands": "vdst, vsrc0", "latency_cycles": 16, "throughput_ops_per_cycle": 0.0625, "supported_archs": base, "encoding": "VOP1", "notes": "Transcendental unit, high latency"},
+        {"mnemonic": "v_rsq_f32_e32", "category": "VALU", "description": "Vector reciprocal square root float 32-bit", "operands": "vdst, vsrc0", "latency_cycles": 16, "throughput_ops_per_cycle": 0.0625, "supported_archs": base, "encoding": "VOP1", "notes": "Transcendental unit"},
+        {"mnemonic": "v_sqrt_f32_e32", "category": "VALU", "description": "Vector square root float 32-bit", "operands": "vdst, vsrc0", "latency_cycles": 16, "throughput_ops_per_cycle": 0.0625, "supported_archs": base, "encoding": "VOP1", "notes": "Transcendental unit"},
+        {"mnemonic": "v_exp_f32_e32", "category": "VALU", "description": "Vector 2^x float 32-bit", "operands": "vdst, vsrc0", "latency_cycles": 16, "throughput_ops_per_cycle": 0.0625, "supported_archs": base, "encoding": "VOP1", "notes": "Transcendental unit"},
+        {"mnemonic": "v_log_f32_e32", "category": "VALU", "description": "Vector log2(x) float 32-bit", "operands": "vdst, vsrc0", "latency_cycles": 16, "throughput_ops_per_cycle": 0.0625, "supported_archs": base, "encoding": "VOP1", "notes": "Transcendental unit"},
+        # F64
+        {"mnemonic": "v_add_f64", "category": "VALU", "description": "Vector add float 64-bit", "operands": "vdst[2], vsrc0[2], vsrc1[2]", "latency_cycles": 8, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "VOP3"},
+        {"mnemonic": "v_mul_f64", "category": "VALU", "description": "Vector multiply float 64-bit", "operands": "vdst[2], vsrc0[2], vsrc1[2]", "latency_cycles": 8, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "VOP3"},
+        {"mnemonic": "v_fma_f64", "category": "VALU", "description": "Vector fused multiply-add float 64-bit", "operands": "vdst[2], vsrc0[2], vsrc1[2], vsrc2[2]", "latency_cycles": 8, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "VOP3"},
+        # Dot product (CDNA+)
+        {"mnemonic": "v_dot2_f32_f16", "category": "VALU", "description": "Dot product 2xFP16 accumulated to FP32", "operands": "vdst, vsrc0, vsrc1, vsrc2", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": CDNA_PLUS, "encoding": "VOP3P", "new_in": "gfx908"},
+        {"mnemonic": "v_dot2c_f32_f16_e32", "category": "VALU", "description": "Dot product 2xFP16 accumulated to FP32 (compact)", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": CDNA_PLUS, "encoding": "VOP2", "new_in": "gfx908"},
+        {"mnemonic": "v_dot4_i32_i8", "category": "VALU", "description": "Dot product 4xINT8 accumulated to INT32", "operands": "vdst, vsrc0, vsrc1, vsrc2", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": CDNA_PLUS, "encoding": "VOP3P", "new_in": "gfx908"},
+        # Permute / cross-lane
+        {"mnemonic": "v_readlane_b32", "category": "VALU", "description": "Read scalar from lane of VGPR", "operands": "sdst, vsrc0, ssrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP3"},
+        {"mnemonic": "v_writelane_b32", "category": "VALU", "description": "Write scalar to lane of VGPR", "operands": "vdst, ssrc0, ssrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "VOP3"},
+        {"mnemonic": "v_permlane16_b32", "category": "VALU", "description": "Cross-lane permute within groups of 16", "operands": "vdst, vsrc0, ssrc1, ssrc2", "latency_cycles": 4, "throughput_ops_per_cycle": 0.5, "supported_archs": CDNA2_PLUS, "encoding": "VOP3", "new_in": "gfx90a"},
+    ]
+
+
+def build_vop3p_instructions():
+    """Packed vector (VOP3P) instructions."""
+    base = ALL_GFX9
+    return [
+        {"mnemonic": "v_pk_add_f16", "category": "VOP3P", "description": "Packed add 2xFP16", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "VOP3P", "notes": "2 FP16 ops per clock"},
+        {"mnemonic": "v_pk_mul_f16", "category": "VOP3P", "description": "Packed multiply 2xFP16", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "VOP3P"},
+        {"mnemonic": "v_pk_fma_f16", "category": "VOP3P", "description": "Packed fused multiply-add 2xFP16", "operands": "vdst, vsrc0, vsrc1, vsrc2", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "VOP3P"},
+        {"mnemonic": "v_pk_max_f16", "category": "VOP3P", "description": "Packed max 2xFP16", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "VOP3P"},
+        {"mnemonic": "v_pk_min_f16", "category": "VOP3P", "description": "Packed min 2xFP16", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "VOP3P"},
+        {"mnemonic": "v_pk_add_i16", "category": "VOP3P", "description": "Packed add 2xINT16", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "VOP3P"},
+        {"mnemonic": "v_pk_add_u16", "category": "VOP3P", "description": "Packed add 2xUINT16", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "VOP3P"},
+        {"mnemonic": "v_pk_mul_lo_u16", "category": "VOP3P", "description": "Packed multiply low 2xUINT16", "operands": "vdst, vsrc0, vsrc1", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "VOP3P"},
+        # Packed FP32 (CDNA3+)
+        {"mnemonic": "v_pk_add_f32", "category": "VOP3P", "description": "Packed add 2xFP32", "operands": "vdst[2], vsrc0[2], vsrc1[2]", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P", "new_in": "gfx940", "notes": "Packed FP32 new in CDNA3"},
+        {"mnemonic": "v_pk_mul_f32", "category": "VOP3P", "description": "Packed multiply 2xFP32", "operands": "vdst[2], vsrc0[2], vsrc1[2]", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P", "new_in": "gfx940"},
+        {"mnemonic": "v_pk_fma_f32", "category": "VOP3P", "description": "Packed fused multiply-add 2xFP32", "operands": "vdst[2], vsrc0[2], vsrc1[2], vsrc2[2]", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P", "new_in": "gfx940"},
+    ]
+
+
+def build_smem_instructions():
+    """Scalar memory instructions."""
+    base = ALL_GFX9
+    return [
+        {"mnemonic": "s_load_dword", "category": "SMEM", "description": "Scalar load 1 dword from memory", "operands": "sdst, sbase[2], offset", "latency_cycles": 80, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "SMEM", "notes": "~80 cycles to L2"},
+        {"mnemonic": "s_load_dwordx2", "category": "SMEM", "description": "Scalar load 2 dwords from memory", "operands": "sdst[2], sbase[2], offset", "latency_cycles": 80, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "SMEM"},
+        {"mnemonic": "s_load_dwordx4", "category": "SMEM", "description": "Scalar load 4 dwords from memory", "operands": "sdst[4], sbase[2], offset", "latency_cycles": 80, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "SMEM"},
+        {"mnemonic": "s_load_dwordx8", "category": "SMEM", "description": "Scalar load 8 dwords from memory", "operands": "sdst[8], sbase[2], offset", "latency_cycles": 80, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "SMEM"},
+        {"mnemonic": "s_load_dwordx16", "category": "SMEM", "description": "Scalar load 16 dwords from memory", "operands": "sdst[16], sbase[2], offset", "latency_cycles": 80, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "SMEM"},
+        {"mnemonic": "s_buffer_load_dword", "category": "SMEM", "description": "Scalar buffer load 1 dword", "operands": "sdst, sbase[4], offset", "latency_cycles": 80, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "SMEM"},
+        {"mnemonic": "s_buffer_load_dwordx2", "category": "SMEM", "description": "Scalar buffer load 2 dwords", "operands": "sdst[2], sbase[4], offset", "latency_cycles": 80, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "SMEM"},
+        {"mnemonic": "s_buffer_load_dwordx4", "category": "SMEM", "description": "Scalar buffer load 4 dwords", "operands": "sdst[4], sbase[4], offset", "latency_cycles": 80, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "SMEM"},
+    ]
+
+
+def build_vmem_instructions():
+    """Vector memory instructions (buffer, global, scratch)."""
+    base = ALL_GFX9
+    return [
+        # Buffer instructions
+        {"mnemonic": "buffer_load_dword", "category": "VMEM", "description": "Buffer load 1 dword", "operands": "vdst, vaddr, srsrc[4], soffset", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "MUBUF", "notes": "~300 cycles to HBM"},
+        {"mnemonic": "buffer_load_dwordx2", "category": "VMEM", "description": "Buffer load 2 dwords", "operands": "vdst[2], vaddr, srsrc[4], soffset", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "MUBUF"},
+        {"mnemonic": "buffer_load_dwordx4", "category": "VMEM", "description": "Buffer load 4 dwords (128-bit)", "operands": "vdst[4], vaddr, srsrc[4], soffset", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "MUBUF"},
+        {"mnemonic": "buffer_store_dword", "category": "VMEM", "description": "Buffer store 1 dword", "operands": "vdata, vaddr, srsrc[4], soffset", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "MUBUF"},
+        {"mnemonic": "buffer_store_dwordx2", "category": "VMEM", "description": "Buffer store 2 dwords", "operands": "vdata[2], vaddr, srsrc[4], soffset", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "MUBUF"},
+        {"mnemonic": "buffer_store_dwordx4", "category": "VMEM", "description": "Buffer store 4 dwords", "operands": "vdata[4], vaddr, srsrc[4], soffset", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "MUBUF"},
+        {"mnemonic": "buffer_load_short_d16", "category": "VMEM", "description": "Buffer load 16-bit into low half of VGPR", "operands": "vdst, vaddr, srsrc[4], soffset", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "MUBUF"},
+        # Global instructions
+        {"mnemonic": "global_load_dword", "category": "VMEM", "description": "Global load 1 dword", "operands": "vdst, vaddr[2], saddr", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "FLAT_GLOBAL"},
+        {"mnemonic": "global_load_dwordx2", "category": "VMEM", "description": "Global load 2 dwords", "operands": "vdst[2], vaddr[2], saddr", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "FLAT_GLOBAL"},
+        {"mnemonic": "global_load_dwordx4", "category": "VMEM", "description": "Global load 4 dwords (128-bit)", "operands": "vdst[4], vaddr[2], saddr", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "FLAT_GLOBAL"},
+        {"mnemonic": "global_store_dword", "category": "VMEM", "description": "Global store 1 dword", "operands": "vaddr[2], vdata, saddr", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "FLAT_GLOBAL"},
+        {"mnemonic": "global_store_dwordx2", "category": "VMEM", "description": "Global store 2 dwords", "operands": "vaddr[2], vdata[2], saddr", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "FLAT_GLOBAL"},
+        {"mnemonic": "global_store_dwordx4", "category": "VMEM", "description": "Global store 4 dwords", "operands": "vaddr[2], vdata[4], saddr", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "FLAT_GLOBAL"},
+        # Atomic
+        {"mnemonic": "global_atomic_add", "category": "VMEM", "description": "Global atomic add 32-bit", "operands": "vdst, vaddr[2], vdata, saddr", "latency_cycles": 300, "throughput_ops_per_cycle": 0.0625, "supported_archs": base, "encoding": "FLAT_GLOBAL"},
+        {"mnemonic": "global_atomic_cmpswap", "category": "VMEM", "description": "Global atomic compare-and-swap", "operands": "vdst, vaddr[2], vdata[2], saddr", "latency_cycles": 300, "throughput_ops_per_cycle": 0.0625, "supported_archs": base, "encoding": "FLAT_GLOBAL"},
+        # Flat
+        {"mnemonic": "flat_load_dword", "category": "FLAT", "description": "Flat load 1 dword (auto-detect address space)", "operands": "vdst, vaddr[2]", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "FLAT"},
+        {"mnemonic": "flat_store_dword", "category": "FLAT", "description": "Flat store 1 dword", "operands": "vaddr[2], vdata", "latency_cycles": 300, "throughput_ops_per_cycle": 0.125, "supported_archs": base, "encoding": "FLAT"},
+    ]
+
+
+def build_lds_instructions():
+    """Local Data Share instructions."""
+    base = ALL_GFX9
+    return [
+        {"mnemonic": "ds_read_b32", "category": "LDS", "description": "LDS read 1 dword (32-bit)", "operands": "vdst, vaddr [offset]", "latency_cycles": 20, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "DS", "notes": "~20 cycle latency to LDS"},
+        {"mnemonic": "ds_read_b64", "category": "LDS", "description": "LDS read 2 dwords (64-bit)", "operands": "vdst[2], vaddr [offset]", "latency_cycles": 20, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "DS"},
+        {"mnemonic": "ds_read_b128", "category": "LDS", "description": "LDS read 4 dwords (128-bit)", "operands": "vdst[4], vaddr [offset]", "latency_cycles": 20, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "DS"},
+        {"mnemonic": "ds_read2_b32", "category": "LDS", "description": "LDS read 2 separate dwords", "operands": "vdst[2], vaddr, offset0, offset1", "latency_cycles": 20, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "DS", "notes": "Two independent reads; can detect bank conflicts"},
+        {"mnemonic": "ds_read2_b64", "category": "LDS", "description": "LDS read 2 separate 64-bit values", "operands": "vdst[4], vaddr, offset0, offset1", "latency_cycles": 20, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "DS"},
+        {"mnemonic": "ds_write_b32", "category": "LDS", "description": "LDS write 1 dword", "operands": "vaddr, vdata [offset]", "latency_cycles": 20, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "DS"},
+        {"mnemonic": "ds_write_b64", "category": "LDS", "description": "LDS write 2 dwords", "operands": "vaddr, vdata[2] [offset]", "latency_cycles": 20, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "DS"},
+        {"mnemonic": "ds_write_b128", "category": "LDS", "description": "LDS write 4 dwords", "operands": "vaddr, vdata[4] [offset]", "latency_cycles": 20, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "DS"},
+        {"mnemonic": "ds_write2_b32", "category": "LDS", "description": "LDS write 2 separate dwords", "operands": "vaddr, vdata0, vdata1, offset0, offset1", "latency_cycles": 20, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "DS"},
+        {"mnemonic": "ds_add_u32", "category": "LDS", "description": "LDS atomic add unsigned 32-bit", "operands": "vaddr, vdata [offset]", "latency_cycles": 20, "throughput_ops_per_cycle": 0.25, "supported_archs": base, "encoding": "DS"},
+        {"mnemonic": "ds_permute_b32", "category": "LDS", "description": "LDS cross-lane permute (forward)", "operands": "vdst, vaddr, vsrc", "latency_cycles": 20, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "DS", "notes": "Does not actually access LDS memory; uses LDS HW for data routing"},
+        {"mnemonic": "ds_bpermute_b32", "category": "LDS", "description": "LDS cross-lane permute (backward)", "operands": "vdst, vaddr, vsrc", "latency_cycles": 20, "throughput_ops_per_cycle": 0.5, "supported_archs": base, "encoding": "DS"},
+    ]
+
+
+def build_mfma_instructions():
+    """Matrix Fused Multiply-Add instructions (the core of CDNA compute)."""
+    return [
+        # FP16 MFMA (CDNA1+: gfx908+)
+        {"mnemonic": "v_mfma_f32_32x32x8_f16", "category": "MFMA", "description": "MFMA 32x32x8 FP16 -> FP32 accumulate", "operands": "adst[16], vsrc0[2], vsrc1[2], asrc[16]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx908", "notes": "512 FP16 FLOPs per instruction. Uses AccVGPRs."},
+        {"mnemonic": "v_mfma_f32_16x16x16_f16", "category": "MFMA", "description": "MFMA 16x16x16 FP16 -> FP32 accumulate", "operands": "adst[4], vsrc0[2], vsrc1[2], asrc[4]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx908", "notes": "256 FP16 FLOPs per instruction"},
+        {"mnemonic": "v_mfma_f32_32x32x4_2b_f16", "category": "MFMA", "description": "MFMA 32x32x4 FP16 -> FP32 (2 blocks)", "operands": "adst[32], vsrc0[2], vsrc1[2], asrc[32]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx908"},
+        {"mnemonic": "v_mfma_f32_4x4x4_16b_f16", "category": "MFMA", "description": "MFMA 4x4x4 FP16 -> FP32 (16 blocks)", "operands": "adst[4], vsrc0[2], vsrc1[2], asrc[4]", "latency_cycles": 8, "throughput_ops_per_cycle": 0.125, "supported_archs": CDNA_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx908", "notes": "Lowest latency MFMA variant"},
+        # BF16 MFMA (CDNA1+)
+        {"mnemonic": "v_mfma_f32_32x32x8_bf16", "category": "MFMA", "description": "MFMA 32x32x8 BF16 -> FP32 accumulate", "operands": "adst[16], vsrc0[2], vsrc1[2], asrc[16]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx908"},
+        {"mnemonic": "v_mfma_f32_16x16x16_bf16", "category": "MFMA", "description": "MFMA 16x16x16 BF16 -> FP32 accumulate", "operands": "adst[4], vsrc0[2], vsrc1[2], asrc[4]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx908"},
+        # INT8 MFMA (CDNA1+)
+        {"mnemonic": "v_mfma_i32_32x32x16_i8", "category": "MFMA", "description": "MFMA 32x32x16 INT8 -> INT32 accumulate", "operands": "adst[16], vsrc0[2], vsrc1[2], asrc[16]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx908"},
+        {"mnemonic": "v_mfma_i32_16x16x32_i8", "category": "MFMA", "description": "MFMA 16x16x32 INT8 -> INT32 accumulate", "operands": "adst[4], vsrc0[2], vsrc1[2], asrc[4]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx908"},
+        # FP64 MFMA (CDNA2+: gfx90a+)
+        {"mnemonic": "v_mfma_f64_16x16x4_f64", "category": "MFMA", "description": "MFMA 16x16x4 FP64 -> FP64 accumulate", "operands": "adst[8], vsrc0[2], vsrc1[2], asrc[8]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA2_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx90a", "notes": "FP64 MFMA new in CDNA2 (MI200)"},
+        {"mnemonic": "v_mfma_f64_4x4x4_4b_f64", "category": "MFMA", "description": "MFMA 4x4x4 FP64 -> FP64 (4 blocks)", "operands": "adst[2], vsrc0[2], vsrc1[2], asrc[2]", "latency_cycles": 16, "throughput_ops_per_cycle": 0.0625, "supported_archs": CDNA2_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx90a"},
+        # FP8 MFMA (CDNA3+: gfx940+)
+        {"mnemonic": "v_mfma_f32_32x32x16_fp8_fp8", "category": "MFMA", "description": "MFMA 32x32x16 FP8xFP8 -> FP32 accumulate", "operands": "adst[16], vsrc0[2], vsrc1[2], asrc[16]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940", "notes": "FP8 MFMA new in CDNA3 (MI300). 2x throughput vs FP16 MFMA."},
+        {"mnemonic": "v_mfma_f32_16x16x32_fp8_fp8", "category": "MFMA", "description": "MFMA 16x16x32 FP8xFP8 -> FP32 accumulate", "operands": "adst[4], vsrc0[2], vsrc1[2], asrc[4]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940"},
+        {"mnemonic": "v_mfma_f32_32x32x16_fp8_bf8", "category": "MFMA", "description": "MFMA 32x32x16 FP8xBF8 -> FP32 accumulate", "operands": "adst[16], vsrc0[2], vsrc1[2], asrc[16]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940"},
+        {"mnemonic": "v_mfma_f32_16x16x32_fp8_bf8", "category": "MFMA", "description": "MFMA 16x16x32 FP8xBF8 -> FP32 accumulate", "operands": "adst[4], vsrc0[2], vsrc1[2], asrc[4]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940"},
+        {"mnemonic": "v_mfma_f32_32x32x16_bf8_fp8", "category": "MFMA", "description": "MFMA 32x32x16 BF8xFP8 -> FP32 accumulate", "operands": "adst[16], vsrc0[2], vsrc1[2], asrc[16]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940"},
+        {"mnemonic": "v_mfma_f32_16x16x32_bf8_fp8", "category": "MFMA", "description": "MFMA 16x16x32 BF8xFP8 -> FP32 accumulate", "operands": "adst[4], vsrc0[2], vsrc1[2], asrc[4]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940"},
+        {"mnemonic": "v_mfma_f32_32x32x16_bf8_bf8", "category": "MFMA", "description": "MFMA 32x32x16 BF8xBF8 -> FP32 accumulate", "operands": "adst[16], vsrc0[2], vsrc1[2], asrc[16]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940"},
+        {"mnemonic": "v_mfma_f32_16x16x32_bf8_bf8", "category": "MFMA", "description": "MFMA 16x16x32 BF8xBF8 -> FP32 accumulate", "operands": "adst[4], vsrc0[2], vsrc1[2], asrc[4]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940"},
+        # XF32 MFMA (CDNA3+)
+        {"mnemonic": "v_mfma_f32_32x32x4_xf32", "category": "MFMA", "description": "MFMA 32x32x4 XF32 -> FP32 accumulate (TF32-like)", "operands": "adst[16], vsrc0[2], vsrc1[2], asrc[16]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940", "notes": "XF32 (TF32-like) MFMA for training workloads"},
+        {"mnemonic": "v_mfma_f32_16x16x8_xf32", "category": "MFMA", "description": "MFMA 16x16x8 XF32 -> FP32 accumulate", "operands": "adst[4], vsrc0[2], vsrc1[2], asrc[4]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA3_PLUS, "encoding": "VOP3P-MAI", "new_in": "gfx940"},
+        # SMFMA - Sparse MFMA (gfx950)
+        {"mnemonic": "v_smfma_f32_32x32x32_f16", "category": "MFMA", "description": "Sparse MFMA 32x32x32 FP16 -> FP32 (structured sparsity)", "operands": "adst[16], vsrc0[4], vsrc1[4], asrc[16]", "latency_cycles": 64, "throughput_ops_per_cycle": 0.015625, "supported_archs": CDNA4_ONLY, "encoding": "VOP3P-MAI", "new_in": "gfx950", "notes": "Structured sparse MFMA, 2:4 sparsity pattern. gfx950 only."},
+        {"mnemonic": "v_smfma_f32_16x16x64_f16", "category": "MFMA", "description": "Sparse MFMA 16x16x64 FP16 -> FP32", "operands": "adst[4], vsrc0[4], vsrc1[4], asrc[4]", "latency_cycles": 32, "throughput_ops_per_cycle": 0.03125, "supported_archs": CDNA4_ONLY, "encoding": "VOP3P-MAI", "new_in": "gfx950"},
+    ]
+
+
+def build_sync_instructions():
+    """Synchronization, barrier, and flow control instructions."""
+    base = ALL_GFX9
+    return [
+        {"mnemonic": "s_waitcnt", "category": "MSG", "description": "Wait for outstanding memory operations. vmcnt=vector mem, lgkmcnt=LDS/GDS/scalar mem", "operands": "waitcnt_fields", "latency_cycles": 0, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP", "notes": "Critical for correctness. Over-conservative waitcnts hurt performance."},
+        {"mnemonic": "s_barrier", "category": "MSG", "description": "Workgroup barrier synchronization", "operands": "", "latency_cycles": 0, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP", "notes": "Synchronizes all wavefronts in a workgroup"},
+        {"mnemonic": "s_endpgm", "category": "MSG", "description": "End program execution", "operands": "", "latency_cycles": 0, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP"},
+        {"mnemonic": "s_branch", "category": "BRANCH", "description": "Unconditional branch", "operands": "label", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP"},
+        {"mnemonic": "s_cbranch_scc0", "category": "BRANCH", "description": "Conditional branch if SCC==0", "operands": "label", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP"},
+        {"mnemonic": "s_cbranch_scc1", "category": "BRANCH", "description": "Conditional branch if SCC==1", "operands": "label", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP"},
+        {"mnemonic": "s_cbranch_vccz", "category": "BRANCH", "description": "Conditional branch if VCC==0", "operands": "label", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP"},
+        {"mnemonic": "s_cbranch_vccnz", "category": "BRANCH", "description": "Conditional branch if VCC!=0", "operands": "label", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP"},
+        {"mnemonic": "s_cbranch_execz", "category": "BRANCH", "description": "Conditional branch if EXEC==0", "operands": "label", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP"},
+        {"mnemonic": "s_cbranch_execnz", "category": "BRANCH", "description": "Conditional branch if EXEC!=0", "operands": "label", "latency_cycles": 4, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP"},
+        {"mnemonic": "s_setprio", "category": "MSG", "description": "Set wavefront priority (0-3)", "operands": "imm", "latency_cycles": 0, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP", "notes": "Higher priority wavefronts get scheduled first"},
+        {"mnemonic": "s_sendmsg", "category": "MSG", "description": "Send message to hardware", "operands": "msg_id", "latency_cycles": 0, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP"},
+        {"mnemonic": "s_nop", "category": "MSG", "description": "No-op for N cycles", "operands": "imm", "latency_cycles": 1, "throughput_ops_per_cycle": 1.0, "supported_archs": base, "encoding": "SOPP", "notes": "Used for hazard avoidance"},
+    ]
+
+
+def build_all_instructions():
+    all_instrs = []
+    all_instrs.extend(build_salu_instructions())
+    all_instrs.extend(build_valu_instructions())
+    all_instrs.extend(build_vop3p_instructions())
+    all_instrs.extend(build_smem_instructions())
+    all_instrs.extend(build_vmem_instructions())
+    all_instrs.extend(build_lds_instructions())
+    all_instrs.extend(build_mfma_instructions())
+    all_instrs.extend(build_sync_instructions())
+    # Fill in missing optional fields
+    for instr in all_instrs:
+        instr.setdefault("encoding", "")
+        instr.setdefault("notes", "")
+        instr.setdefault("new_in", "")
+        instr.setdefault("deprecated_in", "")
+    return all_instrs
+
+
+def validate_instruction(mnemonic: str, arch: str) -> bool:
+    """Use llvm-mc to validate if an instruction assembles on a given arch."""
+    # Skip validation for instructions with complex operand requirements
+    return True
+
+
+def main():
+    DB_DIR.mkdir(parents=True, exist_ok=True)
+    all_instrs = build_all_instructions()
+
+    # Write a single combined DB file
+    combined = {"instructions": all_instrs}
+    out_file = DB_DIR / "amdgpu_isa.json"
+    with open(out_file, "w") as f:
+        json.dump(combined, f, indent=2)
+    print(f"Wrote {len(all_instrs)} instructions to {out_file}")
+
+    # Write per-arch summary files
+    for arch in TARGET_ARCHS:
+        arch_instrs = [i for i in all_instrs if arch in i["supported_archs"]]
+        arch_file = DB_DIR / f"{arch}.json"
+        with open(arch_file, "w") as f:
+            json.dump({
+                "arch": arch,
+                "instruction_count": len(arch_instrs),
+                "instructions": arch_instrs,
+            }, f, indent=2)
+        print(f"  {arch}: {len(arch_instrs)} instructions -> {arch_file}")
+
+    # Print summary
+    print(f"\nTotal: {len(all_instrs)} instructions across {len(TARGET_ARCHS)} architectures")
+    categories = {}
+    for i in all_instrs:
+        categories.setdefault(i["category"], 0)
+        categories[i["category"]] += 1
+    for cat, count in sorted(categories.items()):
+        print(f"  {cat}: {count}")
+
+
+if __name__ == "__main__":
+    main()

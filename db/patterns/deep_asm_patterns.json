@@ -1,0 +1,146 @@
+{
+  "total_kernels_analyzed": 2660,
+  "mfma_pattern_summary": {
+    "max_chain_across_all": 96,
+    "avg_chain_length": 17.8397935614263,
+    "total_chains": 110832,
+    "top_mfma_types": {
+      "v_mfma_f32_16x16x32_fp8_fp8": 1002900,
+      "v_mfma_i32_16x16x32_i8": 765920,
+      "v_mfma_f32_16x16x16_bf16": 121664,
+      "v_mfma_scale_f32_16x16x128_f8f6f4": 31520,
+      "v_mfma_f32_16x16x16_f16": 28512,
+      "v_mfma_f32_16x16x32_bf16": 6784,
+      "v_mfma_f32_16x16x32_f16": 5760,
+      "v_mfma_f32_32x32x8_bf16": 4704,
+      "v_mfma_f32_32x32x16_bf16": 4208,
+      "v_mfma_f32_16x16x128_f8f6f4": 1940,
+      "v_mfma_f32_32x32x16_f16": 1776,
+      "v_mfma_f32_32x32x64_f8f6f4": 1052,
+      "v_mfma_i32_32x32x16_i8": 288,
+      "v_mfma_f32_32x32x16_fp8_fp8": 192
+    },
+    "interleave_totals": {
+      "ds_read": 157854,
+      "ds_write": 33392,
+      "vmem": 527676,
+      "valu": 254960,
+      "other": 225202
+    }
+  },
+  "lds_pattern_summary": {
+    "total_with_lds": 2604,
+    "double_buffer_count": 2460,
+    "double_buffer_pct": 94.47004608294931,
+    "avg_lds_bytes": 39013.90629800307,
+    "max_lds_bytes": 61824
+  },
+  "prefetch_summary": {
+    "avg_loads_before_first_wait": 7.768045112781955,
+    "max_loads_before_first_wait": 57,
+    "avg_loads_between_waits": 7.024349119730147
+  },
+  "scheduling_summary": {
+    "kernels_using_priority": 18,
+    "avg_partial_waitcnt_ratio": 0.5721147039114839
+  },
+  "vectorization_summary": {
+    "avg_vectorization_pct": 58.020559435407556,
+    "kernels_above_50pct": 1992,
+    "kernels_below_10pct": 311
+  },
+  "arch_differences": {
+    "gfx942_kernel_count": 1357,
+    "gfx950_kernel_count": 1303,
+    "gfx942_mfma_types": [
+      "v_mfma_f32_16x16x16_bf16",
+      "v_mfma_f32_16x16x16_f16",
+      "v_mfma_f32_16x16x32_fp8_fp8",
+      "v_mfma_f32_32x32x16_fp8_fp8",
+      "v_mfma_f32_32x32x8_bf16",
+      "v_mfma_i32_16x16x32_i8",
+      "v_mfma_i32_32x32x16_i8"
+    ],
+    "gfx950_mfma_types": [
+      "v_mfma_f32_16x16x128_f8f6f4",
+      "v_mfma_f32_16x16x16_bf16",
+      "v_mfma_f32_16x16x16_f16",
+      "v_mfma_f32_16x16x32_bf16",
+      "v_mfma_f32_16x16x32_f16",
+      "v_mfma_f32_16x16x32_fp8_fp8",
+      "v_mfma_f32_32x32x16_bf16",
+      "v_mfma_f32_32x32x16_f16",
+      "v_mfma_f32_32x32x16_fp8_fp8",
+      "v_mfma_f32_32x32x64_f8f6f4",
+      "v_mfma_i32_16x16x32_i8",
+      "v_mfma_scale_f32_16x16x128_f8f6f4"
+    ],
+    "new_mfma_in_gfx950": [
+      "v_mfma_f32_16x16x128_f8f6f4",
+      "v_mfma_f32_16x16x32_bf16",
+      "v_mfma_f32_16x16x32_f16",
+      "v_mfma_f32_32x32x16_bf16",
+      "v_mfma_f32_32x32x16_f16",
+      "v_mfma_f32_32x32x64_f8f6f4",
+      "v_mfma_scale_f32_16x16x128_f8f6f4"
+    ],
+    "gfx942_avg_mfma_chain": 20.843372629006968,
+    "gfx950_avg_mfma_chain": 19.52444647057931
+  },
+  "category_summaries": {
+    "attention": {
+      "count": 97,
+      "avg_instructions": 9545.536082474227,
+      "avg_mfma": 826.7216494845361,
+      "max_mfma": 1920
+    },
+    "comm": {
+      "count": 1,
+      "avg_instructions": 763.0,
+      "avg_mfma": 0.0,
+      "max_mfma": 0
+    },
+    "fmha": {
+      "count": 283,
+      "avg_instructions": 3529.13074204947,
+      "avg_mfma": 329.8374558303887,
+      "max_mfma": 512
+    },
+    "gemm": {
+      "count": 90,
+      "avg_instructions": 2011.9222222222222,
+      "avg_mfma": 272.0,
+      "max_mfma": 512
+    },
+    "mla": {
+      "count": 44,
+      "avg_instructions": 5168.363636363636,
+      "avg_mfma": 487.3636363636364,
+      "max_mfma": 816
+    },
+    "moe": {
+      "count": 2069,
+      "avg_instructions": 4850.942484291929,
+      "avg_mfma": 847.0178830352827,
+      "max_mfma": 2304
+    },
+    "norm": {
+      "count": 5,
+      "avg_instructions": 1246.2,
+      "avg_mfma": 0.0,
+      "max_mfma": 0
+    },
+    "other": {
+      "count": 29,
+      "avg_instructions": 2620.3793103448274,
+      "avg_mfma": 182.06896551724137,
+      "max_mfma": 256
+    },
+    "topk": {
+      "count": 42,
+      "avg_instructions": 1363.3095238095239,
+      "avg_mfma": 0.0,
+      "max_mfma": 0
+    }
+  }
+}

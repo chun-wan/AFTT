@@ -1,0 +1,140 @@
+{
+  "version": "1.0",
+  "description": "Profiling-derived rules for kernel performance analysis. Based on common rocprof-compute findings and AMD GPU performance counters.",
+  "rules": [
+    {
+      "rule_id": "PR001",
+      "name": "Low MFMA Utilization",
+      "category": "compute",
+      "metric": "mfma_busy_pct",
+      "threshold": {"warn": 50, "critical": 25},
+      "description": "MFMA unit utilization is below expected threshold. For GEMM kernels, MFMA should be >70% busy to be considered compute-bound.",
+      "diagnosis": "The kernel may be memory-bound or have excessive synchronization between MFMA instructions.",
+      "suggestion": "Increase tile size to improve data reuse. Use software pipelining to overlap loads with MFMA. Ensure MFMA instructions are properly chained without unnecessary waitcnts.",
+      "rocprof_counter": "SQ_INSTS_VALU_MFMA",
+      "reference": "rocprof-compute MFMA utilization metric"
+    },
+    {
+      "rule_id": "PR002",
+      "name": "Low VALU Utilization",
+      "category": "compute",
+      "metric": "valu_busy_pct",
+      "threshold": {"warn": 40, "critical": 20},
+      "description": "VALU (Vector ALU) utilization is below threshold. Wavefronts may be stalled on memory or synchronization.",
+      "diagnosis": "Check for excessive s_waitcnt, barrier overhead, or memory-bound execution.",
+      "suggestion": "Overlap computation with memory operations. Reduce barriers. Consider loop unrolling to increase ILP.",
+      "rocprof_counter": "SQ_INSTS_VALU",
+      "reference": "rocprof-compute VALU analysis"
+    },
+    {
+      "rule_id": "PR003",
+      "name": "Memory Bandwidth Saturation",
+      "category": "memory",
+      "metric": "hbm_bandwidth_pct",
+      "threshold": {"warn": 80, "critical": 90},
+      "description": "HBM bandwidth usage is at or near peak. The kernel is memory-bandwidth-bound.",
+      "diagnosis": "The kernel's arithmetic intensity is too low relative to its data movement. Memory traffic may include redundant or uncoalesced accesses.",
+      "suggestion": "Increase data reuse via larger tiles and LDS buffering. Ensure coalesced access patterns. Consider using lower precision (FP8 instead of FP16) to halve data movement. Use compression if supported.",
+      "rocprof_counter": "TCC_EA_RDREQ_32B_sum, TCC_EA_WRREQ_32B_sum",
+      "reference": "rocprof-compute memory throughput analysis"
+    },
+    {
+      "rule_id": "PR004",
+      "name": "LDS Bank Conflict Rate",
+      "category": "memory",
+      "metric": "lds_bank_conflict_rate",
+      "threshold": {"warn": 10, "critical": 30},
+      "description": "LDS access patterns cause bank conflicts. Conflict rate above threshold indicates significant serialization.",
+      "diagnosis": "Shared memory access patterns have stride conflicts. Common with power-of-2 strides matching the 32-bank LDS.",
+      "suggestion": "Add padding to shared memory arrays (+1 to one dimension). Rearrange access patterns to distribute across banks.",
+      "rocprof_counter": "SQ_LDS_BANK_CONFLICT",
+      "reference": "rocprof-compute LDS analysis"
+    },
+    {
+      "rule_id": "PR005",
+      "name": "Low Occupancy",
+      "category": "resource",
+      "metric": "occupancy_pct",
+      "threshold": {"warn": 25, "critical": 12.5},
+      "description": "Kernel occupancy (active waves / max waves) is too low. This reduces the GPU's ability to hide latency.",
+      "diagnosis": "Excessive VGPR or LDS usage per workgroup limits concurrent wavefronts.",
+      "suggestion": "Reduce register usage with __launch_bounds__. Decrease LDS allocation per workgroup. Consider smaller tile sizes. Check for register spilling.",
+      "rocprof_counter": "SQ_WAVES",
+      "occupancy_table": {
+        "gfx942": {
+          "max_waves_per_simd": 8,
+          "vgpr_per_simd": 512,
+          "sgpr_per_simd": 800,
+          "lds_per_cu_bytes": 65536,
+          "thresholds": {
+            "64_vgprs": 8,
+            "128_vgprs": 4,
+            "256_vgprs": 2,
+            "512_vgprs": 1
+          }
+        }
+      },
+      "reference": "AMD Occupancy Calculator; rocprof-compute occupancy"
+    },
+    {
+      "rule_id": "PR006",
+      "name": "Excessive Wavefront Stalls",
+      "category": "pipeline",
+      "metric": "stall_pct",
+      "threshold": {"warn": 30, "critical": 50},
+      "description": "Wavefronts spend a significant portion of time stalled, waiting for memory or synchronization.",
+      "diagnosis": "Common causes: s_waitcnt vmcnt(0) too often, s_barrier overhead, memory system congestion.",
+      "suggestion": "Use partial waitcnts. Prefetch data. Reduce barrier frequency. Consider persistent kernel patterns to avoid launch overhead.",
+      "rocprof_counter": "SQ_WAIT_INST_*",
+      "reference": "rocprof-compute wavefront stall analysis"
+    },
+    {
+      "rule_id": "PR007",
+      "name": "L2 Cache Thrashing",
+      "category": "memory",
+      "metric": "l2_hit_rate_pct",
+      "threshold": {"warn": 50, "critical": 30},
+      "description": "L2 cache hit rate is very low, indicating that the working set exceeds L2 capacity or access patterns are adversarial.",
+      "diagnosis": "Data reuse is poor. Adjacent workgroups may be accessing distant memory regions.",
+      "suggestion": "Improve data locality through tiling. Use software-managed caching in LDS. Consider workgroup scheduling that improves spatial locality.",
+      "rocprof_counter": "TCC_HIT_sum, TCC_MISS_sum",
+      "reference": "rocprof-compute cache analysis"
+    },
+    {
+      "rule_id": "PR008",
+      "name": "Instruction Mix Imbalance",
+      "category": "compute",
+      "metric": "compute_to_memory_ratio",
+      "threshold": {"warn_low": 2.0, "warn_high": 100.0},
+      "description": "The ratio of compute instructions to memory instructions is outside the optimal range for the hardware's compute-to-bandwidth ratio.",
+      "diagnosis": "Too low: kernel is memory-bound, not enough computation per byte loaded. Too high: compute is excessive, consider reducing precision or algorithm change.",
+      "suggestion": "For memory-bound (ratio < 2): increase tile size, use data compression, reduce precision. For compute-bound (ratio > 100): check if algorithm can be simplified.",
+      "rocprof_counter": "SQ_INSTS_VALU, SQ_INSTS_VMEM",
+      "reference": "AMD roofline model analysis"
+    },
+    {
+      "rule_id": "PR009",
+      "name": "Unbalanced Workgroup Distribution",
+      "category": "scheduling",
+      "metric": "workgroup_imbalance",
+      "threshold": {"warn": 20, "critical": 50},
+      "description": "Some CUs are doing significantly more work than others, leaving some CUs idle while others are overloaded.",
+      "diagnosis": "Grid dimensions don't evenly divide across CUs, or work per workgroup varies significantly.",
+      "suggestion": "Pad grid dimensions to be multiples of CU count. Use Stream-K scheduling for better load balancing. Ensure uniform work per workgroup.",
+      "rocprof_counter": "GPU_BUSY per CU",
+      "reference": "rocprof-compute workgroup distribution"
+    },
+    {
+      "rule_id": "PR010",
+      "name": "Register Spilling to Scratch",
+      "category": "resource",
+      "metric": "scratch_usage",
+      "threshold": {"warn": 1, "critical": 100},
+      "description": "Kernel spills registers to scratch memory (off-chip). Scratch access has similar latency to global memory, severely impacting performance.",
+      "diagnosis": "Kernel exceeds available VGPR/SGPR allocation, forcing register spills through the memory hierarchy.",
+      "suggestion": "Reduce register usage. Simplify control flow. Use __launch_bounds__ to guide register allocation. Break large kernels into smaller ones.",
+      "rocprof_counter": "SQ_INSTS_FLAT_LDS_ONLY (scratch)",
+      "reference": "rocprof-compute scratch memory analysis"
+    }
+  ]
+}

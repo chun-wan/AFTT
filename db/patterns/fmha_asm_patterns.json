@@ -1,0 +1,187 @@
+{
+  "title": "Flash Attention (FMHA) ASM Optimization Patterns - CK on gfx942",
+  "source": "25 forward + 156 backward disassembled kernels from aiter/3rdparty/composable_kernel",
+  "summary": {
+    "forward_kernels": 24,
+    "backward_kernels": 156,
+    "forward_mfma_per_kernel": 176,
+    "backward_mfma_per_kernel": 480,
+    "forward_dpp_per_kernel": 0,
+    "backward_dpp_per_kernel": 92,
+    "forward_barriers_per_kernel": 30,
+    "backward_barriers_per_kernel": 51
+  },
+  "forward_pass": {
+    "description": "Computes S=Q*K^T (scaled), P=softmax(S), O=P*V. Single fused kernel per head-dim variant.",
+    "architecture": {
+      "mfma_type": "v_mfma_f32_32x32x8_bf16",
+      "mfma_count": 176,
+      "tile_size": "32x32 BF16 (larger tiles for forward, fewer MFMAs but more FP per MFMA)",
+      "accumulation": "FP32 in VGPRs v[64:79] (16 registers per 32x32 tile output)",
+      "register_usage": {
+        "max_vgpr": 235,
+        "max_agpr": 3,
+        "max_sgpr": 96,
+        "occupancy_waves": 2
+      }
+    },
+    "memory_strategy": {
+      "q_loading": "Pre-loaded into VGPRs before main loop",
+      "k_loading": "Direct-to-LDS via buffer_load_dword ... lds, then ds_read_b128 into VGPRs",
+      "v_loading": "Direct global loads into VGPRs (buffer_load_dword v224-v227) during Q*K^T MFMA chain",
+      "direct_to_lds_count": "4 buffer_load_dword lds per K-tile iteration (m0 stepped by 0x880)",
+      "software_pipelining": "Next-iteration V loads interleaved with current Q*K^T MFMAs"
+    },
+    "main_loop_pattern": {
+      "description": "Per K-tile iteration: ds_read K from LDS -> barrier -> Q*K^T MFMA chain (16 MFMAs) with interleaved V loads -> P*V MFMAs",
+      "interleaving_detail": [
+        "ds_read_b128 x8 (read K tile from LDS into VGPRs v[160:223])",
+        "s_waitcnt lgkmcnt(0) + s_barrier",
+        "v_mfma Q*K -> buffer_load_dword lds (next K tile, 1 per 2 MFMAs)",
+        "v_mfma Q*K -> buffer_load_dword lds",
+        "v_mfma Q*K -> buffer_load_dword lds",
+        "v_mfma Q*K -> buffer_load_dword lds",
+        "v_mfma Q*K -> buffer_load_dword V (next iteration global loads)",
+        "v_mfma Q*K -> buffer_load_dword V",
+        "v_mfma Q*K -> buffer_load_dword V",
+        "v_mfma Q*K -> buffer_load_dword V",
+        "v_mfma Q*K (final in chain)"
+      ],
+      "mfma_to_load_ratio": "2 MFMAs per 1 buffer_load (optimal for hiding VMEM latency)"
+    },
+    "epilogue": {
+      "causal_masking": "v_cndmask_b32 to zero out future positions (per-element mask based on position comparison)",
+      "softmax": "Online softmax using running max and rescaling, no DPP needed (per-lane computation within MFMA tiles)",
+      "output_write": "buffer_store results to global memory"
+    },
+    "variants": {
+      "rtna": "Round to nearest away (BF16 conversion mode)",
+      "rtne": "Round to nearest even (adds ~700 instructions for rounding logic)",
+      "rtz": "Round to zero (simplest, smallest kernel)",
+      "causal": "Adds causal mask check (~500 more instructions)",
+      "group": "Group Query Attention (extra indexing for shared KV heads, ~20 more instructions)"
+    }
+  },
+  "backward_pass": {
+    "description": "Computes dQ, dK, dV from dO. Much more complex than forward: requires recomputing S, P, and computing multiple gradient matrices.",
+    "architecture": {
+      "mfma_type": "v_mfma_f32_16x16x16_bf16",
+      "mfma_count": 480,
+      "tile_size": "16x16 BF16 (smaller tiles than forward for finer-grained gradient computation)",
+      "accumulation": "FP32 in VGPRs v[48:55] for dQ, dK, dV partial results; AGPRs a[0:255] for MFMA operands",
+      "register_usage": {
+        "max_vgpr": 251,
+        "max_agpr": 255,
+        "max_sgpr": 83,
+        "occupancy_waves": 1,
+        "note": "Full AGPR utilization (a[0:255]) - single wave occupancy, all 512 GPRs used"
+      }
+    },
+    "dpp_patterns": {
+      "total_dpp_instructions": 92,
+      "purpose": "Softmax gradient computation: dS_ij = P_ij * (dP_ij - sum_j(P_ij * dP_ij))",
+      "patterns": {
+        "quad_broadcast": {
+          "count": 68,
+          "instruction": "v_mov_b32_dpp / v_subrev_f32_dpp with quad_perm:[N,N,N,N]",
+          "description": "Broadcast lane N within each 4-lane quad to all 4 lanes. Used for distributing the row-sum (D_i = sum_j P_ij*dO_ij) to all elements in that quad for computing dS = P*(dP - D).",
+          "breakdown": {
+            "quad_perm:[0,0,0,0]": 17,
+            "quad_perm:[1,1,1,1]": 17,
+            "quad_perm:[2,2,2,2]": 17,
+            "quad_perm:[3,3,3,3]": 17
+          },
+          "code_sequence": [
+            "// Step 1: Broadcast D_i (row-sum) to each quad element",
+            "v_mov_b32_dpp v127, v124 quad_perm:[3,3,3,3]  // D for lane 3 -> all",
+            "v_mov_b32_dpp v126, v124 quad_perm:[2,2,2,2]  // D for lane 2 -> all",
+            "v_mov_b32_dpp v125, v124 quad_perm:[1,1,1,1]  // D for lane 1 -> all",
+            "v_mov_b32_dpp v124, v124 quad_perm:[0,0,0,0]  // D for lane 0 -> all",
+            "",
+            "// Step 2: Compute dS = P * (dP - D) via fused subtract-broadcast",
+            "v_subrev_f32_dpp v72, v150, v72 quad_perm:[0,0,0,0]  // v72 -= D[lane0]",
+            "v_subrev_f32_dpp v73, v150, v73 quad_perm:[1,1,1,1]  // v73 -= D[lane1]",
+            "v_subrev_f32_dpp v74, v150, v74 quad_perm:[2,2,2,2]  // v74 -= D[lane2]",
+            "v_subrev_f32_dpp v75, v150, v75 quad_perm:[3,3,3,3]  // v75 -= D[lane3]"
+          ]
+        },
+        "quad_swap": {
+          "count": 24,
+          "instruction": "v_mov_b32_dpp with quad_perm:[1,0,3,2]",
+          "description": "Swap adjacent pairs within each quad. Used for BF16 packing / data layout transformation between MFMA stages.",
+          "code_example": "v_mov_b32_dpp v18, v72 quad_perm:[1,0,3,2]  // swap pairs for packing"
+        }
+      },
+      "cycle_savings_vs_lds": "Without DPP, the D_i broadcast would require ds_write + s_barrier + ds_read per quad (~40 cycles). With DPP: 4 cycles for broadcast + 8 cycles for fused subtract = 12 cycles. Savings: ~28 cycles per iteration, repeated 2x per K-tile = ~56 cycles saved per tile."
+    },
+    "memory_strategy": {
+      "q_k_v_loading": "buffer_load_dword idxen (indexed global loads) for Q, K, V tiles",
+      "do_loading": "buffer_load_dword for dO (output gradient)",
+      "gradient_accumulation": "ds_write_b32 for partial dQ/dK/dV to LDS, then ds_read_b128 for reduction",
+      "lse_loading": "Pre-loaded log-sum-exp from forward pass for numerically stable softmax backward",
+      "software_pipelining": {
+        "vmcnt_pattern": "vmcnt(32) lgkmcnt(0) before barriers - 32+ loads in flight",
+        "lgkmcnt_pattern": "lgkmcnt(4) for precise LDS read tracking",
+        "interleaving": "MFMA -> ds_write partial gradient -> MFMA -> ds_read for accumulation -> MFMA"
+      }
+    },
+    "main_loop_structure": {
+      "phases_per_ktile": [
+        "Phase 1: Load K tile, compute S = Q*K^T (16 MFMAs with ds_write interleaved)",
+        "Phase 2: DPP softmax gradient: broadcast D, compute dS = P*(dP-D)",
+        "Phase 3: v_perm_b32 for BF16 packing of dS elements",
+        "Phase 4: Compute dQ += dS * K (16 MFMAs with ds_read interleaved)",
+        "Phase 5: Compute dK += dS^T * Q (16 MFMAs)",
+        "Phase 6: Compute dV += P^T * dO (16 MFMAs)"
+      ],
+      "mfma_per_phase": "~80 MFMAs per K-tile (5-6 phases x 16 MFMAs each)"
+    },
+    "variants": {
+      "pssk": "Split-K for dS computation (distributes K-tiles across workgroups, atomic add)",
+      "pddv": "Split-K for dQ, dK, dV accumulation (extra global atomic adds)",
+      "psskddv": "Both split-K modes enabled (most complex, ~6.6K instructions)",
+      "a16": "FP16 atomics for gradient accumulation (faster but less precise)",
+      "a32": "FP32 atomics (more precise, slightly slower)"
+    }
+  },
+  "key_optimization_techniques": {
+    "1_mfma_interleaving": {
+      "description": "Interleave MFMA with memory operations to hide latency",
+      "forward": "2 MFMAs per 1 buffer_load (K to LDS, V to VGPR)",
+      "backward": "MFMA -> ds_write -> MFMA -> ds_read -> MFMA (3-way interleave)"
+    },
+    "2_dpp_softmax_gradient": {
+      "description": "Use DPP quad_perm to broadcast row-sums within 4-lane quads, avoiding LDS",
+      "applicable_to": "Any kernel computing softmax gradients or per-row reductions that map to quads"
+    },
+    "3_direct_to_lds_loading": {
+      "description": "buffer_load_dword ... lds bypasses VGPRs, reduces register pressure",
+      "forward_usage": "4 direct-to-LDS loads per K-tile (via m0 address register stepping)"
+    },
+    "4_full_agpr_utilization": {
+      "description": "Backward uses all 256 AGPRs for MFMA operand storage, freeing VGPRs for indexing/control",
+      "trade_off": "1 wave occupancy but maximum compute throughput"
+    },
+    "5_precise_waitcnt": {
+      "description": "Use vmcnt(N) with N>0 to allow partial wait instead of full drain",
+      "forward": "s_waitcnt lgkmcnt(0) before barriers (full LDS drain)",
+      "backward": "s_waitcnt vmcnt(32) lgkmcnt(0) - 32 loads still in flight while processing"
+    },
+    "6_v_perm_b32_packing": {
+      "description": "v_perm_b32 for BF16/FP16 byte rearrangement between compute stages",
+      "usage": "Pack two FP32 results into BF16 pair for next MFMA input"
+    }
+  },
+  "comparison_to_non_asm": {
+    "rmsnorm_kernels_cu": {
+      "what_it_uses": "hipcub::BlockReduce for variance sum (generic, not DPP-optimized)",
+      "what_it_should_use": "DPP butterfly reduction (like layernorm ASM: row_ror:8,4,2,1) via hip_reduce.h block_reduce",
+      "estimated_speedup": "10-20% on reduction phase"
+    },
+    "fused_qk_norm_rope_cache_quant_cu": {
+      "what_it_uses": "__shfl_xor with width=32 (CUDA-style, ignores half the AMD wavefront)",
+      "what_it_should_use": "wave_reduce from hip_reduce.h (DPP-based, uses full 64-lane wavefront)",
+      "estimated_speedup": "15-30% on reduction phase, 2x lane utilization"
+    }
+  }
+}

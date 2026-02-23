@@ -1,0 +1,130 @@
+{
+  "version": "1.0",
+  "description": "Anti-patterns and bad kernel design patterns for AMDGPU",
+  "patterns": [
+    {
+      "pattern_id": "AP001",
+      "name": "LDS Bank Conflict (Stride-32)",
+      "category": "memory",
+      "severity": "critical",
+      "description": "LDS access with stride equal to a multiple of 32 dwords causes bank conflicts. All threads in a wavefront access the same LDS bank, serializing the access.",
+      "asm_signature": "ds_read.*offset:\\d+.*\\n.*ds_read.*offset:\\d+",
+      "detection_logic": "Check ds_read/ds_write instructions where address offsets differ by multiples of 128 bytes (32 banks * 4 bytes).",
+      "suggestion": "Add 1 dword padding to shared memory rows. E.g., change float smem[32][32] to float smem[32][33]. This distributes accesses across different banks.",
+      "reference": "AMD GPU ISA Manual: LDS Banking; aiter/3rdparty/composable_kernel padding patterns",
+      "example_bad": "float smem[32][32]; // stride-32 causes bank conflict\nsmem[threadIdx.y][threadIdx.x] = ...;",
+      "example_good": "float smem[32][33]; // +1 padding avoids bank conflict\nsmem[threadIdx.y][threadIdx.x] = ...;"
+    },
+    {
+      "pattern_id": "AP002",
+      "name": "Uncoalesced Global Memory Access",
+      "category": "memory",
+      "severity": "critical",
+      "description": "Consecutive threads access non-contiguous global memory addresses. This causes multiple cache line fetches per wavefront instead of one, wasting memory bandwidth.",
+      "asm_signature": "global_load.*v\\[.*\\].*offset",
+      "detection_logic": "Analyze global_load/global_store patterns where the VGPR address is computed with a large stride multiplied by thread index.",
+      "suggestion": "Rearrange data layout or loop order so consecutive threads access consecutive addresses. For matrix ops, ensure the inner loop dimension corresponds to the column index.",
+      "reference": "AMD Instinct Performance Guide: Memory Coalescing",
+      "example_bad": "// Column-major traversal of row-major data\nfor (j = 0; j < width; j++)\n  sum += A[tid + j * height]; // stride = height",
+      "example_good": "// Row-major traversal\nfor (j = 0; j < width; j++)\n  sum += A[tid * width + j]; // stride = 1, coalesced"
+    },
+    {
+      "pattern_id": "AP003",
+      "name": "Excessive s_waitcnt Stalls",
+      "category": "pipeline",
+      "severity": "warning",
+      "description": "Too many s_waitcnt vmcnt(0) or lgkmcnt(0) instructions that force the wavefront to wait for ALL outstanding memory operations. This prevents overlapping memory latency with computation.",
+      "asm_signature": "s_waitcnt\\s+vmcnt\\(0\\)",
+      "detection_logic": "Count s_waitcnt vmcnt(0) and lgkmcnt(0) instructions. Flag when they appear more than once per 10 compute instructions, or when they could use non-zero counts.",
+      "suggestion": "Use partial waitcnts (e.g., vmcnt(2) instead of vmcnt(0)) to allow some memory operations to remain in flight while waiting for only the oldest ones. Reorder instructions to maximize distance between loads and their uses.",
+      "reference": "AMD GCN ISA: s_waitcnt; CK pipeline patterns for async prefetch",
+      "example_bad": "global_load_dwordx4 ...\ns_waitcnt vmcnt(0)  // waits for ALL loads\nv_fma_f32 ...",
+      "example_good": "global_load_dwordx4 v[0:3], ...  // load A\nglobal_load_dwordx4 v[4:7], ...  // load B\n// ... compute on previous data ...\ns_waitcnt vmcnt(1)  // wait only for load A\nv_fma_f32 ...  // use A while B still loading"
+    },
+    {
+      "pattern_id": "AP004",
+      "name": "High Register Pressure (Low Occupancy)",
+      "category": "resource",
+      "severity": "warning",
+      "description": "Kernel uses too many VGPRs or SGPRs, reducing the number of wavefronts that can run concurrently. On gfx942, each CU has 512 VGPRs and 512 AccVGPRs per SIMD. Using >128 VGPRs limits occupancy to <4 waves/SIMD.",
+      "asm_signature": ".vgpr_count:\\s*(\\d+)",
+      "detection_logic": "Parse .vgpr_count from kernel metadata. Flag if >128 VGPRs (occupancy <4 on CDNA3) or >256 VGPRs (occupancy <2).",
+      "suggestion": "Reduce register usage by: (1) breaking the kernel into smaller kernels, (2) using shared memory to spill some values, (3) reducing tile sizes, (4) using lower precision types. Consider compiler hints like __launch_bounds__.",
+      "reference": "AMD Occupancy Calculator; rocprof-compute occupancy analysis",
+      "example_bad": "__global__ void kernel() {\n  float a[64]; // 64 VGPRs just for this array\n  // ... more register-heavy code\n}",
+      "example_good": "__global__ void kernel() {\n  __shared__ float a[64]; // offload to LDS\n  // ... or reduce working set\n}"
+    },
+    {
+      "pattern_id": "AP005",
+      "name": "Missing Prefetch / No Double Buffering",
+      "category": "pipeline",
+      "severity": "warning",
+      "description": "Main loop loads data and immediately waits for it before computing. No prefetch or double-buffering is used, leaving the compute units idle during memory latency.",
+      "asm_signature": "global_load.*\\n(s_waitcnt|s_nop){1,3}\\n.*(v_fma|v_mfma|v_mul|v_add)",
+      "detection_logic": "Detect patterns where global_load is immediately followed by s_waitcnt and then compute instructions, with no interleaved loads from the next iteration.",
+      "suggestion": "Implement software pipelining with double buffering: pre-load data for iteration N+1 while computing on iteration N. Use ping-pong LDS buffers to overlap memory and compute.",
+      "reference": "aiter CK gemm_pipeline_ag_bg_cr_comp_v4.hpp (ping-pong LDS); CK tutorial pipeline examples",
+      "example_bad": "for (int t = 0; t < tiles; t++) {\n  load_tile(t);\n  __syncthreads();  // wait\n  compute(t);\n  __syncthreads();\n}",
+      "example_good": "load_tile(0);  // prefetch first tile\nfor (int t = 0; t < tiles; t++) {\n  if (t + 1 < tiles) load_tile_async(t+1);  // prefetch next\n  __syncthreads();\n  compute(t);  // compute current while next is loading\n  __syncthreads();\n  swap_buffers();\n}"
+    },
+    {
+      "pattern_id": "AP006",
+      "name": "Suboptimal MFMA Selection",
+      "category": "compute",
+      "severity": "info",
+      "description": "Using smaller MFMA tiles (e.g., 4x4x4) when larger tiles (32x32x8) would be more efficient for the problem size. Larger MFMA tiles have better arithmetic intensity.",
+      "asm_signature": "v_mfma_.*4x4x4",
+      "detection_logic": "Check MFMA instructions used. If small tiles are used but the overall matrix dimensions are large, suggest larger tiles.",
+      "suggestion": "For large matrix operations, prefer v_mfma_f32_32x32x8_f16 (512 FLOPs/instruction) over v_mfma_f32_4x4x4_16b_f16 (16 FLOPs). Larger tiles amortize instruction overhead and improve data reuse.",
+      "reference": "AMD CDNA3 ISA: MFMA instructions; aiter CK block_gemm patterns",
+      "example_bad": "// Using 4x4 MFMA for large GEMM\nv_mfma_f32_4x4x4_16b_f16 a[0:3], v[0:1], v[2:3], a[0:3]",
+      "example_good": "// Using 32x32 MFMA for large GEMM\nv_mfma_f32_32x32x8_f16 a[0:15], v[0:1], v[2:3], a[0:15]"
+    },
+    {
+      "pattern_id": "AP007",
+      "name": "No MFMA Usage for Matrix Operations",
+      "category": "compute",
+      "severity": "critical",
+      "description": "Matrix multiplication is implemented using scalar FMA instructions instead of MFMA (Matrix Fused Multiply-Add). MFMA can compute a full matrix tile in one instruction, delivering 10-100x higher throughput.",
+      "asm_signature": "(v_fma_f32|v_fmac_f32).*\\n.*(v_fma_f32|v_fmac_f32).*\\n.*(v_fma_f32|v_fmac_f32)",
+      "detection_logic": "In GEMM-like kernels, detect long chains of v_fma/v_fmac without any v_mfma instructions. If the kernel computes matmul, it should use MFMA.",
+      "suggestion": "Replace scalar FMA chains with MFMA instructions. Use CK or aiter templates for optimized MFMA-based GEMM. For FP16, use v_mfma_f32_32x32x8_f16 for optimal throughput.",
+      "reference": "aiter GEMM kernels; CK composable_kernel block_gemm_asmem_bsmem_creg patterns"
+    },
+    {
+      "pattern_id": "AP008",
+      "name": "Redundant LDS Barrier",
+      "category": "sync",
+      "severity": "info",
+      "description": "Multiple __syncthreads() (s_barrier) in sequence without LDS read/write between them. Extra barriers add synchronization overhead without correctness benefit.",
+      "asm_signature": "s_barrier\\n\\s*s_barrier",
+      "detection_logic": "Find consecutive s_barrier instructions with no ds_read/ds_write between them.",
+      "suggestion": "Remove redundant barriers. Only use s_barrier when there is a producer-consumer dependency through LDS between different threads.",
+      "reference": "AMD programming best practices"
+    },
+    {
+      "pattern_id": "AP009",
+      "name": "Non-Vectorized Global Memory Access",
+      "category": "memory",
+      "severity": "warning",
+      "description": "Using 32-bit global loads/stores when 128-bit (dwordx4) would be possible. Wider loads better utilize memory bandwidth and reduce instruction count.",
+      "asm_signature": "global_load_dword\\s",
+      "detection_logic": "Count global_load_dword vs global_load_dwordx4. If many single-dword loads could be combined into wider loads, flag it.",
+      "suggestion": "Use vectorized types (float4, half8) to enable 128-bit loads. The compiler often vectorizes automatically with -O3, but explicit vectorization guarantees it.",
+      "reference": "AMD memory optimization guide",
+      "example_bad": "float a = input[idx];\nfloat b = input[idx+1]; // two 32-bit loads",
+      "example_good": "float2 ab = *reinterpret_cast<const float2*>(&input[idx]); // one 64-bit load"
+    },
+    {
+      "pattern_id": "AP010",
+      "name": "FP8 Not Used on CDNA3+",
+      "category": "precision",
+      "severity": "info",
+      "description": "On gfx940+ (MI300/MI325X/MI350), FP8 MFMA instructions provide 2x throughput compared to FP16 MFMA. Inference workloads should consider FP8 quantization.",
+      "asm_signature": "v_mfma_f32_.*_f16",
+      "detection_logic": "On gfx940+, if only FP16 MFMA instructions are used, suggest considering FP8 alternatives for applicable workloads.",
+      "suggestion": "Consider using FP8 (E4M3 or E5M2) MFMA instructions: v_mfma_f32_32x32x16_fp8_fp8 provides 2x throughput vs v_mfma_f32_32x32x8_f16. Use block-scaling for accuracy preservation.",
+      "reference": "aiter FP8 GEMM kernels; hsa/gfx942/fp8gemm_blockscale/"
+    }
+  ]
+}

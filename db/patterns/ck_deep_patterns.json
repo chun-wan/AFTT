@@ -1,0 +1,1330 @@
+{
+  "total_pipelines_analyzed": 21,
+  "pipeline_analyses": [
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_base.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_base",
+      "parameters": {},
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "single_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [],
+      "block_sync_count": 0,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": false,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": false,
+        "has_block_sync": false,
+        "has_tail_handling": false,
+        "has_warp_specialization": false,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_async.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_async",
+      "parameters": {
+        "PrefetchStages": 2,
+        "PrefillStages": 1,
+        "GlobalBufferNum": 1
+      },
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 2,
+      "buffer_strategy": "single_buffer_ping_pong_lds",
+      "ping_pong_detected": true,
+      "tail_variants": [
+        "One",
+        "Three",
+        "Two"
+      ],
+      "block_sync_count": 4,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": true,
+        "has_ping_pong": true,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 2
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_v3.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_v3",
+      "parameters": {
+        "PrefetchStages": 2,
+        "PrefillStages": 1,
+        "GlobalBufferNum": 1
+      },
+      "sched_group_barriers": [
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "num_mfma_per_issue - num_dswrite_per_issue_a"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "num_mfma_per_issue - num_dswrite_per_issue_b"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "ds_read_a_mfma_rate"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "num_ds_read_inst_a - (num_dsread_a_mfma - 1) * ds_read_a_mfma_rate"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "ds_read_b_mfma_rate"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "num_ds_read_inst_b - (num_dsread_b_mfma - 1) * ds_read_b_mfma_rate"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        }
+      ],
+      "sched_barrier_calls": 3,
+      "buffer_strategy": "single_buffer_ping_pong_lds",
+      "ping_pong_detected": true,
+      "tail_variants": [
+        "Even",
+        "Odd"
+      ],
+      "block_sync_count": 5,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {
+        "DS_WRITE (LDS store)": 2,
+        "MFMA (matrix fused multiply-add)": 6,
+        "VMEM_READ (global/buffer memory load)": 2,
+        "DS_READ (LDS load)": 4
+      },
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": true,
+        "uses_sched_barrier": true,
+        "has_ping_pong": true,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 2
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_v4.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_v4",
+      "parameters": {
+        "PrefetchStages": 2,
+        "PrefillStages": 1,
+        "GlobalBufferNum": 1
+      },
+      "sched_group_barriers": [
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "num_ds_read_inst / num_issue"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "num_ds_write_inst / num_issue"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "C_MFMA_Inst_Num / num_issue - 3"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "8"
+        }
+      ],
+      "sched_barrier_calls": 5,
+      "buffer_strategy": "single_buffer_ping_pong_lds",
+      "ping_pong_detected": true,
+      "tail_variants": [
+        "One",
+        "Three",
+        "Two"
+      ],
+      "block_sync_count": 8,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {
+        "MFMA (matrix fused multiply-add)": 5,
+        "DS_READ (LDS load)": 2,
+        "DS_WRITE (LDS store)": 1,
+        "VMEM_READ (global/buffer memory load)": 1
+      },
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": true,
+        "uses_sched_barrier": true,
+        "has_ping_pong": true,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 2
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_v5.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_v5",
+      "parameters": {
+        "PrefetchStages": 1,
+        "PrefillStages": 1,
+        "GlobalBufferNum": 1
+      },
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "single_buffer_ping_pong_lds",
+      "ping_pong_detected": true,
+      "tail_variants": [
+        "Empty"
+      ],
+      "block_sync_count": 4,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": true,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 1
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_v6.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_v6",
+      "parameters": {
+        "PrefetchStages": 3,
+        "PrefillStages": 1,
+        "GlobalBufferNum": 2,
+        "HotloopUnroll": 2
+      },
+      "sched_group_barriers": [
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "ds_read_a_mfma_rate"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "num_dsread_stage1_a - (num_dsread_stage1_a_mfma - 1) * ds_read_a_mfma_rate"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "ds_read_b_mfma_rate"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "num_dsread_stage1_b - (num_dsread_stage1_b_mfma - 1) * ds_read_b_mfma_rate"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "num_mfma_per_issue - num_dswrite_per_issue_a"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "num_mfma_per_issue - num_dswrite_per_issue_b"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "ds_read_a_mfma_rate"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "num_dsread_stage3_a - (num_dsread_stage3_a_mfma - 1) * ds_read_a_mfma_rate"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "ds_read_b_mfma_rate"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "num_dsread_stage3_b - (num_dsread_stage3_b_mfma - 1) * ds_read_b_mfma_rate"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        }
+      ],
+      "sched_barrier_calls": 1,
+      "buffer_strategy": "double_global_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [
+        "Even",
+        "Odd"
+      ],
+      "block_sync_count": 5,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {
+        "DS_READ (LDS load)": 8,
+        "MFMA (matrix fused multiply-add)": 8,
+        "DS_WRITE (LDS store)": 2,
+        "VMEM_READ (global/buffer memory load)": 2
+      },
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": true,
+        "uses_sched_barrier": true,
+        "has_ping_pong": false,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 3
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_mem.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_mem",
+      "parameters": {
+        "PrefillStages": 1
+      },
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "double_smem_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [
+        "One",
+        "Three",
+        "Two"
+      ],
+      "block_sync_count": 10,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_scheduler.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_scheduler",
+      "parameters": {},
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "single_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [
+        "Empty",
+        "Even",
+        "Odd",
+        "One",
+        "Three",
+        "Two"
+      ],
+      "block_sync_count": 0,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": false,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": false,
+        "has_block_sync": false,
+        "has_tail_handling": true,
+        "has_warp_specialization": false,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_agmem_bgmem_creg_v1.hpp",
+      "pipeline_name": "gemm_pipeline_agmem_bgmem_creg_v1",
+      "parameters": {
+        "PrefetchStages": 1,
+        "PrefillStages": 1,
+        "GlobalBufferNum": 1
+      },
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "double_smem_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [
+        "Empty"
+      ],
+      "block_sync_count": 5,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 1
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_agmem_bgmem_creg_v2.hpp",
+      "pipeline_name": "gemm_pipeline_agmem_bgmem_creg_v2",
+      "parameters": {
+        "PrefetchStages": 2,
+        "PrefillStages": 1,
+        "GlobalBufferNum": 1
+      },
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "double_smem_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [
+        "Empty"
+      ],
+      "block_sync_count": 5,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 2
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipelines.hpp",
+      "pipeline_name": "gemm_pipelines",
+      "parameters": {},
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "single_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [],
+      "block_sync_count": 0,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": false,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": false,
+        "has_block_sync": false,
+        "has_tail_handling": false,
+        "has_warp_specialization": false,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_universal_pipeline_ag_bg_cr_policy.hpp",
+      "pipeline_name": "gemm_universal_pipeline_ag_bg_cr_policy",
+      "parameters": {},
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "single_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [],
+      "block_sync_count": 0,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": false,
+        "has_block_sync": false,
+        "has_tail_handling": false,
+        "has_warp_specialization": true,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/wp_pipeline_agmem_bgmem_creg_base_policy.hpp",
+      "pipeline_name": "wp_pipeline_agmem_bgmem_creg_base_policy",
+      "parameters": {},
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "single_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [],
+      "block_sync_count": 0,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": false,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": false,
+        "has_block_sync": false,
+        "has_tail_handling": false,
+        "has_warp_specialization": false,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/wp_pipeline_agmem_bgmem_creg_v2.hpp",
+      "pipeline_name": "wp_pipeline_agmem_bgmem_creg_v2",
+      "parameters": {
+        "PrefetchStages": 2,
+        "PrefillStages": 1,
+        "GlobalBufferNum": 1
+      },
+      "sched_group_barriers": [
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        }
+      ],
+      "sched_barrier_calls": 4,
+      "buffer_strategy": "double_smem_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [
+        "Even",
+        "Odd"
+      ],
+      "block_sync_count": 2,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {
+        "MFMA (matrix fused multiply-add)": 1,
+        "DS_WRITE (LDS store)": 2,
+        "VMEM_READ (global/buffer memory load)": 3,
+        "DS_READ (LDS load)": 2
+      },
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": true,
+        "uses_sched_barrier": true,
+        "has_ping_pong": false,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 2
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/flatmm/pipeline/flatmm_pipeline_agmem_bgmem_creg_v1.hpp",
+      "pipeline_name": "flatmm_pipeline_agmem_bgmem_creg_v1",
+      "parameters": {
+        "PrefetchStages": 2
+      },
+      "sched_group_barriers": [
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        }
+      ],
+      "sched_barrier_calls": 6,
+      "buffer_strategy": "single_buffer_ping_pong_lds",
+      "ping_pong_detected": true,
+      "tail_variants": [
+        "Even",
+        "Odd"
+      ],
+      "block_sync_count": 6,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {
+        "MFMA (matrix fused multiply-add)": 1,
+        "DS_WRITE (LDS store)": 2,
+        "VMEM_READ (global/buffer memory load)": 3,
+        "DS_READ (LDS load)": 2
+      },
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": true,
+        "uses_sched_barrier": true,
+        "has_ping_pong": true,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 2
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/flatmm/pipeline/flatmm_pipeline_agmem_bgmem_creg_v1_policy.hpp",
+      "pipeline_name": "flatmm_pipeline_agmem_bgmem_creg_v1_policy",
+      "parameters": {},
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "single_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [],
+      "block_sync_count": 0,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": false,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": false,
+        "has_block_sync": false,
+        "has_tail_handling": false,
+        "has_warp_specialization": false,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/flatmm/pipeline/mixed_prec_flatmm_pipeline_agmem_bgmem_creg_v1.hpp",
+      "pipeline_name": "mixed_prec_flatmm_pipeline_agmem_bgmem_creg_v1",
+      "parameters": {},
+      "sched_group_barriers": [
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        }
+      ],
+      "sched_barrier_calls": 13,
+      "buffer_strategy": "single_buffer_ping_pong_lds",
+      "ping_pong_detected": true,
+      "tail_variants": [
+        "Even",
+        "Odd"
+      ],
+      "block_sync_count": 10,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {
+        "MFMA (matrix fused multiply-add)": 2,
+        "DS_WRITE (LDS store)": 4,
+        "VMEM_READ (global/buffer memory load)": 6,
+        "DS_READ (LDS load)": 4
+      },
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": true,
+        "uses_sched_barrier": true,
+        "has_ping_pong": true,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/flatmm/pipeline/mixed_prec_flatmm_pipeline_agmem_bgmem_creg_v1_policy.hpp",
+      "pipeline_name": "mixed_prec_flatmm_pipeline_agmem_bgmem_creg_v1_policy",
+      "parameters": {},
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "single_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [],
+      "block_sync_count": 0,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": false,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": false,
+        "has_block_sync": false,
+        "has_tail_handling": false,
+        "has_warp_specialization": false,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/flatmm/pipeline/moe_flatmm_pipeline_agmem_bgmem_creg.hpp",
+      "pipeline_name": "moe_flatmm_pipeline_agmem_bgmem_creg",
+      "parameters": {},
+      "sched_group_barriers": [
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        }
+      ],
+      "sched_barrier_calls": 6,
+      "buffer_strategy": "single_buffer_ping_pong_lds",
+      "ping_pong_detected": true,
+      "tail_variants": [
+        "Even",
+        "Odd"
+      ],
+      "block_sync_count": 6,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {
+        "MFMA (matrix fused multiply-add)": 1,
+        "DS_WRITE (LDS store)": 2,
+        "VMEM_READ (global/buffer memory load)": 3,
+        "DS_READ (LDS load)": 2
+      },
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": true,
+        "uses_sched_barrier": true,
+        "has_ping_pong": true,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/flatmm/pipeline/mx_flatmm_pipeline_agmem_bgmem_creg_v1.hpp",
+      "pipeline_name": "mx_flatmm_pipeline_agmem_bgmem_creg_v1",
+      "parameters": {},
+      "sched_group_barriers": [
+        {
+          "mask_hex": "0x008",
+          "mask_name": "MFMA (matrix fused multiply-add)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x200",
+          "mask_name": "DS_WRITE (LDS store)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x100",
+          "mask_name": "DS_READ (LDS load)",
+          "count_expr": "1"
+        },
+        {
+          "mask_hex": "0x020",
+          "mask_name": "VMEM_READ (global/buffer memory load)",
+          "count_expr": "1"
+        }
+      ],
+      "sched_barrier_calls": 6,
+      "buffer_strategy": "single_buffer_ping_pong_lds",
+      "ping_pong_detected": true,
+      "tail_variants": [
+        "Even",
+        "Odd"
+      ],
+      "block_sync_count": 3,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {
+        "MFMA (matrix fused multiply-add)": 1,
+        "DS_WRITE (LDS store)": 2,
+        "VMEM_READ (global/buffer memory load)": 3,
+        "DS_READ (LDS load)": 2
+      },
+      "warp_specialization": true,
+      "features": {
+        "uses_sched_group_barrier": true,
+        "uses_sched_barrier": true,
+        "has_ping_pong": true,
+        "has_double_smem": true,
+        "has_block_sync": true,
+        "has_tail_handling": true,
+        "has_warp_specialization": true,
+        "prefetch_stages": 0
+      }
+    },
+    {
+      "file": "3rdparty/composable_kernel/include/ck_tile/ops/flatmm/pipeline/mx_flatmm_pipeline_agmem_bgmem_creg_v1_policy.hpp",
+      "pipeline_name": "mx_flatmm_pipeline_agmem_bgmem_creg_v1_policy",
+      "parameters": {},
+      "sched_group_barriers": [],
+      "sched_barrier_calls": 0,
+      "buffer_strategy": "single_buffer",
+      "ping_pong_detected": false,
+      "tail_variants": [],
+      "block_sync_count": 0,
+      "scheduler_structure": {},
+      "sched_barrier_summary": {},
+      "warp_specialization": false,
+      "features": {
+        "uses_sched_group_barrier": false,
+        "uses_sched_barrier": false,
+        "has_ping_pong": false,
+        "has_double_smem": false,
+        "has_block_sync": false,
+        "has_tail_handling": false,
+        "has_warp_specialization": false,
+        "prefetch_stages": 0
+      }
+    }
+  ],
+  "pipeline_comparison": [
+    {
+      "pipeline": "gemm_pipeline_ag_bg_cr_comp_v3",
+      "strategy": "single_buffer_compute_optimized",
+      "prefetch_stages": 2,
+      "prefill_stages": 1,
+      "global_buffers": 1,
+      "lds_buffers": 1,
+      "sched_group_barrier_masks": [
+        "0x008 (MFMA)",
+        "0x100 (DS_READ)",
+        "0x200 (DS_WRITE)",
+        "0x020 (VMEM_READ)"
+      ],
+      "scheduler_structure": "Two-stage: (1) DS_WRITE+VMEM_READ interleaved with MFMA, (2) DS_READ interleaved with MFMA",
+      "hotloop": "do-while with num_loop - 1 iterations. Each iteration: sync -> prefill LDS -> global_load next -> block_gemm -> sync -> local_prefetch -> HotLoopScheduler",
+      "tail_handling": [
+        "Odd",
+        "Even"
+      ],
+      "key_insight": "Single LDS buffer requires block_sync_lds between write and read phases. Scheduling barriers ensure DS writes complete before VMEM reads are issued.",
+      "performance_tradeoff": "Half the LDS usage of v4 but requires more synchronization barriers."
+    },
+    {
+      "pipeline": "gemm_pipeline_ag_bg_cr_comp_v4",
+      "strategy": "double_buffer_ping_pong",
+      "prefetch_stages": 2,
+      "prefill_stages": 1,
+      "global_buffers": 1,
+      "lds_buffers": 2,
+      "sched_group_barrier_masks": [
+        "0x008 (MFMA)",
+        "0x100 (DS_READ)",
+        "0x200 (DS_WRITE)",
+        "0x020 (VMEM_READ)"
+      ],
+      "scheduler_structure": "Single-stage per VMEM issue: MFMA(1) -> DS_READ(N) -> MFMA(1) -> DS_WRITE(N) -> MFMA(1) -> VMEM(1) -> MFMA(remaining)",
+      "hotloop": "do-while with iCounter = num_loop - 2. Each iteration has ping phase (read block1, fill block0, compute block0) then pong phase (read block0, fill block1, compute block1). iCounter -= 2 per iteration.",
+      "tail_handling": [
+        "One",
+        "Two",
+        "Three"
+      ],
+      "key_insight": "Two LDS buffers (a_lds_block0/1, b_lds_block0/1) at offset smem_size. While computing on one buffer, the other is being filled. Eliminates read-after-write hazard without sync.",
+      "performance_tradeoff": "2x LDS usage but significantly reduced sync overhead. Best for large tile sizes where LDS is not the bottleneck."
+    },
+    {
+      "pipeline": "gemm_pipeline_ag_bg_cr_comp_v5",
+      "strategy": "warp_specialization",
+      "prefetch_stages": 1,
+      "prefill_stages": 1,
+      "global_buffers": 1,
+      "lds_buffers": 1,
+      "sched_group_barrier_masks": [],
+      "scheduler_structure": "No instruction-level scheduling. Uses warp-level ping-pong: warp 0 does memory ops while warp 1 computes, then they swap.",
+      "hotloop": "while(num_compute_steps > 1): sync -> warp 0: MemoryOpsStep / warp 1: ComputeStep -> operation_id alternates",
+      "tail_handling": [
+        "Empty"
+      ],
+      "key_insight": "Warp specialization: different warps assigned different roles (memory vs compute). No __builtin_amdgcn_sched_group_barrier needed. Two register tile sets for alternating computation.",
+      "performance_tradeoff": "Simpler scheduling but requires careful warp role assignment. Each warp only does half the work types."
+    },
+    {
+      "pipeline": "gemm_pipeline_ag_bg_cr_comp_v6",
+      "strategy": "triple_prefetch_double_buffer",
+      "prefetch_stages": 3,
+      "prefill_stages": 1,
+      "global_buffers": 2,
+      "lds_buffers": 1,
+      "sched_group_barrier_masks": [
+        "0x008 (MFMA)",
+        "0x100 (DS_READ)",
+        "0x200 (DS_WRITE)",
+        "0x020 (VMEM_READ)"
+      ],
+      "scheduler_structure": "Three-stage: (1) DS_READ_A + MFMA, DS_READ_B + MFMA, (2) DS_WRITE + VMEM_READ + MFMA for A and B, (3) DS_READ_A + MFMA, DS_READ_B + MFMA",
+      "hotloop": "do-while with HotloopUnroll=2. Each iteration: LoopFunc(I0) then LoopFunc(I1). Inner K-loop with KRepeat steps. Prefill/prefetch at k0 == KRepeat-1.",
+      "tail_handling": [
+        "Odd",
+        "Even"
+      ],
+      "key_insight": "Three prefetch stages allow deeper memory latency hiding. Double global buffers (I0/I1) with HotloopUnroll=2 processes two K-tiles per iteration. Three-stage scheduler separates read and write phases more explicitly.",
+      "performance_tradeoff": "Highest latency hiding but requires 3 pipeline stages before hot loop starts. Best for large GEMM shapes where the overhead of pipeline fill is amortized."
+    },
+    {
+      "pipeline": "flatmm_pipeline_agmem_bgmem_creg_v1",
+      "strategy": "mixed_ping_pong",
+      "prefetch_stages": 2,
+      "prefill_stages": 1,
+      "global_buffers": 1,
+      "lds_buffers": 2,
+      "sched_group_barrier_masks": [
+        "0x008 (MFMA)",
+        "0x100 (DS_READ)",
+        "0x200 (DS_WRITE)",
+        "0x020 (VMEM_READ)"
+      ],
+      "scheduler_structure": "Per-M scheduling via SchedulerPerM: for each MFMA, interleave DS_WRITE(1), VMEM_READ(1), DS_READ(1) based on instruction order. K x M nested loop.",
+      "hotloop": "while(iCounter > 0) with 2 K-steps per iteration. A: LDS ping/pong (p_smem_ping, p_smem_pong). B: register ping/pong (b_warp_tensor_ping/pong). GEMM alternates between ping and pong data.",
+      "tail_handling": [
+        "Odd",
+        "Even"
+      ],
+      "key_insight": "A matrix goes through DRAM->reg->LDS(ping/pong)->reg->GEMM. B matrix stays in registers with ping/pong register tiles. Asymmetric strategy: LDS double-buffer for A, register double-buffer for B.",
+      "performance_tradeoff": "Optimized for flat matrix multiply where B is reused across M tiles. Register double-buffering for B avoids LDS bandwidth contention."
+    },
+    {
+      "pipeline": "gemm_pipeline_ag_bg_cr_comp_async",
+      "strategy": "async_copy",
+      "prefetch_stages": 2,
+      "prefill_stages": 1,
+      "global_buffers": 1,
+      "lds_buffers": 1,
+      "sched_group_barrier_masks": [],
+      "scheduler_structure": "Uses async copy intrinsics for global-to-LDS transfers, overlapping with compute.",
+      "hotloop": "Similar to v3 but with async copy for memory transfers.",
+      "tail_handling": [
+        "Odd",
+        "Even"
+      ],
+      "key_insight": "Async copy allows global memory loads to be issued and completed in the background without explicit waitcnt management.",
+      "performance_tradeoff": "Requires hardware support for async copy. Simplifies scheduling but may have limitations on copy granularity."
+    }
+  ],
+  "sched_barrier_reference": {
+    "description": "__builtin_amdgcn_sched_group_barrier(mask, count, flags) constrains the instruction scheduler to issue exactly 'count' instructions matching 'mask' before proceeding.",
+    "masks": {
+      "0x008": {
+        "name": "MFMA",
+        "instructions": "v_mfma_*, v_smfma_*",
+        "purpose": "Control matrix multiply-accumulate instruction placement"
+      },
+      "0x020": {
+        "name": "VMEM_READ",
+        "instructions": "global_load_*, buffer_load_*",
+        "purpose": "Control global/buffer memory load placement"
+      },
+      "0x040": {
+        "name": "VMEM_WRITE",
+        "instructions": "global_store_*, buffer_store_*",
+        "purpose": "Control global/buffer memory store placement"
+      },
+      "0x100": {
+        "name": "DS_READ",
+        "instructions": "ds_read_*, ds_load_*",
+        "purpose": "Control LDS read placement"
+      },
+      "0x200": {
+        "name": "DS_WRITE",
+        "instructions": "ds_write_*, ds_store_*",
+        "purpose": "Control LDS write placement"
+      }
+    },
+    "common_patterns": [
+      {
+        "name": "MFMA-DS_READ interleave",
+        "sequence": "sched_group_barrier(0x008, 1) -> sched_group_barrier(0x100, N)",
+        "purpose": "Issue 1 MFMA then N DS reads, hiding MFMA latency with LDS access"
+      },
+      {
+        "name": "MFMA-DS_WRITE-VMEM pipeline",
+        "sequence": "sched_group_barrier(0x200, 1) -> sched_group_barrier(0x008, 1) -> sched_group_barrier(0x020, 1)",
+        "purpose": "Interleave LDS store, MFMA compute, and global memory prefetch"
+      },
+      {
+        "name": "Full barrier",
+        "sequence": "__builtin_amdgcn_sched_barrier(0)",
+        "purpose": "Reset scheduler state, ensuring all prior scheduled groups are issued"
+      }
+    ],
+    "usage_guidelines": [
+      "Use sched_group_barrier to explicitly control instruction interleaving in hot loops",
+      "The 'count' parameter determines how many instructions of that type must be issued",
+      "Pair with sched_barrier(0) at loop boundaries to reset scheduler state",
+      "Ratios should match the actual instruction mix: e.g., if you have 8 MFMA and 2 DS_READ per iteration, schedule ratio 4:1",
+      "Too many barriers can hurt performance by over-constraining the scheduler"
+    ]
+  },
+  "key_optimization_patterns": [
+    {
+      "name": "Ping-Pong Double Buffer (LDS)",
+      "description": "Allocate 2x LDS space. While computing from buffer A, fill buffer B from global memory. Swap on next iteration.",
+      "used_in": [
+        "v4",
+        "flatmm_v1"
+      ],
+      "lds_cost": "2x base",
+      "benefit": "Eliminates read-after-write sync between LDS fill and GEMM compute",
+      "code_pattern": "a_lds_block0 = GetABLdsTensorViews(p_smem); a_lds_block1 = GetABLdsTensorViews(p_smem + smem_size);"
+    },
+    {
+      "name": "Register Double Buffer",
+      "description": "Keep two sets of register tiles (ping/pong). While computing with one set, prefetch into the other.",
+      "used_in": [
+        "flatmm_v1 (for B matrix)",
+        "v5 (for both)"
+      ],
+      "lds_cost": "1x base",
+      "benefit": "Avoids LDS bandwidth contention for frequently reused data",
+      "code_pattern": "b_warp_tensor_ping / b_warp_tensor_pong"
+    },
+    {
+      "name": "Warp Specialization",
+      "description": "Assign different warps to different roles: memory warps load data, compute warps run MFMA.",
+      "used_in": [
+        "v5"
+      ],
+      "lds_cost": "1x base",
+      "benefit": "No instruction-level scheduling needed. Warps can be independently optimized.",
+      "code_pattern": "if(operation_id == 0) MemoryOpsStep(warp_id); else ComputeStep(warp_id);"
+    },
+    {
+      "name": "Deep Prefetch Pipeline",
+      "description": "Issue 3+ prefetch stages before the hot loop starts to fully hide memory latency.",
+      "used_in": [
+        "v6 (PrefetchStages=3)"
+      ],
+      "lds_cost": "1-2x base",
+      "benefit": "Deeper pipeline hides longer memory latencies. Best for large GEMM.",
+      "code_pattern": "GlobalPrefetch1 -> GlobalPrefetch2 -> LocalPrefill -> GlobalPrefetch3 -> HotLoop"
+    },
+    {
+      "name": "Instruction Scheduling Barriers",
+      "description": "Use __builtin_amdgcn_sched_group_barrier to explicitly control which instruction types are issued in what order.",
+      "used_in": [
+        "v3",
+        "v4",
+        "v6",
+        "flatmm_v1"
+      ],
+      "lds_cost": "none",
+      "benefit": "Prevents compiler from reordering instructions in ways that cause pipeline stalls",
+      "code_pattern": "sched_group_barrier(0x008, 1, 0); sched_group_barrier(0x100, N, 0);"
+    }
+  ]
+}

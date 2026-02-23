@@ -1,0 +1,1076 @@
+{
+  "source": "/home/root123/TensorRT-LLM",
+  "kernel_scan_stats": {
+    "total_cu_files": 263,
+    "total_h_files": 194,
+    "total_lines": 34007332,
+    "directories": {
+      "beamSearchKernels": {
+        "cu_files": 9,
+        "cuh_files": 0,
+        "h_files": 1,
+        "cpp_files": 0,
+        "total_lines": 1024,
+        "patterns": {
+          "has_shared_memory": 1,
+          "has_softmax": 1,
+          "has_online_softmax": 1
+        }
+      },
+      "causalConv1d": {
+        "cu_files": 1,
+        "cuh_files": 0,
+        "h_files": 1,
+        "cpp_files": 0,
+        "total_lines": 754,
+        "patterns": {
+          "has_shared_memory": 1,
+          "has_warp_primitives": 2,
+          "has_causal_mask": 2
+        }
+      },
+      "communicationKernels": {
+        "cu_files": 6,
+        "cuh_files": 0,
+        "h_files": 6,
+        "cpp_files": 0,
+        "total_lines": 6375,
+        "patterns": {
+          "has_shared_memory": 5,
+          "has_warp_primitives": 3,
+          "has_fp8": 3,
+          "has_quantization": 6,
+          "has_tensor_core": 8
+        }
+      },
+      "contextFusedMultiHeadAttention": {
+        "cu_files": 1,
+        "cuh_files": 0,
+        "h_files": 5,
+        "cpp_files": 88,
+        "total_lines": 1117310,
+        "patterns": {
+          "has_shared_memory": 1,
+          "has_tensor_core": 6,
+          "has_fp8": 3,
+          "has_flash_attention": 93,
+          "has_causal_mask": 4,
+          "has_softmax": 7,
+          "has_quantization": 2,
+          "has_paged_kv": 31,
+          "has_cublas": 2
+        }
+      },
+      "cuteDslKernels": {
+        "cu_files": 1,
+        "cuh_files": 0,
+        "h_files": 1,
+        "cpp_files": 0,
+        "total_lines": 617,
+        "patterns": {
+          "has_tensor_core": 1,
+          "has_fp8": 1,
+          "has_quantization": 1,
+          "has_cutlass": 2
+        }
+      },
+      "cutlass_kernels": {
+        "cu_files": 48,
+        "cuh_files": 8,
+        "h_files": 42,
+        "cpp_files": 2,
+        "total_lines": 23301,
+        "patterns": {
+          "has_fp8": 50,
+          "has_quantization": 44,
+          "has_cutlass": 99,
+          "has_shared_memory": 3,
+          "has_tensor_core": 25,
+          "has_warp_primitives": 2,
+          "has_softmax": 1
+        }
+      },
+      "decoderMaskedMultiheadAttention": {
+        "cu_files": 57,
+        "cuh_files": 0,
+        "h_files": 17,
+        "cpp_files": 621,
+        "total_lines": 1892115,
+        "patterns": {
+          "has_quantization": 6,
+          "has_shared_memory": 1,
+          "has_warp_primitives": 1,
+          "has_tensor_core": 14,
+          "has_fp8": 10,
+          "has_softmax": 9,
+          "has_flash_attention": 1,
+          "has_paged_kv": 484,
+          "has_causal_mask": 2
+        }
+      },
+      "dsv3MinLatencyKernels": {
+        "cu_files": 2,
+        "cuh_files": 0,
+        "h_files": 2,
+        "cpp_files": 0,
+        "total_lines": 1007,
+        "patterns": {
+          "has_shared_memory": 2,
+          "has_warp_primitives": 2,
+          "has_tensor_core": 2
+        }
+      },
+      "flashMLA": {
+        "cu_files": 4,
+        "cuh_files": 0,
+        "h_files": 7,
+        "cpp_files": 0,
+        "total_lines": 2217,
+        "patterns": {
+          "has_shared_memory": 2,
+          "has_warp_primitives": 3,
+          "has_cutlass": 9,
+          "has_tensor_core": 4,
+          "has_fp8": 3,
+          "has_flash_attention": 3,
+          "has_softmax": 4,
+          "has_causal_mask": 2
+        }
+      },
+      "fusedLayernormKernels": {
+        "cu_files": 1,
+        "cuh_files": 3,
+        "h_files": 2,
+        "cpp_files": 0,
+        "total_lines": 1931,
+        "patterns": {
+          "has_tensor_core": 4,
+          "has_warp_primitives": 1,
+          "has_fp8": 3,
+          "has_quantization": 1,
+          "has_shared_memory": 2
+        }
+      },
+      "groupRmsNormKernels": {
+        "cu_files": 1,
+        "cuh_files": 0,
+        "h_files": 1,
+        "cpp_files": 0,
+        "total_lines": 965,
+        "patterns": {
+          "has_shared_memory": 1,
+          "has_warp_primitives": 1,
+          "has_tensor_core": 1
+        }
+      },
+      "internal_cutlass_kernels": {
+        "cu_files": 0,
+        "cuh_files": 0,
+        "h_files": 6,
+        "cpp_files": 0,
+        "total_lines": 1864,
+        "patterns": {
+          "has_fp8": 5,
+          "has_cutlass": 6,
+          "has_tensor_core": 1,
+          "has_quantization": 3,
+          "has_softmax": 1
+        }
+      },
+      "llama4MinLatencyKernels": {
+        "cu_files": 4,
+        "cuh_files": 5,
+        "h_files": 4,
+        "cpp_files": 0,
+        "total_lines": 2551,
+        "patterns": {
+          "has_fp8": 11,
+          "has_shared_memory": 6,
+          "has_warp_primitives": 6,
+          "has_tensor_core": 7,
+          "has_quantization": 2
+        }
+      },
+      "lora": {
+        "cu_files": 1,
+        "cuh_files": 0,
+        "h_files": 3,
+        "cpp_files": 2,
+        "total_lines": 1054,
+        "patterns": {
+          "has_shared_memory": 1,
+          "has_tensor_core": 2,
+          "has_cublas": 2,
+          "has_cutlass": 1
+        }
+      },
+      "moeLoadBalance": {
+        "cu_files": 1,
+        "cuh_files": 0,
+        "h_files": 2,
+        "cpp_files": 0,
+        "total_lines": 902,
+        "patterns": {
+          "has_shared_memory": 1,
+          "has_warp_primitives": 1,
+          "has_tensor_core": 1
+        }
+      },
+      "selectiveScan": {
+        "cu_files": 15,
+        "cuh_files": 0,
+        "h_files": 10,
+        "cpp_files": 0,
+        "total_lines": 9373,
+        "patterns": {
+          "has_shared_memory": 5,
+          "has_fp8": 7,
+          "has_tensor_core": 7
+        }
+      },
+      "speculativeDecoding": {
+        "cu_files": 8,
+        "cuh_files": 0,
+        "h_files": 8,
+        "cpp_files": 0,
+        "total_lines": 6801,
+        "patterns": {
+          "has_shared_memory": 6,
+          "has_softmax": 2,
+          "has_fp8": 2
+        }
+      },
+      "tinygemm2": {
+        "cu_files": 1,
+        "cuh_files": 1,
+        "h_files": 0,
+        "cpp_files": 0,
+        "total_lines": 570,
+        "patterns": {
+          "has_tensor_core": 2,
+          "has_shared_memory": 1,
+          "has_warp_primitives": 1
+        }
+      },
+      "trtllmGenKernels": {
+        "cu_files": 7,
+        "cuh_files": 2,
+        "h_files": 59,
+        "cpp_files": 3400,
+        "total_lines": 30899585,
+        "patterns": {
+          "has_tensor_core": 53,
+          "has_fp8": 121,
+          "has_quantization": 15,
+          "has_softmax": 1299,
+          "has_causal_mask": 1949,
+          "has_shared_memory": 6,
+          "has_warp_primitives": 4,
+          "has_cutlass": 8,
+          "has_paged_kv": 2270
+        }
+      },
+      "unfusedAttentionKernels": {
+        "cu_files": 11,
+        "cuh_files": 0,
+        "h_files": 1,
+        "cpp_files": 0,
+        "total_lines": 2223,
+        "patterns": {
+          "has_fp8": 4,
+          "has_shared_memory": 1,
+          "has_tensor_core": 1,
+          "has_quantization": 1,
+          "has_paged_kv": 1
+        }
+      },
+      "userbuffers": {
+        "cu_files": 1,
+        "cuh_files": 0,
+        "h_files": 6,
+        "cpp_files": 5,
+        "total_lines": 4175,
+        "patterns": {
+          "has_shared_memory": 2,
+          "has_warp_primitives": 2,
+          "has_tensor_core": 6,
+          "has_fp8": 2,
+          "has_quantization": 4
+        }
+      },
+      "weightOnlyBatchedGemv": {
+        "cu_files": 27,
+        "cuh_files": 0,
+        "h_files": 10,
+        "cpp_files": 0,
+        "total_lines": 2950,
+        "patterns": {
+          "has_shared_memory": 4,
+          "has_tensor_core": 4,
+          "has_fp8": 4,
+          "has_quantization": 8,
+          "has_cutlass": 5,
+          "has_warp_primitives": 2
+        }
+      }
+    }
+  },
+  "total_algorithms_cataloged": 37,
+  "categories": {
+    "Attention": 7,
+    "Communication": 1,
+    "GEMM": 6,
+    "KV-Cache": 2,
+    "MoE": 5,
+    "Normalization": 4,
+    "Quantization": 3,
+    "Sampling": 2,
+    "Specialized": 7
+  },
+  "algorithms": [
+    {
+      "category": "Attention",
+      "algorithm": "Context Fused Multi-Head Attention (FMHA)",
+      "trtllm_path": "contextFusedMultiHeadAttention/",
+      "description": "Flash Attention implementation for prefill/context phase. Tiles QKV in shared memory, computes attention with online softmax to avoid materializing full attention matrix.",
+      "key_techniques": [
+        "Tiled QKV computation in shared memory",
+        "Online softmax (numerically stable, single-pass)",
+        "Causal masking support",
+        "Multi-head / Multi-query / Grouped-query attention",
+        "FP16/BF16/FP8 support",
+        "Paged KV-cache support"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "tensor_cores",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*d) per head with tiling",
+      "variants": [
+        "MHA",
+        "MQA",
+        "GQA",
+        "with_ALiBi",
+        "with_RoPE"
+      ]
+    },
+    {
+      "category": "Attention",
+      "algorithm": "Decoder Masked Multi-Head Attention (DMHA)",
+      "trtllm_path": "decoderMaskedMultiheadAttention/",
+      "description": "Optimized attention for autoregressive decode phase. Single query token attends to all cached KV pairs.",
+      "key_techniques": [
+        "Single-query optimization",
+        "Paged KV-cache traversal",
+        "Cross-attention support",
+        "Beam search integration"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*d) per query token",
+      "variants": [
+        "MHA",
+        "MQA",
+        "GQA",
+        "cross_attention"
+      ]
+    },
+    {
+      "category": "Attention",
+      "algorithm": "XQA (Cross-Query Attention) Dispatcher",
+      "trtllm_path": "xqaDispatcher.cpp",
+      "description": "Dispatcher for optimized attention variants that fuses Q projection with attention computation.",
+      "key_techniques": [
+        "Fused Q projection + attention",
+        "Dynamic dispatch based on sequence length",
+        "Multi-GPU sharding support"
+      ],
+      "cuda_features": [
+        "tensor_cores"
+      ],
+      "complexity": "Variable",
+      "variants": [
+        "multi_gpu",
+        "single_gpu"
+      ]
+    },
+    {
+      "category": "Attention",
+      "algorithm": "Flash MLA (Multi-Level Attention)",
+      "trtllm_path": "flashMLA/",
+      "description": "Multi-level attention implementation for models like DeepSeek that use compressed KV representations with latent attention.",
+      "key_techniques": [
+        "Compressed KV-cache",
+        "Latent attention decomposition",
+        "Flash attention style tiling"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "tensor_cores"
+      ],
+      "complexity": "O(N*d_compressed)",
+      "variants": [
+        "chunked_prefill",
+        "decode"
+      ]
+    },
+    {
+      "category": "Attention",
+      "algorithm": "Unfused Attention Kernels",
+      "trtllm_path": "unfusedAttentionKernels/",
+      "description": "Separate QK matmul, softmax, and PV matmul kernels for cases where fusion is not beneficial.",
+      "key_techniques": [
+        "Separate Q*K^T computation",
+        "Standalone softmax",
+        "Separate softmax(QK^T)*V computation",
+        "Useful for debugging and small batch sizes"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N^2*d)",
+      "variants": [
+        "standard",
+        "with_mask"
+      ]
+    },
+    {
+      "category": "Attention",
+      "algorithm": "Sage Attention",
+      "trtllm_path": "sageAttentionKernels.cu",
+      "description": "Approximate attention using locality-sensitive hashing or sparse patterns for ultra-long sequences.",
+      "key_techniques": [
+        "Sparse attention patterns",
+        "Approximate attention for long sequences"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*sqrt(N)*d) approximate",
+      "variants": [
+        "standard"
+      ]
+    },
+    {
+      "category": "Attention",
+      "algorithm": "Sparse Attention",
+      "trtllm_path": "sparseAttentionKernels.cu",
+      "description": "Structured sparse attention patterns (local + global) for efficient long-sequence processing.",
+      "key_techniques": [
+        "Local windowed attention",
+        "Global attention tokens",
+        "Structured sparsity patterns"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N*w*d) where w is window size",
+      "variants": [
+        "local_global",
+        "strided"
+      ]
+    },
+    {
+      "category": "GEMM",
+      "algorithm": "CUTLASS GEMM Kernels",
+      "trtllm_path": "cutlass_kernels/",
+      "description": "High-performance GEMM implementations based on NVIDIA CUTLASS library. Covers standard GEMM, grouped GEMM, split-K, and stream-K variants.",
+      "key_techniques": [
+        "CUTLASS tile-based GEMM",
+        "Split-K parallelism for small M",
+        "Stream-K for load balancing",
+        "Grouped GEMM for batched operations",
+        "FP16/BF16/INT8/FP8 support",
+        "Epilogue fusion (bias, activation, quantization)"
+      ],
+      "cuda_features": [
+        "tensor_cores",
+        "shared_memory",
+        "cutlass"
+      ],
+      "complexity": "O(M*N*K)",
+      "variants": [
+        "standard",
+        "split_k",
+        "stream_k",
+        "grouped",
+        "batched"
+      ]
+    },
+    {
+      "category": "GEMM",
+      "algorithm": "Weight-Only Batched GEMV",
+      "trtllm_path": "weightOnlyBatchedGemv/",
+      "description": "Optimized GEMV for weight-only quantized models. Dequantizes on-the-fly during matrix-vector multiplication.",
+      "key_techniques": [
+        "On-the-fly weight dequantization",
+        "W4A16, W8A16 support",
+        "Vectorized memory access",
+        "Per-channel and per-group scales"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(M*K)",
+      "variants": [
+        "W4A16",
+        "W8A16",
+        "per_channel",
+        "per_group"
+      ]
+    },
+    {
+      "category": "GEMM",
+      "algorithm": "QServe GEMM",
+      "trtllm_path": "qserveGemm*.cu",
+      "description": "Quantized serving GEMM with per-channel and per-group quantization support.",
+      "key_techniques": [
+        "Per-channel quantization",
+        "Per-group quantization",
+        "Fused dequantization"
+      ],
+      "cuda_features": [
+        "tensor_cores"
+      ],
+      "complexity": "O(M*N*K)",
+      "variants": [
+        "per_channel",
+        "per_group"
+      ]
+    },
+    {
+      "category": "GEMM",
+      "algorithm": "Group GEMM",
+      "trtllm_path": "groupGemm.cu",
+      "description": "Grouped GEMM for executing multiple small GEMMs concurrently, commonly used in MoE.",
+      "key_techniques": [
+        "Multiple concurrent GEMMs",
+        "Variable batch sizes per group",
+        "CUDA graph compatible"
+      ],
+      "cuda_features": [
+        "tensor_cores",
+        "cutlass"
+      ],
+      "complexity": "O(sum(M_i*N_i*K_i))",
+      "variants": [
+        "standard",
+        "cuda_graph"
+      ]
+    },
+    {
+      "category": "GEMM",
+      "algorithm": "Split-K Group GEMM",
+      "trtllm_path": "splitkGroupGemm.cu",
+      "description": "Split-K parallelized group GEMM for better utilization with small problem sizes.",
+      "key_techniques": [
+        "Split-K across multiple CTAs",
+        "Atomic reduction",
+        "Better GPU utilization for small M"
+      ],
+      "cuda_features": [
+        "tensor_cores",
+        "atomics"
+      ],
+      "complexity": "O(M*N*K/split_k)",
+      "variants": [
+        "standard"
+      ]
+    },
+    {
+      "category": "GEMM",
+      "algorithm": "TinyGEMM",
+      "trtllm_path": "tinygemm2/",
+      "description": "Highly optimized small-matrix GEMM kernels for decode-phase where batch sizes are very small.",
+      "key_techniques": [
+        "Optimized for very small M (1-8)",
+        "Register-level tiling",
+        "Minimal shared memory usage"
+      ],
+      "cuda_features": [
+        "tensor_cores",
+        "warp_primitives"
+      ],
+      "complexity": "O(M*N*K) with small M",
+      "variants": [
+        "fp16",
+        "bf16",
+        "fp8"
+      ]
+    },
+    {
+      "category": "MoE",
+      "algorithm": "MoE Routing Kernels",
+      "trtllm_path": "customMoeRoutingKernels.cu",
+      "description": "Expert routing for Mixture of Experts: TopK gating, expert assignment, and token dispatch.",
+      "key_techniques": [
+        "TopK expert selection",
+        "Load-balanced routing",
+        "Token-to-expert assignment",
+        "Capacity factor handling"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*E) where E is num experts",
+      "variants": [
+        "topk",
+        "expert_choice"
+      ]
+    },
+    {
+      "category": "MoE",
+      "algorithm": "MoE Alignment Kernels",
+      "trtllm_path": "moeAlignKernels.cu",
+      "description": "Token alignment and permutation for efficient expert GEMM execution.",
+      "key_techniques": [
+        "Token permutation for grouped GEMM",
+        "Expert-parallel layout transformation",
+        "Padding and alignment"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N*K)",
+      "variants": [
+        "standard"
+      ]
+    },
+    {
+      "category": "MoE",
+      "algorithm": "MoE Prepare Kernels",
+      "trtllm_path": "moePrepareKernels.cu",
+      "description": "Prepares token layout for MoE GEMM execution including sorting and grouping.",
+      "key_techniques": [
+        "Token sorting by expert ID",
+        "Group size computation",
+        "Expert metadata preparation"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N*log(N))",
+      "variants": [
+        "standard"
+      ]
+    },
+    {
+      "category": "MoE",
+      "algorithm": "Fused MoE Communication",
+      "trtllm_path": "fusedMoeCommKernels.cu",
+      "description": "Fused MoE computation with inter-GPU communication for expert parallelism.",
+      "key_techniques": [
+        "All-to-all communication",
+        "Expert-parallel distribution",
+        "Fused compute + communication overlap"
+      ],
+      "cuda_features": [
+        "nccl",
+        "shared_memory"
+      ],
+      "complexity": "O(N*K + comm)",
+      "variants": [
+        "all_to_all"
+      ]
+    },
+    {
+      "category": "MoE",
+      "algorithm": "MoE Load Balance",
+      "trtllm_path": "moeLoadBalance/",
+      "description": "Load balancing mechanisms for MoE including auxiliary loss computation and expert utilization tracking.",
+      "key_techniques": [
+        "Auxiliary load balancing loss",
+        "Expert utilization statistics",
+        "Dynamic capacity adjustment"
+      ],
+      "cuda_features": [
+        "atomics"
+      ],
+      "complexity": "O(N*E)",
+      "variants": [
+        "standard"
+      ]
+    },
+    {
+      "category": "Normalization",
+      "algorithm": "LayerNorm",
+      "trtllm_path": "layernormKernels.cu",
+      "description": "Layer normalization with optional bias and residual connection.",
+      "key_techniques": [
+        "Two-pass (mean, variance) or Welford's online algorithm",
+        "Vectorized memory access",
+        "Fused residual add",
+        "Per-channel scaling"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*d)",
+      "variants": [
+        "standard",
+        "fused_residual",
+        "with_bias"
+      ]
+    },
+    {
+      "category": "Normalization",
+      "algorithm": "RMSNorm",
+      "trtllm_path": "rmsnormKernels.cu",
+      "description": "Root Mean Square normalization, commonly used in LLaMA-family models.",
+      "key_techniques": [
+        "Single-pass RMS computation",
+        "No mean subtraction (unlike LayerNorm)",
+        "Vectorized loads (float4)",
+        "Fused quantization output"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*d)",
+      "variants": [
+        "standard",
+        "fused_quant",
+        "group_rmsnorm"
+      ]
+    },
+    {
+      "category": "Normalization",
+      "algorithm": "Group RMSNorm",
+      "trtllm_path": "groupRmsNormKernels/",
+      "description": "Group-wise RMS normalization for grouped architectures.",
+      "key_techniques": [
+        "Per-group normalization",
+        "Shared memory reduction within groups"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*d)",
+      "variants": [
+        "standard"
+      ]
+    },
+    {
+      "category": "Normalization",
+      "algorithm": "Fused LayerNorm Kernels",
+      "trtllm_path": "fusedLayernormKernels/",
+      "description": "Fused LayerNorm with other operations like quantization, residual add, and activation.",
+      "key_techniques": [
+        "Fused norm + quantization",
+        "Fused norm + residual",
+        "Fused norm + activation"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*d)",
+      "variants": [
+        "fused_quant",
+        "fused_residual"
+      ]
+    },
+    {
+      "category": "Quantization",
+      "algorithm": "Dynamic Quantization",
+      "trtllm_path": "quantization.cu",
+      "description": "Dynamic per-tensor and per-token quantization for INT8/FP8 inference.",
+      "key_techniques": [
+        "Per-tensor scale computation",
+        "Per-token quantization",
+        "Symmetric quantization",
+        "FP8 E4M3 format support"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*d)",
+      "variants": [
+        "per_tensor",
+        "per_token",
+        "fp8",
+        "int8"
+      ]
+    },
+    {
+      "category": "Quantization",
+      "algorithm": "Fused Activation + Quantization",
+      "trtllm_path": "fusedActivationQuant.cu",
+      "description": "Fused activation function (SiLU, GELU) with quantization in a single kernel pass.",
+      "key_techniques": [
+        "Single-pass activation + quantization",
+        "SwiGLU / GeGLU support",
+        "Per-token output scale"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N*d)",
+      "variants": [
+        "silu_quant",
+        "gelu_quant"
+      ]
+    },
+    {
+      "category": "Quantization",
+      "algorithm": "Pre-Quantization Scaling",
+      "trtllm_path": "preQuantScaleKernel.cu",
+      "description": "SmoothQuant-style per-channel scaling applied before quantization to reduce outlier impact.",
+      "key_techniques": [
+        "Per-channel scale factors",
+        "Outlier migration from activations to weights",
+        "SmoothQuant algorithm"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N*d)",
+      "variants": [
+        "smoothquant"
+      ]
+    },
+    {
+      "category": "KV-Cache",
+      "algorithm": "KV-Cache Utils",
+      "trtllm_path": "kvCacheUtils.h",
+      "description": "Paged KV-cache management with block-level page tables for efficient memory usage.",
+      "key_techniques": [
+        "Block-level page table",
+        "Dynamic page allocation",
+        "FP8 KV-cache quantization",
+        "Copy-on-write support"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(num_pages)",
+      "variants": [
+        "paged",
+        "continuous",
+        "fp8_quantized"
+      ]
+    },
+    {
+      "category": "KV-Cache",
+      "algorithm": "KV-Cache Partial Copy",
+      "trtllm_path": "kvCachePartialCopy.cu",
+      "description": "Partial copy kernels for updating KV-cache during decode with speculative decoding.",
+      "key_techniques": [
+        "Partial page copy",
+        "Scatter-based update",
+        "Speculative decoding support"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(new_tokens*d)",
+      "variants": [
+        "standard",
+        "speculative"
+      ]
+    },
+    {
+      "category": "Sampling",
+      "algorithm": "Top-K Sampling",
+      "trtllm_path": "samplingTopKKernels.cu",
+      "description": "Efficient top-K sampling from logit distributions using partial sorting.",
+      "key_techniques": [
+        "Radix-based top-K selection",
+        "Per-request K values",
+        "Temperature scaling"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(V) where V is vocab size",
+      "variants": [
+        "standard",
+        "batched"
+      ]
+    },
+    {
+      "category": "Sampling",
+      "algorithm": "Top-P (Nucleus) Sampling",
+      "trtllm_path": "samplingTopPKernels.cu",
+      "description": "Nucleus sampling with cumulative probability threshold.",
+      "key_techniques": [
+        "Sort-based cumulative probability",
+        "Dynamic vocabulary truncation",
+        "Air Top-P variant for efficiency"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(V*log(V))",
+      "variants": [
+        "standard",
+        "air_top_p"
+      ]
+    },
+    {
+      "category": "Communication",
+      "algorithm": "Custom AllReduce",
+      "trtllm_path": "customAllReduceKernels.cu",
+      "description": "Custom all-reduce implementation using NVLink for lower latency than NCCL for small messages.",
+      "key_techniques": [
+        "NVLink peer-to-peer access",
+        "Two-phase reduce-scatter + all-gather",
+        "Fused with computation"
+      ],
+      "cuda_features": [
+        "nvlink",
+        "shared_memory"
+      ],
+      "complexity": "O(N*d/P + latency)",
+      "variants": [
+        "one_shot",
+        "two_shot"
+      ]
+    },
+    {
+      "category": "Specialized",
+      "algorithm": "Selective Scan (Mamba)",
+      "trtllm_path": "selectiveScan/",
+      "description": "Efficient selective scan for Mamba/SSM models. Hardware-aware parallel scan.",
+      "key_techniques": [
+        "Parallel prefix scan",
+        "Selective gating",
+        "Hardware-aware chunked computation"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(N*d*state_dim)",
+      "variants": [
+        "standard",
+        "chunked"
+      ]
+    },
+    {
+      "category": "Specialized",
+      "algorithm": "Causal Conv1D",
+      "trtllm_path": "causalConv1d/",
+      "description": "1D causal convolution for Mamba and similar architectures.",
+      "key_techniques": [
+        "Causal padding",
+        "Depthwise separable",
+        "Fused with activation"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N*d*k) where k is kernel size",
+      "variants": [
+        "standard",
+        "fused_activation"
+      ]
+    },
+    {
+      "category": "Specialized",
+      "algorithm": "Beam Search",
+      "trtllm_path": "beamSearchKernels/",
+      "description": "Beam search decoding with KV-cache management.",
+      "key_techniques": [
+        "Top-K beam selection",
+        "KV-cache reordering",
+        "Length penalty"
+      ],
+      "cuda_features": [
+        "shared_memory",
+        "warp_primitives"
+      ],
+      "complexity": "O(B*K*V) where B is beam width",
+      "variants": [
+        "standard",
+        "diverse"
+      ]
+    },
+    {
+      "category": "Specialized",
+      "algorithm": "Speculative Decoding",
+      "trtllm_path": "speculativeDecoding/",
+      "description": "Speculative decoding verification and acceptance kernels.",
+      "key_techniques": [
+        "Draft-verify pattern",
+        "Token acceptance/rejection",
+        "Tree-based speculation"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N*draft_length)",
+      "variants": [
+        "standard",
+        "medusa",
+        "eagle"
+      ]
+    },
+    {
+      "category": "Specialized",
+      "algorithm": "Fused QK-Norm + RoPE",
+      "trtllm_path": "fusedQKNormRopeKernel.cu",
+      "description": "Fused query/key normalization with rotary position embedding in a single kernel.",
+      "key_techniques": [
+        "Fused norm + RoPE",
+        "Reduced memory bandwidth",
+        "Per-head processing"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N*d)",
+      "variants": [
+        "standard"
+      ]
+    },
+    {
+      "category": "Specialized",
+      "algorithm": "LoRA Kernels",
+      "trtllm_path": "lora/",
+      "description": "Low-Rank Adaptation kernels for efficient fine-tuned model serving.",
+      "key_techniques": [
+        "Low-rank decomposition (A*B)",
+        "Multi-LoRA batching",
+        "Fused with base GEMM"
+      ],
+      "cuda_features": [
+        "tensor_cores"
+      ],
+      "complexity": "O(N*d*r) where r is rank",
+      "variants": [
+        "standard",
+        "batched_multi_lora"
+      ]
+    },
+    {
+      "category": "Specialized",
+      "algorithm": "DoRA Scaling",
+      "trtllm_path": "doraScaling.cu",
+      "description": "Weight-Decomposed Low-Rank Adaptation scaling kernel.",
+      "key_techniques": [
+        "Direction + magnitude decomposition",
+        "Per-column scaling"
+      ],
+      "cuda_features": [
+        "shared_memory"
+      ],
+      "complexity": "O(N*d)",
+      "variants": [
+        "standard"
+      ]
+    }
+  ]
+}

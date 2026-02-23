@@ -1,0 +1,1351 @@
+{
+  "pipeline_patterns": [
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_base.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_base",
+      "features": [
+        "async_copy",
+        "prefetch"
+      ],
+      "template_params": "typename Problem, typename Policy"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_async.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_async",
+      "features": [
+        "double_smem_buffer",
+        "ping_pong_lds",
+        "async_copy",
+        "prefetch",
+        "mfma_usage"
+      ],
+      "template_params": "typename Problem"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_async_default_policy.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_async_default_policy",
+      "features": [
+        "async_copy"
+      ],
+      "template_params": "typename Problem,\n              typename OverrideADataType = remove_cvref_t<typename Problem::ADataType"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_v3.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_v3",
+      "features": [
+        "double_smem_buffer",
+        "ping_pong_lds",
+        "prefetch",
+        "mfma_usage"
+      ],
+      "template_params": "typename Problem"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_v4.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_v4",
+      "features": [
+        "double_smem_buffer",
+        "ping_pong_lds",
+        "prefetch",
+        "mfma_usage"
+      ],
+      "template_params": "typename Problem"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_v5.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_v5",
+      "features": [
+        "double_smem_buffer",
+        "ping_pong_lds",
+        "prefetch"
+      ],
+      "template_params": "typename Problem"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_comp_v6.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_comp_v6",
+      "features": [
+        "double_smem_buffer",
+        "prefetch",
+        "mfma_usage"
+      ],
+      "template_params": "typename Problem"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_mem.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_mem",
+      "features": [
+        "double_smem_buffer",
+        "prefetch"
+      ],
+      "template_params": "typename Problem"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_ag_bg_cr_scheduler.hpp",
+      "pipeline_name": "gemm_pipeline_ag_bg_cr_scheduler",
+      "features": [
+        "prefetch"
+      ]
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_agmem_bgmem_creg_v1.hpp",
+      "pipeline_name": "gemm_pipeline_agmem_bgmem_creg_v1",
+      "features": [
+        "double_smem_buffer",
+        "prefetch"
+      ],
+      "template_params": "typename Problem"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_agmem_bgmem_creg_v2.hpp",
+      "pipeline_name": "gemm_pipeline_agmem_bgmem_creg_v2",
+      "features": [
+        "double_smem_buffer",
+        "prefetch"
+      ],
+      "template_params": "typename Problem"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipeline_problem.hpp",
+      "pipeline_name": "gemm_pipeline_problem",
+      "features": [
+        "double_smem_buffer"
+      ],
+      "template_params": "typename AsDataType_,\n          typename BsDataType_,\n          typename EDataType_,\n          typename BlockGemmShape_,\n          typename Traits_,\n          typename ComputeDataType_ = AsDataType_,\n"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/gemm_pipelines.hpp",
+      "pipeline_name": "gemm_pipelines",
+      "features": [
+        "async_copy"
+      ]
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/tile_gemm_traits.hpp",
+      "pipeline_name": "tile_gemm_traits",
+      "features": [
+        "double_smem_buffer"
+      ],
+      "template_params": "bool kPadM_,\n          bool kPadN_,\n          bool kPadK_,\n          typename AsLayout_,\n          typename BsLayout_,\n          typename CLayout_,\n          index_t NumWaveGroups_ = 1"
+    },
+    {
+      "source_file": "/home/root123/aiter/3rdparty/composable_kernel/include/ck_tile/ops/gemm/pipeline/wp_pipeline_agmem_bgmem_creg_v2.hpp",
+      "pipeline_name": "wp_pipeline_agmem_bgmem_creg_v2",
+      "features": [
+        "double_smem_buffer",
+        "prefetch",
+        "mfma_usage"
+      ],
+      "template_params": "typename Problem"
+    }
+  ],
+  "asm_kernel_configs": [
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/bf16gemm/bf16gemm_fp32bf16.csv",
+      "kernel_count": 23,
+      "sample_entries": [
+        "knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias",
+        "_ZN5aiter43bf16gemm_fp32bf16_tn_128x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk.co,1,128,64,0,1,0,64,1",
+        "_ZN5aiter43bf16gemm_fp32bf16_tn_160x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk.co,1,160,64,0,1,0,64,1",
+        "_ZN5aiter42bf16gemm_fp32bf16_tn_32x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_32x64_bshuffle_splitk.co,1,32,64,0,1,0,64,1",
+        "_ZN5aiter37bf16gemm_fp32bf16_tn_32x64_pf3_splitkE,bf16gemm_fp32bf16_tn_32x64_pf3_splitk.co,1,32,64,3,0,0,64,1"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/f4gemm/f4gemm_bf16_per1x32Fp4.csv",
+      "kernel_count": 1,
+      "sample_entries": [
+        "tile_M,tile_N,splitK,bpreshuffle,knl_name,co_name"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmha_v3_bwd/fmha_bwd_dq_convert.csv",
+      "kernel_count": 25,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,atomic32,pssk,pddv,mode,bf16_cvt,ts_qo,ts,knl_name,co_name",
+        "fp16,64,64,0,0,0,0,0,3,0,64,_ZN5aiter29fmha_bwd_hd64_dq_convert_fp16E,bwd_hd64_dq_convert_fp16.co",
+        "fp16,64,64,0,0,0,0,1,3,0,64,_ZN5aiter35fmha_bwd_hd64_dq_convert_fp16_groupE,bwd_hd64_dq_convert_fp16_group.co",
+        "bf16,64,64,0,0,0,0,0,0,0,64,_ZN5aiter34fmha_bwd_hd64_dq_convert_bf16_rtneE,bwd_hd64_dq_convert_bf16_rtne.co",
+        "bf16,64,64,0,0,0,0,0,1,0,64,_ZN5aiter34fmha_bwd_hd64_dq_convert_bf16_rtnaE,bwd_hd64_dq_convert_bf16_rtna.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmha_v3_bwd/fmha_bwd_dq_shuffle.csv",
+      "kernel_count": 1,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,atomic32,pssk,pddv,mode,bf16_cvt,ts_qo,ts,knl_name,co_name"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmha_v3_bwd/fmha_bwd_dqdkdv.csv",
+      "kernel_count": 121,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,atomic32,pssk,pddv,mode,bf16_cvt,ts_qo,ts,knl_name,co_name",
+        "fp16,192,192,0,1,1,1,0,3,16,64,_ZN5aiter31fmha_bwd_hd192_fp16_a32_psskddvE,bwd_hd192_fp16_a32_psskddv.co",
+        "fp16,128,128,1,1,1,0,1,3,16,192,_ZN5aiter41fmha_bwd_hd128_fp16_causal_a32_pssk_groupE,bwd_hd128_fp16_causal_a32_pssk_group.co",
+        "fp16,128,128,1,1,1,1,1,3,16,192,_ZN5aiter44fmha_bwd_hd128_fp16_causal_a32_psskddv_groupE,bwd_hd128_fp16_causal_a32_psskddv_group.co",
+        "fp16,128,128,0,0,0,0,0,3,16,192,_ZN5aiter23fmha_bwd_hd128_fp16_a16E,bwd_hd128_fp16_a16.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmha_v3_bwd/fmha_bwd_odo.csv",
+      "kernel_count": 13,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,atomic32,pssk,pddv,mode,bf16_cvt,ts_qo,ts,knl_name,co_name",
+        "fp16,64,64,0,0,0,0,0,3,0,128,_ZN5aiter22fmha_bwd_hd64_odo_fp16E,bwd_hd64_odo_fp16.co",
+        "fp16,64,64,0,0,0,0,1,3,0,128,_ZN5aiter28fmha_bwd_hd64_odo_fp16_groupE,bwd_hd64_odo_fp16_group.co",
+        "bf16,64,64,0,0,0,0,0,3,0,128,_ZN5aiter22fmha_bwd_hd64_odo_bf16E,bwd_hd64_odo_bf16.co",
+        "bf16,64,64,0,0,0,0,1,3,0,128,_ZN5aiter28fmha_bwd_hd64_odo_bf16_groupE,bwd_hd64_odo_bf16_group.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmha_v3_fwd/fmha_fwd.csv",
+      "kernel_count": 25,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,mode,bf16_cvt,ts_qo,ts_kv,knl_name,co_name",
+        "bf16,128,128,0,0,0,256,32,_ZN5aiter24fmha_fwd_hd128_bf16_rtneE,fwd_hd128_bf16_rtne.co",
+        "bf16,128,128,0,0,1,256,32,_ZN5aiter24fmha_fwd_hd128_bf16_rtnaE,fwd_hd128_bf16_rtna.co",
+        "bf16,128,128,0,0,2,256,32,_ZN5aiter23fmha_fwd_hd128_bf16_rtzE,fwd_hd128_bf16_rtz.co",
+        "bf16,128,128,2,0,0,256,32,_ZN5aiter31fmha_fwd_hd128_bf16_causal_rtneE,fwd_hd128_bf16_causal_rtne.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_bf16_blockscaleFp8_g1u1_gelu.csv",
+      "kernel_count": 9,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter47fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_32x128E,fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_32x128.co,0,1,0,1,0,32,128",
+        "_ZN5aiter47fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_32x256E,fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter50fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x128E,fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x128.co,0,1,0,1,1,32,128",
+        "_ZN5aiter50fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x256E,fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x256.co,0,1,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_bf16_noquant_g1u0_gelu.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter54fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_32x512E,fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_32x512.co,2,0,0,1,0,32,512",
+        "_ZN5aiter57fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_ps_32x512E,fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_ps_32x512.co,2,0,0,1,1,32,512"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_bf16_pertokenFp8_g1u1_gelu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter55fmoe_bf16_pertokenFp8_g1u1_vs_multix_gelu_1tg_ps_32x448E,fmoe_bf16_pertokenFp8_g1u1_vs_multix_gelu_1tg_ps_32x448.co,0,1,2,1,1,32,448",
+        "_ZN5aiter45fmoe_bf16_pertokenFp8_g1u1_vs_gelu_1tg_32x128E,fmoe_bf16_pertokenFp8_g1u1_vs_gelu_1tg_32x128.co,0,1,0,1,0,32,128",
+        "_ZN5aiter45fmoe_bf16_pertokenFp8_g1u1_vs_gelu_1tg_32x384E,fmoe_bf16_pertokenFp8_g1u1_vs_gelu_1tg_32x384.co,0,1,0,1,0,32,384",
+        "_ZN5aiter52fmoe_bf16_pertokenFp8_g1u1_vs_multix_gelu_1tg_32x128E,fmoe_bf16_pertokenFp8_g1u1_vs_multix_gelu_1tg_32x128.co,0,1,2,1,0,32,128"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_bf16_pertokenFp8_g1u1_gelu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter50fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x128E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x128.co,0,1,0,1,0,32,128",
+        "_ZN5aiter53fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x256E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter50fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x256E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter50fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x320E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x320.co,0,1,0,1,0,32,320"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_bf16_pertokenInt8_g1u0_gelu.csv",
+      "kernel_count": 18,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x448E,fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x448.co,0,1,0,1,1,32,448",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x512E,fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x512.co,0,1,0,1,1,32,512",
+        "_ZN5aiter46fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_32x320E,fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_32x320.co,0,1,0,1,0,32,320",
+        "_ZN5aiter57fmoe_bf16_pertokenInt8_g1u0_vs_atm_opt_gelu_1tg_ps_32x512E,fmoe_bf16_pertokenInt8_g1u0_vs_atm_opt_gelu_1tg_ps_32x512.co,1,1,0,1,1,32,512"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_bf16_pertokenInt8_g1u1_gelu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter46fmoe_bf16_pertokenInt8_g1u1_vs_gelu_1tg_32x256E,fmoe_bf16_pertokenInt8_g1u1_vs_gelu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x192E,fmoe_bf16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x192.co,0,1,0,1,1,32,192",
+        "_ZN5aiter53fmoe_bf16_pertokenInt8_g1u1_vs_multix_gelu_1tg_32x448E,fmoe_bf16_pertokenInt8_g1u1_vs_multix_gelu_1tg_32x448.co,0,1,2,1,0,32,448",
+        "_ZN5aiter56fmoe_bf16_pertokenInt8_g1u1_vs_multix_gelu_1tg_ps_32x128E,fmoe_bf16_pertokenInt8_g1u1_vs_multix_gelu_1tg_ps_32x128.co,0,1,2,1,1,32,128"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_bf16_pertokenInt8_g1u1_gelu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x448E,fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x448.co,0,0,0,1,0,32,448",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x128E,fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x128.co,0,0,0,1,0,32,128",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x384E,fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x384.co,0,0,0,1,0,32,384",
+        "_ZN5aiter51fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x256E,fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x256.co,0,0,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_fp16_blockscaleFp8_g1u1_gelu.csv",
+      "kernel_count": 5,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter50fmoe_fp16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x256E,fmoe_fp16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter47fmoe_fp16_blockscaleFp8_g1u1_vs_gelu_1tg_32x256E,fmoe_fp16_blockscaleFp8_g1u1_vs_gelu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter52fmoe_fp16_blockscaleFp8_g1u1_novs_gelu_1tg_ps_32x256E,fmoe_fp16_blockscaleFp8_g1u1_novs_gelu_1tg_ps_32x256.co,0,0,0,1,1,32,256",
+        "_ZN5aiter49fmoe_fp16_blockscaleFp8_g1u1_novs_gelu_1tg_32x256E,fmoe_fp16_blockscaleFp8_g1u1_novs_gelu_1tg_32x256.co,0,0,0,1,0,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_fp16_noquant_g1u0_gelu.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter57fmoe_fp16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_ps_32x512E,fmoe_fp16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_ps_32x512.co,2,0,0,1,1,32,512",
+        "_ZN5aiter54fmoe_fp16_noquantFp16_g1u0_vs_atm_inlv_gelu_1tg_32x512E,fmoe_fp16_noquantFp16_g1u0_vs_atm_inlv_gelu_1tg_32x512.co,2,0,0,1,0,32,512"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_fp16_pertokenFp8_g1u1_gelu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter48fmoe_fp16_pertokenFp8_g1u1_vs_gelu_1tg_ps_32x384E,fmoe_fp16_pertokenFp8_g1u1_vs_gelu_1tg_ps_32x384.co,0,1,0,1,1,32,384",
+        "_ZN5aiter55fmoe_fp16_pertokenFp8_g1u1_vs_multix_gelu_1tg_ps_32x192E,fmoe_fp16_pertokenFp8_g1u1_vs_multix_gelu_1tg_ps_32x192.co,0,1,2,1,1,32,192",
+        "_ZN5aiter52fmoe_fp16_pertokenFp8_g1u1_vs_multix_gelu_1tg_32x384E,fmoe_fp16_pertokenFp8_g1u1_vs_multix_gelu_1tg_32x384.co,0,1,2,1,0,32,384",
+        "_ZN5aiter48fmoe_fp16_pertokenFp8_g1u1_vs_gelu_1tg_ps_32x256E,fmoe_fp16_pertokenFp8_g1u1_vs_gelu_1tg_ps_32x256.co,0,1,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_fp16_pertokenFp8_g1u1_gelu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x320E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x320.co,0,1,0,1,1,32,320",
+        "_ZN5aiter50fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x256E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x512E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x512.co,0,1,0,1,1,32,512",
+        "_ZN5aiter50fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x512E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x512.co,0,1,0,1,0,32,512"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_fp16_pertokenInt8_g1u0_gelu.csv",
+      "kernel_count": 18,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_32x384E,fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_32x384.co,0,1,0,1,0,32,384",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x512E,fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x512.co,0,1,0,1,1,32,512",
+        "_ZN5aiter50fmoe_fp16_pertokenInt8_g1u0_vs_smf_gelu_1tg_32x512E,fmoe_fp16_pertokenInt8_g1u0_vs_smf_gelu_1tg_32x512.co,0,1,1,1,0,32,512",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_32x256E,fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_32x256.co,0,1,0,1,0,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_fp16_pertokenInt8_g1u1_gelu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter53fmoe_fp16_pertokenInt8_g1u1_vs_multix_gelu_1tg_32x128E,fmoe_fp16_pertokenInt8_g1u1_vs_multix_gelu_1tg_32x128.co,0,1,2,1,0,32,128",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u1_vs_gelu_1tg_32x512E,fmoe_fp16_pertokenInt8_g1u1_vs_gelu_1tg_32x512.co,0,1,0,1,0,32,512",
+        "_ZN5aiter56fmoe_fp16_pertokenInt8_g1u1_vs_multix_gelu_1tg_ps_32x192E,fmoe_fp16_pertokenInt8_g1u1_vs_multix_gelu_1tg_ps_32x192.co,0,1,2,1,1,32,192",
+        "_ZN5aiter56fmoe_fp16_pertokenInt8_g1u1_vs_multix_gelu_1tg_ps_32x512E,fmoe_fp16_pertokenInt8_g1u1_vs_multix_gelu_1tg_ps_32x512.co,0,1,2,1,1,32,512"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/gelu/fmoe_fp16_pertokenInt8_g1u1_gelu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter51fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x128E,fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x128.co,0,0,0,1,1,32,128",
+        "_ZN5aiter51fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x192E,fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x192.co,0,0,0,1,1,32,192",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x448E,fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x448.co,0,0,0,1,0,32,448",
+        "_ZN5aiter51fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x384E,fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x384.co,0,0,0,1,1,32,384"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_bf16_blockscaleFp8_g1u1_silu.csv",
+      "kernel_count": 9,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter47fmoe_bf16_blockscaleFp8_g1u1_vs_silu_1tg_32x128E,fmoe_bf16_blockscaleFp8_g1u1_vs_silu_1tg_32x128.co,0,1,0,1,0,32,128",
+        "_ZN5aiter47fmoe_bf16_blockscaleFp8_g1u1_vs_silu_1tg_32x256E,fmoe_bf16_blockscaleFp8_g1u1_vs_silu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter52fmoe_bf16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x128E,fmoe_bf16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x128.co,0,0,0,1,1,32,128",
+        "_ZN5aiter52fmoe_bf16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x256E,fmoe_bf16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x256.co,0,0,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_bf16_noquant_g1u0_silu.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter57fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_ps_32x512E,fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_ps_32x512.co,2,0,0,1,1,32,512",
+        "_ZN5aiter54fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_32x512E,fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_32x512.co,2,0,0,1,0,32,512"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_bf16_pertokenFp8_g1u1_silu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter52fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_32x384E,fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_32x384.co,0,1,2,1,0,32,384",
+        "_ZN5aiter55fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x384E,fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x384.co,0,1,2,1,1,32,384",
+        "_ZN5aiter55fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x448E,fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x448.co,0,1,2,1,1,32,448",
+        "_ZN5aiter55fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x512E,fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x512.co,0,1,2,1,1,32,512"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_bf16_pertokenFp8_g1u1_silu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter50fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x512E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x512.co,0,1,0,1,0,32,512",
+        "_ZN5aiter53fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x192E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x192.co,0,1,0,1,1,32,192",
+        "_ZN5aiter50fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x192E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x192.co,0,1,0,1,0,32,192",
+        "_ZN5aiter53fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x256E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x256.co,0,1,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_bf16_pertokenInt8_g1u0_silu.csv",
+      "kernel_count": 18,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter46fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_32x256E,fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter50fmoe_bf16_pertokenInt8_g1u0_vs_smf_silu_1tg_32x512E,fmoe_bf16_pertokenInt8_g1u0_vs_smf_silu_1tg_32x512.co,0,1,1,1,0,32,512",
+        "_ZN5aiter54fmoe_bf16_pertokenInt8_g1u0_vs_atm_opt_silu_1tg_32x512E,fmoe_bf16_pertokenInt8_g1u0_vs_atm_opt_silu_1tg_32x512.co,1,1,0,1,0,32,512",
+        "_ZN5aiter46fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_32x448E,fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_32x448.co,0,1,0,1,0,32,448"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_bf16_pertokenInt8_g1u1_silu.csv",
+      "kernel_count": 32,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter50fmoe_bf16_pertokenInt8_g1u1_vs_smf_silu_1tg_32x384E,fmoe_bf16_pertokenInt8_g1u1_vs_smf_silu_1tg_32x384.co,0,1,1,1,0,32,384",
+        "_ZN5aiter53fmoe_bf16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x384E,fmoe_bf16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x384.co,0,1,2,1,0,32,384",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x512E,fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x512.co,0,1,0,1,1,32,512",
+        "_ZN5aiter46fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_32x128E,fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_32x128.co,0,1,0,1,0,32,128"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_bf16_pertokenInt8_g1u1_silu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x448E,fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x448.co,0,0,0,1,0,32,448",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x320E,fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x320.co,0,0,0,1,0,32,320",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x128E,fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x128.co,0,0,0,1,0,32,128",
+        "_ZN5aiter51fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x384E,fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x384.co,0,0,0,1,1,32,384"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_fp16_blockscaleFp8_g1u1_silu.csv",
+      "kernel_count": 5,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter49fmoe_fp16_blockscaleFp8_g1u1_novs_silu_1tg_32x256E,fmoe_fp16_blockscaleFp8_g1u1_novs_silu_1tg_32x256.co,0,0,0,1,0,32,256",
+        "_ZN5aiter50fmoe_fp16_blockscaleFp8_g1u1_vs_silu_1tg_ps_32x256E,fmoe_fp16_blockscaleFp8_g1u1_vs_silu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter52fmoe_fp16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x256E,fmoe_fp16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x256.co,0,0,0,1,1,32,256",
+        "_ZN5aiter47fmoe_fp16_blockscaleFp8_g1u1_vs_silu_1tg_32x256E,fmoe_fp16_blockscaleFp8_g1u1_vs_silu_1tg_32x256.co,0,1,0,1,0,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_fp16_noquant_g1u0_silu.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter54fmoe_fp16_noquantFp16_g1u0_vs_atm_inlv_silu_1tg_32x512E,fmoe_fp16_noquantFp16_g1u0_vs_atm_inlv_silu_1tg_32x512.co,2,0,0,1,0,32,512",
+        "_ZN5aiter57fmoe_fp16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_ps_32x512E,fmoe_fp16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_ps_32x512.co,2,0,0,1,1,32,512"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_fp16_pertokenFp8_g1u1_silu.csv",
+      "kernel_count": 29,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter52fmoe_fp16_pertokenFp8_g1u1_vs_multix_silu_1tg_32x512E,fmoe_fp16_pertokenFp8_g1u1_vs_multix_silu_1tg_32x512.co,0,1,2,1,0,32,512",
+        "_ZN5aiter55fmoe_fp16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x448E,fmoe_fp16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x448.co,0,1,2,1,1,32,448",
+        "_ZN5aiter52fmoe_fp16_pertokenFp8_g1u1_vs_multix_silu_1tg_32x320E,fmoe_fp16_pertokenFp8_g1u1_vs_multix_silu_1tg_32x320.co,0,1,2,1,0,32,320",
+        "_ZN5aiter45fmoe_fp16_pertokenFp8_g1u1_vs_silu_1tg_32x512E,fmoe_fp16_pertokenFp8_g1u1_vs_silu_1tg_32x512.co,0,1,0,1,0,32,512"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_fp16_pertokenFp8_g1u1_silu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter50fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x320E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x320.co,0,1,0,1,0,32,320",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x384E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x384.co,0,1,0,1,1,32,384",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x320E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x320.co,0,1,0,1,1,32,320",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x256E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x256.co,0,1,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_fp16_pertokenInt8_g1u0_silu.csv",
+      "kernel_count": 18,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x512E,fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x512.co,0,1,0,1,1,32,512",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_32x128E,fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_32x128.co,0,1,0,1,0,32,128",
+        "_ZN5aiter50fmoe_fp16_pertokenInt8_g1u0_vs_smf_silu_1tg_32x512E,fmoe_fp16_pertokenInt8_g1u0_vs_smf_silu_1tg_32x512.co,0,1,1,1,0,32,512",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_32x256E,fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_32x256.co,0,1,0,1,0,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_fp16_pertokenInt8_g1u1_silu.csv",
+      "kernel_count": 29,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter56fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_ps_32x192E,fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_ps_32x192.co,0,1,2,1,1,32,192",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x256E,fmoe_fp16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter53fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x320E,fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x320.co,0,1,2,1,0,32,320",
+        "_ZN5aiter53fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x256E,fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x256.co,0,1,2,1,0,32,256"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe/silu/fmoe_fp16_pertokenInt8_g1u1_silu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter51fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x512E,fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x512.co,0,0,0,1,1,32,512",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x192E,fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x192.co,0,0,0,1,0,32,192",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x448E,fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x448.co,0,0,0,1,0,32,448",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x128E,fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x128.co,0,0,0,1,0,32,128"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe_2stages/fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1.csv",
+      "kernel_count": 37,
+      "sample_entries": [
+        "tile_m,tile_n,knl_name,co_name",
+        "16,128,_ZN5aiter59fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_16x128_4tg_pf2E,fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_16x128_4tg_pf2.co",
+        "16,128,_ZN5aiter59fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_16x128_4tg_pf3E,fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_16x128_4tg_pf3.co",
+        "32,128,_ZN5aiter59fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_32x128_3tg_pf2E,fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_32x128_3tg_pf2.co",
+        "32,128,_ZN5aiter59fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_32x128_3tg_pf3E,fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_32x128_3tg_pf3.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe_2stages/fmoe_stage1_bf16_pertokenFp8_doweight_g1u1.csv",
+      "kernel_count": 55,
+      "sample_entries": [
+        "tile_m,tile_n,knl_name,co_name",
+        "16,128,_ZN5aiter57fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_16x128_4tg_pf2E,fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_16x128_4tg_pf2.co",
+        "16,128,_ZN5aiter57fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_16x128_4tg_pf3E,fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_16x128_4tg_pf3.co",
+        "32,128,_ZN5aiter57fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_32x128_3tg_pf2E,fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_32x128_3tg_pf2.co",
+        "32,128,_ZN5aiter57fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_32x128_3tg_pf3E,fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_32x128_3tg_pf3.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe_2stages/fmoe_stage1_bf16_pertokenFp8_g1u1.csv",
+      "kernel_count": 57,
+      "sample_entries": [
+        "tile_m,tile_n,knl_name,co_name",
+        "16,128,_ZN5aiter48fmoe_stage1_bf16_pertokenFp8_g1u1_16x128_4tg_pf2E,fmoe_stage1_bf16_pertokenFp8_g1u1_16x128_4tg_pf2.co",
+        "16,128,_ZN5aiter48fmoe_stage1_bf16_pertokenFp8_g1u1_16x128_4tg_pf3E,fmoe_stage1_bf16_pertokenFp8_g1u1_16x128_4tg_pf3.co",
+        "32,128,_ZN5aiter48fmoe_stage1_bf16_pertokenFp8_g1u1_32x128_3tg_pf2E,fmoe_stage1_bf16_pertokenFp8_g1u1_32x128_3tg_pf2.co",
+        "32,128,_ZN5aiter48fmoe_stage1_bf16_pertokenFp8_g1u1_32x128_3tg_pf3E,fmoe_stage1_bf16_pertokenFp8_g1u1_32x128_3tg_pf3.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fmoe_2stages/fmoe_stage1_bf16_pertokenInt8_g1u1.csv",
+      "kernel_count": 41,
+      "sample_entries": [
+        "tile_m,tile_n,knl_name,co_name",
+        "16,128,_ZN5aiter49fmoe_stage1_bf16_pertokenInt8_g1u1_16x128_4tg_pf2E,fmoe_stage1_bf16_pertokenInt8_g1u1_16x128_4tg_pf2.co",
+        "16,128,_ZN5aiter49fmoe_stage1_bf16_pertokenInt8_g1u1_16x128_4tg_pf3E,fmoe_stage1_bf16_pertokenInt8_g1u1_16x128_4tg_pf3.co",
+        "32,128,_ZN5aiter49fmoe_stage1_bf16_pertokenInt8_g1u1_32x128_3tg_pf2E,fmoe_stage1_bf16_pertokenInt8_g1u1_32x128_3tg_pf2.co",
+        "32,128,_ZN5aiter49fmoe_stage1_bf16_pertokenInt8_g1u1_32x128_3tg_pf3E,fmoe_stage1_bf16_pertokenInt8_g1u1_32x128_3tg_pf3.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/fp8gemm_blockscale/fp8gemm_bf16_blockscale.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name",
+        "128,128,1,1,_ZN5aiter43fp8gemm_bf16_blockscale_BpreShuffle_128x128E,fp8gemm_bf16_blockscale_BpreShuffle_128x128.co",
+        "64,128,1,1,_ZN5aiter42fp8gemm_bf16_blockscale_BpreShuffle_64x128E,fp8gemm_bf16_blockscale_BpreShuffle_64x128.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/i8gemm/i8gemm_bf16_perTokenI8.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name",
+        "128,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_128x128E,I8gemm_bf16_perTokenI8_BpreShuffle_128x128.co",
+        "192,128,1,1,_ZN5aiter42I8gemm_bf16_perTokenI8_BpreShuffle_192x128E,I8gemm_bf16_perTokenI8_BpreShuffle_192x128.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/mla/mla_asm.csv",
+      "kernel_count": 21,
+      "sample_entries": [
+        "qType,kvType,Gqa,ps,qSeqLen,prefill,causal,knl_name,co_name",
+        "bf16,bf16,128,0,0,0,0,_ZN5aiter41mla_dec_stage1_bf16_a16w16_subQ128_mqa128E,mla_dec_stage1_bf16_a16w16_subQ128_mqa128.co",
+        "bf16,bf16,16,1,4,0,0,_ZN5aiter42mla_a16w16_qh16_m16x4_n16x1_coex0_mask1_psE,mla_a16w16_qh16_m16x4_n16x1_coex0_mask1_ps.co",
+        "bf16,bf16,16,0,1,0,0,_ZN5aiter39mla_dec_stage1_bf16_a16w16_subQ16_mqa16E,mla_dec_stage1_bf16_a16w16_subQ16_mqa16.co",
+        "bf16,bf16,16,0,4,0,0,_ZN5aiter39mla_a16w16_qh16_m16x4_n16x1_coex0_mask1E,mla_a16w16_qh16_m16x4_n16x1_coex0_mask1.co"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/pa/pa_asm.csv",
+      "kernel_count": 46,
+      "sample_entries": [
+        "qType,kvType,Gqa,Mtp,Msk,Hp,blkSz,knl_name,co_name,ps,qTile",
+        "bf16,fp8,0,0,1,1,1024,_ZN5aiter42PA_A16W8_BLK1024_1TG_4W_16mx1_64nx4_MTP_PSE,pa_bf16_pertokenFp8_gqa16_1tg_4w_qlen16_msk1_ps.co,1,16",
+        "bf16,fp8,0,0,1,1,1024,_ZN5aiter42PA_A16W8_BLK1024_1TG_4W_32mx1_64nx4_MTP_PSE,pa_bf16_pertokenFp8_gqa16_1tg_4w_qlen32_msk1_ps.co,1,32",
+        "bf16,fp8,0,0,1,1,1024,_ZN5aiter42PA_A16W8_BLK1024_1TG_4W_40mx1_64nx4_MTP_PSE,pa_bf16_pertokenFp8_gqa16_1tg_4w_qlen40_msk1_ps.co,1,40",
+        "bf16,fp8,0,0,1,1,1024,_ZN5aiter42PA_A16W8_BLK1024_1TG_4W_48mx1_64nx4_MTP_PSE,pa_bf16_pertokenFp8_gqa16_1tg_4w_qlen48_msk1_ps.co,1,48"
+      ]
+    },
+    {
+      "arch": "gfx942",
+      "config_file": "gfx942/topksoftmax/topksoftmax.csv",
+      "kernel_count": 21,
+      "sample_entries": [
+        "knl_name,co_name,subm,num_experts,topk,dtype",
+        "_ZN5aiter19topksoftmax_4x128x4E,topksoftmax_4x128x4.co,4,128,4,fp32",
+        "_ZN5aiter19topksoftmax_4x128x6E,topksoftmax_4x128x6.co,4,128,6,fp32",
+        "_ZN5aiter19topksoftmax_4x128x8E,topksoftmax_4x128x8.co,4,128,8,fp32",
+        "_ZN5aiter19topksoftmax_4x256x6E,topksoftmax_4x256x6.co,4,256,6,fp32"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/bf16gemm/bf16gemm_fp32bf16.csv",
+      "kernel_count": 25,
+      "sample_entries": [
+        "knl_name,co_name,tn,tileM,tileN,pf,bPreshuffle,splitK,subK,bias",
+        "_ZN5aiter36bf16gemm_bf16_tn_256x256_bpreshuffleE,bf16gemm_bf16_tn_256x256_bpreshuffle.co,1,256,256,0,1,0,64,0",
+        "_ZN5aiter24bf16gemm_bf16_tn_256x256E,bf16gemm_bf16_tn_256x256.co,1,256,256,0,0,0,64,0",
+        "_ZN5aiter43bf16gemm_fp32bf16_tn_128x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_128x64_bshuffle_splitk.co,1,128,64,0,1,0,64,1",
+        "_ZN5aiter43bf16gemm_fp32bf16_tn_160x64_bshuffle_splitkE,bf16gemm_fp32bf16_tn_160x64_bshuffle_splitk.co,1,160,64,0,1,0,64,1"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/f4gemm/f4gemm_bf16_per1x32Fp4.csv",
+      "kernel_count": 36,
+      "sample_entries": [
+        "tile_M,tile_N,splitK,bpreshuffle,knl_name,co_name",
+        "256,256,0,0,_ZN5aiter44f4gemm_bf16_per1x32Fp4_noBpreShuffle_256x256E,f4gemm_bf16_per1x32Fp4_noBpreShuffle_256x256.co",
+        "256,256,1,1,_ZN5aiter42f4gemm_bf16_per1x32Fp4_BpreShuffle_256x256E,f4gemm_bf16_per1x32Fp4_BpreShuffle_256x256.co",
+        "128,512,1,1,_ZN5aiter42f4gemm_bf16_per1x32Fp4_BpreShuffle_128x512E,f4gemm_bf16_per1x32Fp4_BpreShuffle_128x512.co",
+        "192,256,0,1,_ZN5aiter42f4gemm_bf16_per1x32Fp4_BpreShuffle_192x256E,f4gemm_bf16_per1x32Fp4_BpreShuffle_192x256.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmha_v3_bwd/fmha_bwd_dq_convert.csv",
+      "kernel_count": 13,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,atomic32,pssk,pddv,mode,bf16_cvt,ts_qo,ts,knl_name,co_name",
+        "fp16,64,64,0,0,0,0,0,3,0,64,_ZN5aiter29fmha_bwd_hd64_dq_convert_fp16E,bwd_hd64_dq_convert_fp16.co",
+        "fp16,64,64,0,0,0,0,1,3,0,64,_ZN5aiter35fmha_bwd_hd64_dq_convert_fp16_groupE,bwd_hd64_dq_convert_fp16_group.co",
+        "bf16,64,64,0,0,0,0,0,3,0,64,_ZN5aiter29fmha_bwd_hd64_dq_convert_bf16E,bwd_hd64_dq_convert_bf16.co",
+        "bf16,64,64,0,0,0,0,1,3,0,64,_ZN5aiter35fmha_bwd_hd64_dq_convert_bf16_groupE,bwd_hd64_dq_convert_bf16_group.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmha_v3_bwd/fmha_bwd_dq_shuffle.csv",
+      "kernel_count": 5,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,atomic32,pssk,pddv,mode,bf16_cvt,ts_qo,ts,knl_name,co_name",
+        "bf16,192,192,0,0,0,0,0,3,0,64,_ZN5aiter25fmha_bwd_hd192_dq_shuffleE,bwd_hd192_dq_shuffle.co",
+        "bf16,192,192,0,0,0,0,1,3,0,64,_ZN5aiter31fmha_bwd_hd192_dq_shuffle_groupE,bwd_hd192_dq_shuffle_group.co",
+        "bf16,128,128,0,0,0,0,0,3,0,64,_ZN5aiter25fmha_bwd_hd128_dq_shuffleE,bwd_hd128_dq_shuffle.co",
+        "bf16,128,128,0,0,0,0,1,3,0,64,_ZN5aiter31fmha_bwd_hd128_dq_shuffle_groupE,bwd_hd128_dq_shuffle_group.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmha_v3_bwd/fmha_bwd_dqdkdv.csv",
+      "kernel_count": 89,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,atomic32,pssk,pddv,mode,bf16_cvt,ts_qo,ts,knl_name,co_name",
+        "fp16,128,128,0,0,1,1,0,3,16,256,_ZN5aiter31fmha_bwd_hd128_fp16_a16_psskddvE,bwd_hd128_fp16_a16_psskddv.co",
+        "fp16,128,128,0,0,1,1,1,3,16,256,_ZN5aiter37fmha_bwd_hd128_fp16_a16_psskddv_groupE,bwd_hd128_fp16_a16_psskddv_group.co",
+        "bf16,128,128,0,0,1,1,0,3,16,256,_ZN5aiter31fmha_bwd_hd128_bf16_a16_psskddvE,bwd_hd128_bf16_a16_psskddv.co",
+        "bf16,128,128,0,0,1,1,1,3,16,256,_ZN5aiter37fmha_bwd_hd128_bf16_a16_psskddv_groupE,bwd_hd128_bf16_a16_psskddv_group.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmha_v3_bwd/fmha_bwd_odo.csv",
+      "kernel_count": 13,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,atomic32,pssk,pddv,mode,bf16_cvt,ts_qo,ts,knl_name,co_name",
+        "fp16,64,64,0,0,0,0,0,3,0,128,_ZN5aiter22fmha_bwd_hd64_odo_fp16E,bwd_hd64_odo_fp16.co",
+        "fp16,64,64,0,0,0,0,1,3,0,128,_ZN5aiter28fmha_bwd_hd64_odo_fp16_groupE,bwd_hd64_odo_fp16_group.co",
+        "bf16,64,64,0,0,0,0,0,3,0,128,_ZN5aiter22fmha_bwd_hd64_odo_bf16E,bwd_hd64_odo_bf16.co",
+        "bf16,64,64,0,0,0,0,1,3,0,128,_ZN5aiter28fmha_bwd_hd64_odo_bf16_groupE,bwd_hd64_odo_bf16_group.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmha_v3_fwd/fmha_fwd.csv",
+      "kernel_count": 9,
+      "sample_entries": [
+        "dtype,hdim_q,hdim_v,mask,mode,bf16_cvt,ts_qo,ts_kv,knl_name,co_name",
+        "bf16,128,128,0,0,0,256,64,_ZN5aiter19fmha_fwd_hd128_bf16E,fwd_hd128_bf16.co",
+        "bf16,128,128,2,0,0,256,64,_ZN5aiter26fmha_fwd_hd128_bf16_causalE,fwd_hd128_bf16_causal.co",
+        "bf16,128,128,0,1,0,256,64,_ZN5aiter25fmha_fwd_hd128_bf16_groupE,fwd_hd128_bf16_group.co",
+        "bf16,128,128,2,1,0,256,64,_ZN5aiter32fmha_fwd_hd128_bf16_causal_groupE,fwd_hd128_bf16_causal_group.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_bf16_blockscaleFp8_g1u1_gelu.csv",
+      "kernel_count": 7,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter47fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_32x256E,fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter49fmoe_bf16_blockscaleFp8_g1u1_novs_gelu_1tg_32x256E,fmoe_bf16_blockscaleFp8_g1u1_novs_gelu_1tg_32x256.co,0,0,0,1,0,32,256",
+        "_ZN5aiter50fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x256E,fmoe_bf16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter52fmoe_bf16_blockscaleFp8_g1u1_novs_gelu_1tg_ps_32x256E,fmoe_bf16_blockscaleFp8_g1u1_novs_gelu_1tg_ps_32x256.co,0,0,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_bf16_noquant_g1u0_gelu.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter57fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_ps_32x512E,fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_ps_32x512.co,2,0,0,1,1,32,512",
+        "_ZN5aiter54fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_32x512E,fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_32x512.co,2,0,0,1,0,32,512"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_bf16_pertokenFp8_g1u1_gelu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter45fmoe_bf16_pertokenFp8_g1u1_vs_gelu_1tg_32x384E,fmoe_bf16_pertokenFp8_g1u1_vs_gelu_1tg_32x384.co,0,1,0,1,0,32,384",
+        "_ZN5aiter55fmoe_bf16_pertokenFp8_g1u1_vs_multix_gelu_1tg_ps_32x448E,fmoe_bf16_pertokenFp8_g1u1_vs_multix_gelu_1tg_ps_32x448.co,0,1,2,1,1,32,448",
+        "_ZN5aiter52fmoe_bf16_pertokenFp8_g1u1_vs_multix_gelu_1tg_32x320E,fmoe_bf16_pertokenFp8_g1u1_vs_multix_gelu_1tg_32x320.co,0,1,2,1,0,32,320",
+        "_ZN5aiter48fmoe_bf16_pertokenFp8_g1u1_vs_gelu_1tg_ps_32x128E,fmoe_bf16_pertokenFp8_g1u1_vs_gelu_1tg_ps_32x128.co,0,1,0,1,1,32,128"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_bf16_pertokenFp8_g1u1_gelu_tkw1.csv",
+      "kernel_count": 16,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter50fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x320E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x320.co,0,1,0,1,0,32,320",
+        "_ZN5aiter53fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x320E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x320.co,0,1,0,1,1,32,320",
+        "_ZN5aiter53fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x384E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x384.co,0,1,0,1,1,32,384",
+        "_ZN5aiter50fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x192E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x192.co,0,1,0,1,0,32,192"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_bf16_pertokenInt8_g1u0_gelu.csv",
+      "kernel_count": 18,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter46fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_32x448E,fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_32x448.co,0,1,0,1,0,32,448",
+        "_ZN5aiter50fmoe_bf16_pertokenInt8_g1u0_vs_smf_gelu_1tg_32x512E,fmoe_bf16_pertokenInt8_g1u0_vs_smf_gelu_1tg_32x512.co,0,1,1,1,0,32,512",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x448E,fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x448.co,0,1,0,1,1,32,448",
+        "_ZN5aiter46fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_32x192E,fmoe_bf16_pertokenInt8_g1u0_vs_gelu_1tg_32x192.co,0,1,0,1,0,32,192"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_bf16_pertokenInt8_g1u1_gelu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x448E,fmoe_bf16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x448.co,0,1,0,1,1,32,448",
+        "_ZN5aiter53fmoe_bf16_pertokenInt8_g1u1_vs_multix_gelu_1tg_32x512E,fmoe_bf16_pertokenInt8_g1u1_vs_multix_gelu_1tg_32x512.co,0,1,2,1,0,32,512",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x384E,fmoe_bf16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x384.co,0,1,0,1,1,32,384",
+        "_ZN5aiter53fmoe_bf16_pertokenInt8_g1u1_vs_multix_gelu_1tg_32x320E,fmoe_bf16_pertokenInt8_g1u1_vs_multix_gelu_1tg_32x320.co,0,1,2,1,0,32,320"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_bf16_pertokenInt8_g1u1_gelu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter51fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x192E,fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x192.co,0,0,0,1,1,32,192",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x384E,fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x384.co,0,0,0,1,0,32,384",
+        "_ZN5aiter51fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x448E,fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_ps_32x448.co,0,0,0,1,1,32,448",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x448E,fmoe_bf16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x448.co,0,0,0,1,0,32,448"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_bf16_pertokenMXfp4_g1u1_gelu.csv",
+      "kernel_count": 9,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter49fmoe_bf16_pertokenMXfp4_g1u1_novs_gelu_2tg_32x256E,fmoe_bf16_pertokenMXfp4_g1u1_novs_gelu_2tg_32x256.co,0,0,0,2,0,32,256",
+        "_ZN5aiter47fmoe_bf16_pertokenMXfp4_g1u1_vs_gelu_2tg_32x256E,fmoe_bf16_pertokenMXfp4_g1u1_vs_gelu_2tg_32x256.co,0,1,0,2,0,32,256",
+        "_ZN5aiter49fmoe_bf16_pertokenMXfp4_g1u1_novs_gelu_1tg_32x512E,fmoe_bf16_pertokenMXfp4_g1u1_novs_gelu_1tg_32x512.co,0,0,0,1,0,32,512",
+        "_ZN5aiter47fmoe_bf16_pertokenMXfp4_g1u1_vs_gelu_1tg_32x512E,fmoe_bf16_pertokenMXfp4_g1u1_vs_gelu_1tg_32x512.co,0,1,0,1,0,32,512"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_fp16_blockscaleFp8_g1u1_gelu.csv",
+      "kernel_count": 5,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter50fmoe_fp16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x256E,fmoe_fp16_blockscaleFp8_g1u1_vs_gelu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter49fmoe_fp16_blockscaleFp8_g1u1_novs_gelu_1tg_32x256E,fmoe_fp16_blockscaleFp8_g1u1_novs_gelu_1tg_32x256.co,0,0,0,1,0,32,256",
+        "_ZN5aiter47fmoe_fp16_blockscaleFp8_g1u1_vs_gelu_1tg_32x256E,fmoe_fp16_blockscaleFp8_g1u1_vs_gelu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter52fmoe_fp16_blockscaleFp8_g1u1_novs_gelu_1tg_ps_32x256E,fmoe_fp16_blockscaleFp8_g1u1_novs_gelu_1tg_ps_32x256.co,0,0,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_fp16_noquant_g1u0_gelu.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter54fmoe_fp16_noquantFp16_g1u0_vs_atm_inlv_gelu_1tg_32x512E,fmoe_fp16_noquantFp16_g1u0_vs_atm_inlv_gelu_1tg_32x512.co,2,0,0,1,0,32,512",
+        "_ZN5aiter57fmoe_fp16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_ps_32x512E,fmoe_fp16_noquantBf16_g1u0_vs_atm_inlv_gelu_1tg_ps_32x512.co,2,0,0,1,1,32,512"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_fp16_pertokenFp8_g1u1_gelu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter55fmoe_fp16_pertokenFp8_g1u1_vs_multix_gelu_1tg_ps_32x448E,fmoe_fp16_pertokenFp8_g1u1_vs_multix_gelu_1tg_ps_32x448.co,0,1,2,1,1,32,448",
+        "_ZN5aiter49fmoe_fp16_pertokenFp8_g1u1_vs_smf_gelu_1tg_32x512E,fmoe_fp16_pertokenFp8_g1u1_vs_smf_gelu_1tg_32x512.co,0,1,1,1,0,32,512",
+        "_ZN5aiter48fmoe_fp16_pertokenFp8_g1u1_vs_gelu_1tg_ps_32x320E,fmoe_fp16_pertokenFp8_g1u1_vs_gelu_1tg_ps_32x320.co,0,1,0,1,1,32,320",
+        "_ZN5aiter52fmoe_fp16_pertokenFp8_g1u1_vs_multix_gelu_1tg_32x192E,fmoe_fp16_pertokenFp8_g1u1_vs_multix_gelu_1tg_32x192.co,0,1,2,1,0,32,192"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_fp16_pertokenFp8_g1u1_gelu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x192E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x192.co,0,1,0,1,1,32,192",
+        "_ZN5aiter50fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x192E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_32x192.co,0,1,0,1,0,32,192",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x384E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x384.co,0,1,0,1,1,32,384",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x512E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_gelu_1tg_ps_32x512.co,0,1,0,1,1,32,512"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_fp16_pertokenInt8_g1u0_gelu.csv",
+      "kernel_count": 18,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_32x448E,fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_32x448.co,0,1,0,1,0,32,448",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x128E,fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x128.co,0,1,0,1,1,32,128",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_32x256E,fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x256E,fmoe_fp16_pertokenInt8_g1u0_vs_gelu_1tg_ps_32x256.co,0,1,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_fp16_pertokenInt8_g1u1_gelu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter56fmoe_fp16_pertokenInt8_g1u1_vs_multix_gelu_1tg_ps_32x320E,fmoe_fp16_pertokenInt8_g1u1_vs_multix_gelu_1tg_ps_32x320.co,0,1,2,1,1,32,320",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x256E,fmoe_fp16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u1_vs_gelu_1tg_32x256E,fmoe_fp16_pertokenInt8_g1u1_vs_gelu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x192E,fmoe_fp16_pertokenInt8_g1u1_vs_gelu_1tg_ps_32x192.co,0,1,0,1,1,32,192"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_fp16_pertokenInt8_g1u1_gelu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x384E,fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x384.co,0,0,0,1,0,32,384",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x128E,fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x128.co,0,0,0,1,0,32,128",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x512E,fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x512.co,0,0,0,1,0,32,512",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x320E,fmoe_fp16_pertokenInt8_g1u1_tkw1_gelu_1tg_32x320.co,0,0,0,1,0,32,320"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/gelu/fmoe_fp16_pertokenMXfp4_g1u1_gelu.csv",
+      "kernel_count": 9,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter49fmoe_fp16_pertokenMXfp4_g1u1_novs_gelu_1tg_32x512E,fmoe_fp16_pertokenMXfp4_g1u1_novs_gelu_1tg_32x512.co,0,0,0,1,0,32,512",
+        "_ZN5aiter49fmoe_fp16_pertokenMXfp4_g1u1_novs_gelu_2tg_32x256E,fmoe_fp16_pertokenMXfp4_g1u1_novs_gelu_2tg_32x256.co,0,0,0,2,0,32,256",
+        "_ZN5aiter47fmoe_fp16_pertokenMXfp4_g1u1_vs_gelu_2tg_32x256E,fmoe_fp16_pertokenMXfp4_g1u1_vs_gelu_2tg_32x256.co,0,1,0,2,0,32,256",
+        "_ZN5aiter50fmoe_fp16_pertokenMXfp4_g1u1_vs_gelu_2tg_ps_32x256E,fmoe_fp16_pertokenMXfp4_g1u1_vs_gelu_2tg_ps_32x256.co,0,1,0,2,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_bf16_blockscaleFp8_g1u1_silu.csv",
+      "kernel_count": 7,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter52fmoe_bf16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x256E,fmoe_bf16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x256.co,0,0,0,1,1,32,256",
+        "_ZN5aiter50fmoe_bf16_blockscaleFp8_g1u1_vs_silu_1tg_ps_32x256E,fmoe_bf16_blockscaleFp8_g1u1_vs_silu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter49fmoe_bf16_blockscaleFp8_g1u1_novs_silu_1tg_32x256E,fmoe_bf16_blockscaleFp8_g1u1_novs_silu_1tg_32x256.co,0,0,0,1,0,32,256",
+        "_ZN5aiter47fmoe_bf16_blockscaleFp8_g1u1_vs_silu_1tg_32x256E,fmoe_bf16_blockscaleFp8_g1u1_vs_silu_1tg_32x256.co,0,1,0,1,0,32,256"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_bf16_noquant_g1u0_silu.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter57fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_ps_32x512E,fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_ps_32x512.co,2,0,0,1,1,32,512",
+        "_ZN5aiter54fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_32x512E,fmoe_bf16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_32x512.co,2,0,0,1,0,32,512"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_bf16_pertokenFp8_g1u1_silu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter45fmoe_bf16_pertokenFp8_g1u1_vs_silu_1tg_32x192E,fmoe_bf16_pertokenFp8_g1u1_vs_silu_1tg_32x192.co,0,1,0,1,0,32,192",
+        "_ZN5aiter55fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x320E,fmoe_bf16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x320.co,0,1,2,1,1,32,320",
+        "_ZN5aiter49fmoe_bf16_pertokenFp8_g1u1_vs_smf_silu_1tg_32x512E,fmoe_bf16_pertokenFp8_g1u1_vs_smf_silu_1tg_32x512.co,0,1,1,1,0,32,512",
+        "_ZN5aiter48fmoe_bf16_pertokenFp8_g1u1_vs_silu_1tg_ps_32x320E,fmoe_bf16_pertokenFp8_g1u1_vs_silu_1tg_ps_32x320.co,0,1,0,1,1,32,320"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_bf16_pertokenFp8_g1u1_silu_tkw1.csv",
+      "kernel_count": 16,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter53fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x256E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter53fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x384E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x384.co,0,1,0,1,1,32,384",
+        "_ZN5aiter50fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x512E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x512.co,0,1,0,1,0,32,512",
+        "_ZN5aiter53fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x320E,fmoe_bf16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x320.co,0,1,0,1,1,32,320"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_bf16_pertokenInt8_g1u0_silu.csv",
+      "kernel_count": 18,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x320E,fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x320.co,0,1,0,1,1,32,320",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x512E,fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x512.co,0,1,0,1,1,32,512",
+        "_ZN5aiter46fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_32x448E,fmoe_bf16_pertokenInt8_g1u0_vs_silu_1tg_32x448.co,0,1,0,1,0,32,448",
+        "_ZN5aiter50fmoe_bf16_pertokenInt8_g1u0_vs_smf_silu_1tg_32x512E,fmoe_bf16_pertokenInt8_g1u0_vs_smf_silu_1tg_32x512.co,0,1,1,1,0,32,512"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_bf16_pertokenInt8_g1u1_silu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x384E,fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x384.co,0,1,0,1,1,32,384",
+        "_ZN5aiter53fmoe_bf16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x256E,fmoe_bf16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x256.co,0,1,2,1,0,32,256",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x320E,fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x320.co,0,1,0,1,1,32,320",
+        "_ZN5aiter49fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x128E,fmoe_bf16_pertokenInt8_g1u1_vs_silu_1tg_ps_32x128.co,0,1,0,1,1,32,128"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_bf16_pertokenInt8_g1u1_silu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x128E,fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x128.co,0,0,0,1,0,32,128",
+        "_ZN5aiter51fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x448E,fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x448.co,0,0,0,1,1,32,448",
+        "_ZN5aiter48fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x448E,fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_32x448.co,0,0,0,1,0,32,448",
+        "_ZN5aiter51fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x384E,fmoe_bf16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x384.co,0,0,0,1,1,32,384"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_bf16_pertokenMXfp4_g1u1_silu.csv",
+      "kernel_count": 9,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter47fmoe_bf16_pertokenMXfp4_g1u1_vs_silu_2tg_32x256E,fmoe_bf16_pertokenMXfp4_g1u1_vs_silu_2tg_32x256.co,0,1,0,2,0,32,256",
+        "_ZN5aiter49fmoe_bf16_pertokenMXfp4_g1u1_novs_silu_2tg_32x256E,fmoe_bf16_pertokenMXfp4_g1u1_novs_silu_2tg_32x256.co,0,0,0,2,0,32,256",
+        "_ZN5aiter49fmoe_bf16_pertokenMXfp4_g1u1_novs_silu_1tg_32x512E,fmoe_bf16_pertokenMXfp4_g1u1_novs_silu_1tg_32x512.co,0,0,0,1,0,32,512",
+        "_ZN5aiter56fmoe_bf16_pertokenMXfp4_g1u1_novs_silu_2tg_ps_2tg_32x256E,fmoe_bf16_pertokenMXfp4_g1u1_novs_silu_2tg_ps_2tg_32x256.co,0,0,0,2,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_fp16_blockscaleFp8_g1u1_silu.csv",
+      "kernel_count": 5,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter50fmoe_fp16_blockscaleFp8_g1u1_vs_silu_1tg_ps_32x256E,fmoe_fp16_blockscaleFp8_g1u1_vs_silu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter47fmoe_fp16_blockscaleFp8_g1u1_vs_silu_1tg_32x256E,fmoe_fp16_blockscaleFp8_g1u1_vs_silu_1tg_32x256.co,0,1,0,1,0,32,256",
+        "_ZN5aiter52fmoe_fp16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x256E,fmoe_fp16_blockscaleFp8_g1u1_novs_silu_1tg_ps_32x256.co,0,0,0,1,1,32,256",
+        "_ZN5aiter49fmoe_fp16_blockscaleFp8_g1u1_novs_silu_1tg_32x256E,fmoe_fp16_blockscaleFp8_g1u1_novs_silu_1tg_32x256.co,0,0,0,1,0,32,256"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_fp16_noquant_g1u0_silu.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter54fmoe_fp16_noquantFp16_g1u0_vs_atm_inlv_silu_1tg_32x512E,fmoe_fp16_noquantFp16_g1u0_vs_atm_inlv_silu_1tg_32x512.co,2,0,0,1,0,32,512",
+        "_ZN5aiter57fmoe_fp16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_ps_32x512E,fmoe_fp16_noquantBf16_g1u0_vs_atm_inlv_silu_1tg_ps_32x512.co,2,0,0,1,1,32,512"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_fp16_pertokenFp8_g1u1_silu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter48fmoe_fp16_pertokenFp8_g1u1_vs_silu_1tg_ps_32x448E,fmoe_fp16_pertokenFp8_g1u1_vs_silu_1tg_ps_32x448.co,0,1,0,1,1,32,448",
+        "_ZN5aiter55fmoe_fp16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x320E,fmoe_fp16_pertokenFp8_g1u1_vs_multix_silu_1tg_ps_32x320.co,0,1,2,1,1,32,320",
+        "_ZN5aiter45fmoe_fp16_pertokenFp8_g1u1_vs_silu_1tg_32x448E,fmoe_fp16_pertokenFp8_g1u1_vs_silu_1tg_32x448.co,0,1,0,1,0,32,448",
+        "_ZN5aiter48fmoe_fp16_pertokenFp8_g1u1_vs_silu_1tg_ps_32x320E,fmoe_fp16_pertokenFp8_g1u1_vs_silu_1tg_ps_32x320.co,0,1,0,1,1,32,320"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_fp16_pertokenFp8_g1u1_silu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter50fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x192E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_32x192.co,0,1,0,1,0,32,192",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x384E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x384.co,0,1,0,1,1,32,384",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x192E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x192.co,0,1,0,1,1,32,192",
+        "_ZN5aiter53fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x128E,fmoe_fp16_pertokenFp8_g1u1_vs_tkw1_silu_1tg_ps_32x128.co,0,1,0,1,1,32,128"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_fp16_pertokenInt8_g1u0_silu.csv",
+      "kernel_count": 18,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x512E,fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x512.co,0,1,0,1,1,32,512",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_32x128E,fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_32x128.co,0,1,0,1,0,32,128",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x256E,fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x256.co,0,1,0,1,1,32,256",
+        "_ZN5aiter49fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x128E,fmoe_fp16_pertokenInt8_g1u0_vs_silu_1tg_ps_32x128.co,0,1,0,1,1,32,128"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_fp16_pertokenInt8_g1u1_silu.csv",
+      "kernel_count": 31,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter56fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_ps_32x128E,fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_ps_32x128.co,0,1,2,1,1,32,128",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u1_vs_silu_1tg_32x512E,fmoe_fp16_pertokenInt8_g1u1_vs_silu_1tg_32x512.co,0,1,0,1,0,32,512",
+        "_ZN5aiter46fmoe_fp16_pertokenInt8_g1u1_vs_silu_1tg_32x448E,fmoe_fp16_pertokenInt8_g1u1_vs_silu_1tg_32x448.co,0,1,0,1,0,32,448",
+        "_ZN5aiter53fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x448E,fmoe_fp16_pertokenInt8_g1u1_vs_multix_silu_1tg_32x448.co,0,1,2,1,0,32,448"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_fp16_pertokenInt8_g1u1_silu_tkw1.csv",
+      "kernel_count": 15,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter51fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x192E,fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x192.co,0,0,0,1,1,32,192",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x448E,fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x448.co,0,0,0,1,0,32,448",
+        "_ZN5aiter48fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x384E,fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_32x384.co,0,0,0,1,0,32,384",
+        "_ZN5aiter51fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x256E,fmoe_fp16_pertokenInt8_g1u1_tkw1_silu_1tg_ps_32x256.co,0,0,0,1,1,32,256"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe/silu/fmoe_fp16_pertokenMXfp4_g1u1_silu.csv",
+      "kernel_count": 9,
+      "sample_entries": [
+        "knl_name,co_name,atm,vskip,smf,tg_num_perCU,ps,subGU_m,subGU_n",
+        "_ZN5aiter52fmoe_fp16_pertokenMXfp4_g1u1_novs_silu_1tg_ps_32x512E,fmoe_fp16_pertokenMXfp4_g1u1_novs_silu_1tg_ps_32x512.co,0,0,0,1,1,32,512",
+        "_ZN5aiter49fmoe_fp16_pertokenMXfp4_g1u1_novs_silu_1tg_32x512E,fmoe_fp16_pertokenMXfp4_g1u1_novs_silu_1tg_32x512.co,0,0,0,1,0,32,512",
+        "_ZN5aiter50fmoe_fp16_pertokenMXfp4_g1u1_vs_silu_2tg_ps_32x256E,fmoe_fp16_pertokenMXfp4_g1u1_vs_silu_2tg_ps_32x256.co,0,1,0,2,1,32,256",
+        "_ZN5aiter47fmoe_fp16_pertokenMXfp4_g1u1_vs_silu_2tg_32x256E,fmoe_fp16_pertokenMXfp4_g1u1_vs_silu_2tg_32x256.co,0,1,0,2,0,32,256"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe_2stages/fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1.csv",
+      "kernel_count": 37,
+      "sample_entries": [
+        "tile_m,tile_n,knl_name,co_name",
+        "16,128,_ZN5aiter59fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_16x128_4tg_pf2E,fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_16x128_4tg_pf2.co",
+        "16,128,_ZN5aiter59fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_16x128_4tg_pf3E,fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_16x128_4tg_pf3.co",
+        "32,128,_ZN5aiter59fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_32x128_3tg_pf2E,fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_32x128_3tg_pf2.co",
+        "32,128,_ZN5aiter59fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_32x128_3tg_pf3E,fmoe_stage1_bf16_pertokenFp8_blockscale_g1u1_32x128_3tg_pf3.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe_2stages/fmoe_stage1_bf16_pertokenFp8_doweight_g1u1.csv",
+      "kernel_count": 55,
+      "sample_entries": [
+        "tile_m,tile_n,knl_name,co_name",
+        "16,128,_ZN5aiter57fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_16x128_4tg_pf2E,fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_16x128_4tg_pf2.co",
+        "16,128,_ZN5aiter57fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_16x128_4tg_pf3E,fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_16x128_4tg_pf3.co",
+        "32,128,_ZN5aiter57fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_32x128_3tg_pf2E,fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_32x128_3tg_pf2.co",
+        "32,128,_ZN5aiter57fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_32x128_3tg_pf3E,fmoe_stage1_bf16_pertokenFp8_doweight_g1u1_32x128_3tg_pf3.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe_2stages/fmoe_stage1_bf16_pertokenFp8_g1u1.csv",
+      "kernel_count": 57,
+      "sample_entries": [
+        "tile_m,tile_n,knl_name,co_name",
+        "16,128,_ZN5aiter48fmoe_stage1_bf16_pertokenFp8_g1u1_16x128_4tg_pf2E,fmoe_stage1_bf16_pertokenFp8_g1u1_16x128_4tg_pf2.co",
+        "16,128,_ZN5aiter48fmoe_stage1_bf16_pertokenFp8_g1u1_16x128_4tg_pf3E,fmoe_stage1_bf16_pertokenFp8_g1u1_16x128_4tg_pf3.co",
+        "32,128,_ZN5aiter48fmoe_stage1_bf16_pertokenFp8_g1u1_32x128_3tg_pf2E,fmoe_stage1_bf16_pertokenFp8_g1u1_32x128_3tg_pf2.co",
+        "32,128,_ZN5aiter48fmoe_stage1_bf16_pertokenFp8_g1u1_32x128_3tg_pf3E,fmoe_stage1_bf16_pertokenFp8_g1u1_32x128_3tg_pf3.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fmoe_2stages/fmoe_stage1_bf16_pertokenInt8_g1u1.csv",
+      "kernel_count": 37,
+      "sample_entries": [
+        "tile_m,tile_n,knl_name,co_name",
+        "16,128,_ZN5aiter49fmoe_stage1_bf16_pertokenInt8_g1u1_16x128_4tg_pf2E,fmoe_stage1_bf16_pertokenInt8_g1u1_16x128_4tg_pf2.co",
+        "16,128,_ZN5aiter49fmoe_stage1_bf16_pertokenInt8_g1u1_16x128_4tg_pf3E,fmoe_stage1_bf16_pertokenInt8_g1u1_16x128_4tg_pf3.co",
+        "32,128,_ZN5aiter49fmoe_stage1_bf16_pertokenInt8_g1u1_32x128_3tg_pf2E,fmoe_stage1_bf16_pertokenInt8_g1u1_32x128_3tg_pf2.co",
+        "32,128,_ZN5aiter49fmoe_stage1_bf16_pertokenInt8_g1u1_32x128_3tg_pf3E,fmoe_stage1_bf16_pertokenInt8_g1u1_32x128_3tg_pf3.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/fp8gemm_blockscale/fp8gemm_bf16_blockscale.csv",
+      "kernel_count": 3,
+      "sample_entries": [
+        "tile_m,tile_n,splitK,bpreshuffle,knl_name,co_name",
+        "128,128,1,1,_ZN5aiter43fp8gemm_bf16_blockscale_BpreShuffle_128x128E,fp8gemm_bf16_blockscale_BpreShuffle_128x128.co",
+        "64,128,1,1,_ZN5aiter42fp8gemm_bf16_blockscale_BpreShuffle_64x128E,fp8gemm_bf16_blockscale_BpreShuffle_64x128.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/mla/mla_asm.csv",
+      "kernel_count": 21,
+      "sample_entries": [
+        "qType,kvType,Gqa,ps,qSeqLen,prefill,causal,knl_name,co_name",
+        "bf16,bf16,128,0,0,0,0,_ZN5aiter41mla_dec_stage1_bf16_a16w16_subQ128_mqa128E,mla_dec_stage1_bf16_a16w16_subQ128_mqa128.co",
+        "bf16,bf16,16,1,4,0,0,_ZN5aiter42mla_a16w16_qh16_m16x4_n16x1_coex0_mask1_psE,mla_a16w16_qh16_m16x4_n16x1_coex0_mask1_ps.co",
+        "bf16,bf16,16,0,1,0,0,_ZN5aiter39mla_dec_stage1_bf16_a16w16_subQ16_mqa16E,mla_dec_stage1_bf16_a16w16_subQ16_mqa16.co",
+        "bf16,bf16,16,0,4,0,0,_ZN5aiter39mla_a16w16_qh16_m16x4_n16x1_coex0_mask1E,mla_a16w16_qh16_m16x4_n16x1_coex0_mask1.co"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/pa/pa_asm.csv",
+      "kernel_count": 42,
+      "sample_entries": [
+        "qType,kvType,Gqa,Mtp,Msk,Hp,blkSz,knl_name,co_name,ps,qTile",
+        "bf16,fp8,0,0,1,1,1024,_ZN5aiter42PA_A16W8_BLK1024_1TG_4W_16mx1_64nx4_MTP_PSE,pa_bf16_pertokenFp8_gqa16_1tg_4w_qlen16_msk1_ps.co,1,16",
+        "bf16,fp8,0,0,1,1,1024,_ZN5aiter42PA_A16W8_BLK1024_1TG_4W_32mx1_64nx4_MTP_PSE,pa_bf16_pertokenFp8_gqa16_1tg_4w_qlen32_msk1_ps.co,1,32",
+        "bf16,fp8,0,0,1,1,1024,_ZN5aiter42PA_A16W8_BLK1024_1TG_4W_40mx1_64nx4_MTP_PSE,pa_bf16_pertokenFp8_gqa16_1tg_4w_qlen40_msk1_ps.co,1,40",
+        "bf16,fp8,0,0,1,1,1024,_ZN5aiter42PA_A16W8_BLK1024_1TG_4W_48mx1_64nx4_MTP_PSE,pa_bf16_pertokenFp8_gqa16_1tg_4w_qlen48_msk1_ps.co,1,48"
+      ]
+    },
+    {
+      "arch": "gfx950",
+      "config_file": "gfx950/topksoftmax/topksoftmax.csv",
+      "kernel_count": 21,
+      "sample_entries": [
+        "knl_name,co_name,subm,num_experts,topk,dtype",
+        "_ZN5aiter19topksoftmax_4x128x4E,topksoftmax_4x128x4.co,4,128,4,fp32",
+        "_ZN5aiter19topksoftmax_4x128x6E,topksoftmax_4x128x6.co,4,128,6,fp32",
+        "_ZN5aiter19topksoftmax_4x128x8E,topksoftmax_4x128x8.co,4,128,8,fp32",
+        "_ZN5aiter19topksoftmax_4x256x6E,topksoftmax_4x256x6.co,4,256,6,fp32"
+      ]
+    }
+  ],
+  "tutorial_patterns": [
+    {
+      "tutorial_name": "00_copy_kernel",
+      "files": [
+        "00_copy_kernel/copy_basic.hpp"
+      ],
+      "concepts": []
+    },
+    {
+      "tutorial_name": "01_naive_gemm",
+      "files": [
+        "01_naive_gemm/block_level/practice_gemm_block_pipeline_agmem_bgmem_creg.hpp",
+        "01_naive_gemm/block_level/practice_gemm_block_policy_agmem_bgmem_creg.hpp",
+        "01_naive_gemm/host_level/practice_gemm_host_pipeline_agmem_bgmem_creg.hpp",
+        "01_naive_gemm/host_level/practice_gemm_host_policy_agmem_bgmem_creg.hpp",
+        "01_naive_gemm/practice_gemm.hpp",
+        "01_naive_gemm/reference_gemm.hpp",
+        "01_naive_gemm/warp_level/practice_gemm_warp_pipeline_asmem_bsmem_creg.hpp",
+        "01_naive_gemm/warp_level/practice_gemm_warp_policy_asmem_bsmem_creg.hpp"
+      ],
+      "concepts": [
+        "warp_level_pipeline",
+        "host_level_pipeline",
+        "global_memory_pipeline",
+        "block_level_pipeline",
+        "shared_memory_pipeline"
+      ]
+    }
+  ],
+  "aiter_kernel_types": [
+    {
+      "name": "asm_a8w8_blockscale_bpreshuffle",
+      "file": "csrc/py_itfs_cu/asm_a8w8_blockscale_bpreshuffle.cu",
+      "type": "asm_kernel",
+      "category": "Other"
+    },
+    {
+      "name": "asm_communication",
+      "file": "csrc/py_itfs_cu/asm_communication.cu",
+      "type": "asm_kernel",
+      "category": "Other"
+    },
+    {
+      "name": "asm_flatmm_a8w8_blockscale",
+      "file": "csrc/py_itfs_cu/asm_flatmm_a8w8_blockscale.cu",
+      "type": "asm_kernel",
+      "category": "Other"
+    },
+    {
+      "name": "asm_fmoe",
+      "file": "csrc/py_itfs_cu/asm_fmoe.cu",
+      "type": "asm_kernel",
+      "category": "MoE"
+    },
+    {
+      "name": "asm_gemm_a16w16",
+      "file": "csrc/py_itfs_cu/asm_gemm_a16w16.cu",
+      "type": "asm_kernel",
+      "category": "GEMM"
+    },
+    {
+      "name": "asm_gemm_a4w4",
+      "file": "csrc/py_itfs_cu/asm_gemm_a4w4.cu",
+      "type": "asm_kernel",
+      "category": "GEMM"
+    },
+    {
+      "name": "asm_gemm_a8w8",
+      "file": "csrc/py_itfs_cu/asm_gemm_a8w8.cu",
+      "type": "asm_kernel",
+      "category": "GEMM"
+    },
+    {
+      "name": "asm_layernorm",
+      "file": "csrc/py_itfs_cu/asm_layernorm.cu",
+      "type": "asm_kernel",
+      "category": "Other"
+    },
+    {
+      "name": "asm_mha_bwd",
+      "file": "csrc/py_itfs_cu/asm_mha_bwd.cu",
+      "type": "asm_kernel",
+      "category": "Other"
+    },
+    {
+      "name": "asm_mha_fwd",
+      "file": "csrc/py_itfs_cu/asm_mha_fwd.cu",
+      "type": "asm_kernel",
+      "category": "Other"
+    },
+    {
+      "name": "asm_mha_varlen_bwd",
+      "file": "csrc/py_itfs_cu/asm_mha_varlen_bwd.cu",
+      "type": "asm_kernel",
+      "category": "Other"
+    },
+    {
+      "name": "asm_mha_varlen_fwd",
+      "file": "csrc/py_itfs_cu/asm_mha_varlen_fwd.cu",
+      "type": "asm_kernel",
+      "category": "Other"
+    },
+    {
+      "name": "asm_mi350_a8w8_blockscale",
+      "file": "csrc/py_itfs_cu/asm_mi350_a8w8_blockscale.cu",
+      "type": "asm_kernel",
+      "category": "Other"
+    },
+    {
+      "name": "asm_mla",
+      "file": "csrc/py_itfs_cu/asm_mla.cu",
+      "type": "asm_kernel",
+      "category": "MLA"
+    },
+    {
+      "name": "asm_moe_2stage",
+      "file": "csrc/py_itfs_cu/asm_moe_2stage.cu",
+      "type": "asm_kernel",
+      "category": "MoE"
+    },
+    {
+      "name": "asm_pa",
+      "file": "csrc/py_itfs_cu/asm_pa.cu",
+      "type": "asm_kernel",
+      "category": "Attention"
+    },
+    {
+      "name": "asm_topk_per_row_decode",
+      "file": "csrc/py_itfs_cu/asm_topk_per_row_decode.cu",
+      "type": "asm_kernel",
+      "category": "TopK"
+    },
+    {
+      "name": "asm_topk_per_row_prefill",
+      "file": "csrc/py_itfs_cu/asm_topk_per_row_prefill.cu",
+      "type": "asm_kernel",
+      "category": "TopK"
+    },
+    {
+      "name": "asm_topksoftmax",
+      "file": "csrc/py_itfs_cu/asm_topksoftmax.cu",
+      "type": "asm_kernel",
+      "category": "TopK"
+    }
+  ]
+}

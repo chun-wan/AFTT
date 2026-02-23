@@ -1,0 +1,104 @@
+# AFTT - ASM Fine-Tuning Tool
+
+A static analysis and optimization advisor for AMD GPU (AMDGPU) assembly kernels. Compiles C++/HIP code to ASM, analyzes it against a knowledge base of production-grade optimization patterns extracted from aiter/CK kernels, and provides actionable suggestions for kernel fine-tuning on AMD Instinct GPUs.
+
+## Features
+
+- **ASM Pattern Analysis**: Deep pattern matching against production FMHA, GEMM, and normalization kernels
+- **DPP/Cross-lane Optimization**: Detects suboptimal reductions and suggests DPP-based replacements
+- **Software Pipelining Analysis**: Identifies MFMA-load interleaving opportunities
+- **Register Pressure Estimation**: VGPR/AGPR/SGPR occupancy impact analysis
+- **ISA Instruction Database**: Multi-generation MI GPU instruction reference (gfx900-gfx950)
+- **Compiler Flag Comparison**: Diff ASM output across optimization levels
+- **C++ to ASM Corpus**: Paired dataset for understanding compiler behavior
+
+## Supported Architectures
+
+| Architecture | GPU | Notes |
+|---|---|---|
+| gfx900 | MI25 | Vega 10 |
+| gfx906 | MI50/MI60 | Vega 20 |
+| gfx908 | MI100 | CDNA |
+| gfx90a | MI200 | CDNA2 |
+| gfx940 | MI300A | CDNA3 |
+| gfx941 | MI300A | CDNA3 variant |
+| gfx942 | MI300X/MI325X | CDNA3 |
+| gfx950 | MI350 | CDNA4 |
+
+## Installation
+
+```bash
+pip install -e .
+```
+
+## Usage
+
+```bash
+# Analyze a HIP kernel file
+aftt analyze kernel.cpp --arch gfx942
+
+# Compare compiler flag effects
+aftt compile-compare kernel.cpp --arch gfx942 --flags "-O2,-O3,-Ofast"
+
+# Look up an ISA instruction
+aftt isa v_mfma_f32_32x32x8f16 --arch gfx942
+
+# Get optimization suggestions for existing ASM
+aftt suggest kernel.s --arch gfx942
+
+# Show knowledge base statistics
+aftt stats
+```
+
+## Project Structure
+
+```
+AFTT/
+  db/                        # Knowledge base
+    isa/                     # ISA instruction definitions per arch
+    patterns/                # Optimization patterns (DPP, FMHA, etc.)
+    compiler_flags/          # Compiler flag effect mappings
+    cpp_asm_pairs/           # C++ <-> ASM paired corpus
+    profiling_rules/         # Performance anti-pattern rules
+    training_data/           # Exported datasets for model training
+    disassembly/             # Disassembled .co kernels (not in git)
+  src/                       # Core library
+    compiler.py              # Wrapper for amdclang++ compilation
+    parser.py                # ASM output parser
+    analyzer.py              # Pattern matching engine
+    asm_optimizer.py         # Deep ASM optimization advisor
+    asm_editor.py            # ASM binary editor (llvm-mc + ld.lld)
+    cycle_estimator.py       # Instruction cycle estimation
+    kernel_validator.py      # HIP runtime validation
+    reporter.py              # Report generator
+    isa_db.py                # ISA instruction lookup
+    knowledge_base.py        # Unified KB access layer
+  collectors/                # Data collection scripts
+    isa_collector.py         # Parse AMD ISA docs per gfx arch
+    isa_deep_collector.py    # Deep ISA instruction extraction
+    asm_pair_generator.py    # Generate C++ -> ASM pairs via compiler
+    pattern_extractor.py     # Extract patterns from aiter/CK code
+    ck_deep_analyzer.py      # Deep CK pipeline pattern analysis
+    profiling_collector.py   # Build profiling rule set
+    compiler_flag_tester.py  # Test different compiler flags
+    trtllm_analyzer.py       # TensorRT-LLM kernel algorithm mapping
+    trtllm_mapping.py        # TRT-LLM to AMD pattern bridge
+    dataset_exporter.py      # Export training data for GLM
+    co_disassembler.py       # .co file disassembly
+    co_analyzer.py           # Code object metadata analysis
+  templates/                 # HIP kernel templates for pair generation
+  tests/                     # Unit tests
+  reports/                   # Generated analysis reports
+  cli.py                     # CLI entry point
+  e2e_optimize.py            # End-to-end kernel optimization pipeline
+```
+
+## Roadmap
+
+1. **Static Analysis Tool** (current) - Pattern-based optimization advice
+2. **GLM Fine-tuning Dataset** - Training data from ASM/C++ corpus for LLM re-training
+3. **GLM-powered Kernel Editor** - AI-assisted ASM kernel generation and optimization
+
+## License
+
+MIT
