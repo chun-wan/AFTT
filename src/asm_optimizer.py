@@ -16,7 +16,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Optional
 
-from .asm_editor import AsmInstruction, EditOperation
+from .instruction import Instruction, EditOperation
+from .knowledge_base import KnowledgeBase
 
 
 @dataclass
@@ -115,14 +116,17 @@ class AsmOptimizer:
     - s_waitcnt precision
     """
 
-    def __init__(self, arch: str = "gfx942"):
+    def __init__(self, arch: str = "gfx942", kb: Optional[KnowledgeBase] = None):
         self.arch = arch
+        self.kb = kb
+        if self.kb is not None:
+            self.kb.load()
         self.max_vgpr_per_simd = 512
         self.max_waves_per_simd = 8
         self.lds_per_cu_kb = 64
         self.wavefront_size = 64
 
-    def optimize(self, instructions: list[AsmInstruction],
+    def optimize(self, instructions: list[Instruction],
                  aggressive: bool = False) -> OptimizationResult:
         result = OptimizationResult()
 
@@ -131,6 +135,8 @@ class AsmOptimizer:
         self._opt_waitcnt_relaxation(instructions, result, aggressive)
         self._opt_nop_elimination(instructions, result)
         self._opt_full_wait_splitting(instructions, result)
+        self._opt_redundant_barrier(instructions, result)
+        self._opt_mfma_vmem_interleave(instructions, result)
 
         self._analyze_dpp_opportunities(instructions, result, profile)
         self._analyze_software_pipelining(instructions, result, profile)
@@ -142,12 +148,40 @@ class AsmOptimizer:
         self._analyze_non_dpp_reduction(instructions, result, profile)
         self._analyze_fmha_patterns(instructions, result, profile)
 
+        if self.kb is not None:
+            self._analyze_kb_dpp_patterns(instructions, result, profile)
+            self._analyze_kb_fmha_techniques(instructions, result, profile)
+
         result.stats = profile
+        return result
+
+    def optimize_with_report(self, instructions: list[Instruction],
+                              aggressive: bool = False) -> OptimizationResult:
+        """Like optimize(), but each edit gets a detailed rationale in its comment."""
+        result = self.optimize(instructions, aggressive)
+
+        for edit in result.edits:
+            orig = instructions[edit.target_index] if edit.target_index < len(instructions) else None
+            rationale_parts = []
+            if orig and orig.mnemonic == "s_nop":
+                rationale_parts.append(f"NOP_REDUCTION: s_nop {orig.operands} → {edit.new_mnemonic} {edit.new_operands}")
+                rationale_parts.append("reduces pipeline bubbles")
+            elif edit.new_mnemonic == "s_waitcnt":
+                rationale_parts.append(f"WAITCNT_RELAX: relaxed from {orig.operands if orig else '?'} to {edit.new_operands}")
+                rationale_parts.append("allows more instruction overlap")
+            elif edit.new_mnemonic == "s_nop" and orig and orig.mnemonic == "s_nop":
+                rationale_parts.append(f"NOP_REDUCE: fewer idle cycles")
+            else:
+                rationale_parts.append(f"PATTERN_EDIT: {orig.mnemonic if orig else '?'} → {edit.new_mnemonic}")
+            if edit.comment:
+                rationale_parts.append(edit.comment)
+            edit.comment = " | ".join(rationale_parts)
+
         return result
 
     # ── Kernel Profiling ─────────────────────────────────────────────
 
-    def _build_kernel_profile(self, instructions: list[AsmInstruction]) -> dict:
+    def _build_kernel_profile(self, instructions: list[Instruction]) -> dict:
         """Build a comprehensive profile of the kernel's instruction mix."""
         mfma_count = 0
         mfma_types: dict[str, int] = {}
@@ -283,99 +317,183 @@ class AsmOptimizer:
     def _classify_kernel_type(self, mfma_count, dpp_count, lds_direct_loads,
                                cvt_fp8_count, bpermute_count, barrier_count,
                                mfma_types) -> str:
+        internal_type: str
         if mfma_count == 0:
             if bpermute_count > 0:
-                return "attention_non_mfma"
-            return "non_mfma"
+                internal_type = "attention_non_mfma"
+            else:
+                internal_type = "non_mfma"
+        else:
+            has_fp8_mfma = any("fp8" in t for t in mfma_types)
+            has_bf16_mfma = any("bf16" in t for t in mfma_types)
+            has_i8_mfma = any("i8" in t or "i32" in t for t in mfma_types)
 
-        has_fp8_mfma = any("fp8" in t for t in mfma_types)
-        has_bf16_mfma = any("bf16" in t for t in mfma_types)
-        has_i8_mfma = any("i8" in t or "i32" in t for t in mfma_types)
+            if dpp_count > 0 and has_fp8_mfma:
+                internal_type = "fp8_gemm_with_dequant"
+            elif dpp_count > 0 and has_i8_mfma:
+                internal_type = "int8_gemm_with_dequant"
+            elif has_fp8_mfma:
+                internal_type = "fp8_gemm"
+            elif has_bf16_mfma and lds_direct_loads > 100:
+                internal_type = "bf16_gemm_direct_lds"
+            elif has_bf16_mfma:
+                internal_type = "bf16_gemm"
+            elif bpermute_count > 0:
+                internal_type = "attention_with_permute"
+            elif barrier_count > 20:
+                internal_type = "multi_barrier_kernel"
+            else:
+                internal_type = "mfma_generic"
 
-        if dpp_count > 0 and has_fp8_mfma:
-            return "fp8_gemm_with_dequant"
-        if dpp_count > 0 and has_i8_mfma:
-            return "int8_gemm_with_dequant"
-        if has_fp8_mfma:
-            return "fp8_gemm"
-        if has_bf16_mfma and lds_direct_loads > 100:
-            return "bf16_gemm_direct_lds"
-        if has_bf16_mfma:
-            return "bf16_gemm"
-        if bpermute_count > 0:
-            return "attention_with_permute"
-        if barrier_count > 20:
-            return "multi_barrier_kernel"
-        return "mfma_generic"
+        if self.kb is not None:
+            kb_type = self._map_to_kb_kernel_type(
+                internal_type, dpp_count, bpermute_count, mfma_types
+            )
+            if kb_type is not None:
+                return kb_type
+        return internal_type
+
+    def _map_to_kb_kernel_type(
+        self, internal_type: str, dpp_count: int, bpermute_count: int,
+        mfma_types: dict
+    ) -> Optional[str]:
+        """Map internal kernel type to KB optimization_techniques_by_kernel_type key."""
+        dpp = self.kb.dpp_crosslane_patterns
+        techniques = dpp.get("optimization_techniques_by_kernel_type", {})
+        if not techniques:
+            return None
+
+        has_bf16 = any("bf16" in t for t in mfma_types)
+
+        if internal_type in ("fp8_gemm_with_dequant", "int8_gemm_with_dequant", "fp8_gemm"):
+            return "gemm_fp8_blockscale" if "gemm_fp8_blockscale" in techniques else None
+        if internal_type in ("bf16_gemm_direct_lds", "bf16_gemm"):
+            return "gemm_bf16" if "gemm_bf16" in techniques else None
+        if internal_type == "attention_non_mfma":
+            return "paged_attention" if "paged_attention" in techniques else None
+        if internal_type == "attention_with_permute":
+            if dpp_count > 20 and has_bf16 and "fmha_backward" in techniques:
+                return "fmha_backward"
+            if "paged_attention" in techniques:
+                return "paged_attention"
+            return None
+        if internal_type == "multi_barrier_kernel" and dpp_count > 20 and has_bf16:
+            return "fmha_backward" if "fmha_backward" in techniques else None
+        return None
 
     # ── Same-Length Patches ──────────────────────────────────────────
 
-    def _opt_waitcnt_relaxation(self, instructions: list[AsmInstruction],
+    def _opt_waitcnt_relaxation(self, instructions: list[Instruction],
                                  result: OptimizationResult,
                                  aggressive: bool) -> None:
-        """Relax s_waitcnt vmcnt(0) based on dependency analysis.
+        """Relax s_waitcnt vmcnt(0) with register-level dependency tracking.
 
-        Production kernels use partial waits 57% of the time.
-        bf16gemm pf3 uses vmcnt(20) with 40+ loads in flight.
-        FP8 GEMM uses lgkmcnt(14) with 16 LDS reads pending.
+        Key safety rules:
+        1. Track which VGPRs each VMEM load writes to
+        2. Scan until next barrier/branch/waitcnt for actual consumers
+        3. Block relaxation if barrier follows before all loads are consumed
+        4. Compute safe vmcnt based on load-to-consumer distance
         """
-        vmem_in_flight = 0
-        lgkm_in_flight = 0
-        last_vmem_indices = []
+        # Per-load tracking: list of (load_index, dest_vgprs)
+        pending_loads: list[tuple[int, set[int]]] = []
 
         for i, instr in enumerate(instructions):
             mn = instr.mnemonic
             full = instr.full_text or ""
+            ops = instr.operands or ""
 
             if mn.startswith(("global_load", "buffer_load", "flat_load")):
-                if "lds" in full:
-                    lgkm_in_flight += 1
-                    vmem_in_flight += 1
-                else:
-                    vmem_in_flight += 1
-                last_vmem_indices.append(i)
+                dest_vgprs = set()
+                if "lds" not in full:
+                    dest_vgprs = _extract_vgpr_indices(ops.split(",")[0] if "," in ops else ops)
+                pending_loads.append((i, dest_vgprs))
 
             elif mn.startswith("ds_read"):
-                lgkm_in_flight += 1
+                pass  # lgkm tracked separately
 
             elif mn == "s_waitcnt":
-                counters = _parse_waitcnt_operands(instr.operands)
+                counters = _parse_waitcnt_operands(ops)
 
-                if "vmcnt" in counters and counters["vmcnt"] == 0 and vmem_in_flight > 2:
-                    consumer_regs = set()
-                    for j in range(i + 1, min(i + 8, len(instructions))):
-                        next_mn = instructions[j].mnemonic
+                if "vmcnt" in counters and counters["vmcnt"] == 0 and len(pending_loads) > 2:
+                    # Find distance to next barrier
+                    dist_to_barrier = len(instructions) - i
+                    for j in range(i + 1, len(instructions)):
+                        if instructions[j].mnemonic in ("s_barrier", "s_endpgm", "s_branch"):
+                            dist_to_barrier = j - i
+                            break
+                        if instructions[j].mnemonic == "s_waitcnt":
+                            dist_to_barrier = j - i
+                            break
+
+                    # If barrier is very close (<=4 instructions), don't relax:
+                    # the waitcnt is likely a pre-barrier synchronization point
+                    if dist_to_barrier <= 4:
+                        self._reset_pending(pending_loads, counters)
+                        continue
+
+                    # Collect consumer VGPRs until next sync point
+                    consumer_vgprs: set[int] = set()
+                    for j in range(i + 1, min(i + dist_to_barrier, len(instructions))):
+                        next_instr = instructions[j]
+                        next_mn = next_instr.mnemonic
                         if next_mn in ("s_waitcnt", "s_barrier", "s_endpgm"):
                             break
-                        consumer_regs.update(_extract_vgpr_indices(
-                            instructions[j].operands or ""))
+                        next_ops = next_instr.operands or ""
+                        # For MFMA/VALU, source operands are consumers
+                        if "mfma" in next_mn or next_mn.startswith("v_"):
+                            parts = next_ops.split(",")
+                            for part in parts[1:]:  # skip dest (first operand)
+                                consumer_vgprs.update(_extract_vgpr_indices(part))
+                        elif next_mn.startswith("ds_write"):
+                            consumer_vgprs.update(_extract_vgpr_indices(next_ops))
 
-                    new_vmcnt = 1 if not aggressive else min(2, vmem_in_flight - 1)
-                    new_counters = dict(counters)
-                    new_counters["vmcnt"] = new_vmcnt
-                    new_operands = _build_waitcnt_operands(new_counters)
+                    # Count how many pending loads are NOT consumed before the barrier
+                    # Those loads are safe to still be in-flight
+                    unconsumed = 0
+                    for _, dest_regs in reversed(pending_loads):
+                        if dest_regs and not dest_regs.intersection(consumer_vgprs):
+                            unconsumed += 1
+                        else:
+                            break  # once we hit a consumed load, older ones are needed too
 
-                    result.edits.append(EditOperation(
-                        target_index=i,
-                        new_mnemonic="s_waitcnt",
-                        new_operands=new_operands,
-                        comment=f"Relax vmcnt(0)->vmcnt({new_vmcnt}): "
-                                f"{vmem_in_flight} loads in-flight. "
-                                f"Production bf16gemm uses vmcnt(20) with 40+ loads.",
-                    ))
+                    safe_vmcnt = min(unconsumed, len(pending_loads) - 1)
+                    if aggressive:
+                        safe_vmcnt = min(safe_vmcnt + 1, len(pending_loads) - 1)
 
-                if "vmcnt" in counters:
-                    vmem_in_flight = counters["vmcnt"]
-                    last_vmem_indices = last_vmem_indices[-max(counters["vmcnt"], 1):]
-                if "lgkmcnt" in counters:
-                    lgkm_in_flight = counters["lgkmcnt"]
+                    # Clamp: never relax more than half the in-flight loads
+                    safe_vmcnt = min(safe_vmcnt, len(pending_loads) // 2)
+
+                    if safe_vmcnt > 0:
+                        new_counters = dict(counters)
+                        new_counters["vmcnt"] = safe_vmcnt
+                        new_operands = _build_waitcnt_operands(new_counters)
+
+                        result.edits.append(EditOperation(
+                            target_index=i,
+                            new_mnemonic="s_waitcnt",
+                            new_operands=new_operands,
+                            comment=f"Relax vmcnt(0)->vmcnt({safe_vmcnt}): "
+                                    f"{len(pending_loads)} loads in-flight, "
+                                    f"{unconsumed} unconsumed before next sync, "
+                                    f"barrier dist={dist_to_barrier}",
+                        ))
+
+                self._reset_pending(pending_loads, counters)
 
             elif mn == "s_barrier":
-                vmem_in_flight = 0
-                lgkm_in_flight = 0
-                last_vmem_indices = []
+                pending_loads.clear()
 
-    def _opt_nop_elimination(self, instructions: list[AsmInstruction],
+    @staticmethod
+    def _reset_pending(pending_loads: list, counters: dict) -> None:
+        """Reset pending load tracking after a waitcnt."""
+        if "vmcnt" in counters:
+            keep = counters["vmcnt"]
+            if keep > 0 and len(pending_loads) > keep:
+                pending_loads[:] = pending_loads[-keep:]
+            elif keep == 0:
+                pending_loads.clear()
+
+    def _opt_nop_elimination(self, instructions: list[Instruction],
                               result: OptimizationResult) -> None:
         """Remove unnecessary s_nop not required for MFMA hazard avoidance.
 
@@ -422,9 +540,14 @@ class AsmOptimizer:
                             f"(MFMA hazard needs 1-2 cycles max)",
                 ))
 
-    def _opt_full_wait_splitting(self, instructions: list[AsmInstruction],
+    def _opt_full_wait_splitting(self, instructions: list[Instruction],
                                   result: OptimizationResult) -> None:
-        """Split full waits when only one counter matters."""
+        """Split full waits when only one counter matters.
+
+        s_waitcnt vmcnt(0) lgkmcnt(0) -> s_waitcnt vmcnt(0) when only VMEM needed
+        s_waitcnt vmcnt(0) lgkmcnt(0) -> s_waitcnt lgkmcnt(0) when only LDS needed
+        This is a same-length binary patch (operand-only change).
+        """
         for i, instr in enumerate(instructions):
             if instr.mnemonic != "s_waitcnt":
                 continue
@@ -436,28 +559,157 @@ class AsmOptimizer:
 
             needs_vmem = False
             needs_lds = False
-            for j in range(i + 1, min(i + 10, len(instructions))):
+            for j in range(i + 1, min(i + 15, len(instructions))):
                 next_instr = instructions[j]
-                if next_instr.mnemonic.startswith("ds_"):
+                next_mn = next_instr.mnemonic
+                if next_mn.startswith("ds_"):
                     needs_lds = True
-                if next_instr.mnemonic.startswith(("global_", "buffer_", "flat_")):
+                if next_mn.startswith(("global_", "buffer_", "flat_")):
                     needs_vmem = True
-                if next_instr.mnemonic in ("s_waitcnt", "s_barrier", "s_endpgm"):
+                next_ops = next_instr.operands or ""
+                if "mfma" in next_mn:
+                    src_regs = _extract_vgpr_indices(next_ops)
+                    if src_regs:
+                        needs_vmem = True
+                if next_mn in ("s_waitcnt", "s_barrier", "s_endpgm"):
                     break
 
             if needs_vmem and not needs_lds:
-                result.recommendations.append({
-                    "type": "waitcnt_split",
-                    "severity": "medium",
-                    "index": i,
-                    "description": f"At [{i}] lgkmcnt can be relaxed: following code "
-                                   f"only reads VMEM data, not LDS",
-                    "estimated_cycle_savings": 5,
-                })
+                new_counters = {"vmcnt": 0}
+                if "expcnt" in counters:
+                    new_counters["expcnt"] = counters["expcnt"]
+                new_operands = _build_waitcnt_operands(new_counters)
+                result.edits.append(EditOperation(
+                    target_index=i,
+                    new_mnemonic="s_waitcnt",
+                    new_operands=new_operands,
+                    comment=f"Split full wait: only VMEM needed, removing lgkmcnt(0)",
+                ))
+            elif needs_lds and not needs_vmem:
+                new_counters = {"lgkmcnt": 0}
+                if "expcnt" in counters:
+                    new_counters["expcnt"] = counters["expcnt"]
+                new_operands = _build_waitcnt_operands(new_counters)
+                result.edits.append(EditOperation(
+                    target_index=i,
+                    new_mnemonic="s_waitcnt",
+                    new_operands=new_operands,
+                    comment=f"Split full wait: only LDS needed, removing vmcnt(0)",
+                ))
+
+    def _opt_redundant_barrier(self, instructions: list[Instruction],
+                                result: OptimizationResult) -> None:
+        """Remove redundant s_barrier instructions.
+
+        A barrier is redundant if:
+        1. Two barriers appear with no LDS read/write between them
+        2. A barrier immediately follows s_waitcnt vmcnt(0) lgkmcnt(0) with
+           no LDS activity between the waitcnt and barrier
+        """
+        prev_barrier_idx = -1
+        lds_between = False
+
+        for i, instr in enumerate(instructions):
+            mn = instr.mnemonic
+
+            if mn.startswith("ds_"):
+                lds_between = True
+
+            elif mn == "s_barrier":
+                if prev_barrier_idx >= 0 and not lds_between:
+                    result.edits.append(EditOperation(
+                        target_index=i,
+                        new_mnemonic="s_nop",
+                        new_operands="0",
+                        comment=f"Remove redundant barrier: no LDS ops since barrier at [{prev_barrier_idx}]",
+                    ))
+                else:
+                    prev_barrier_idx = i
+                lds_between = False
+
+            elif mn in ("s_endpgm", "s_branch") or mn.startswith("s_cbranch"):
+                prev_barrier_idx = -1
+                lds_between = False
+
+    def _opt_mfma_vmem_interleave(self, instructions: list[Instruction],
+                                    result: OptimizationResult) -> None:
+        """Interleave VMEM loads into MFMA chains to hide memory latency.
+
+        When 3+ consecutive MFMAs appear without memory ops, and a VMEM load
+        exists nearby (before or after the chain), swap it into the middle of
+        the chain. MFMA has 64-cycle latency, which can hide VMEM latency.
+        Only swaps if no register dependency exists between the two instructions.
+        """
+        i = 0
+        while i < len(instructions) - 3:
+            # Detect MFMA chain start
+            if "mfma" not in instructions[i].mnemonic:
+                i += 1
+                continue
+
+            chain_start = i
+            chain_end = i
+            while chain_end + 1 < len(instructions) and "mfma" in instructions[chain_end + 1].mnemonic:
+                chain_end += 1
+
+            chain_len = chain_end - chain_start + 1
+            if chain_len < 3:
+                i = chain_end + 1
+                continue
+
+            # Look for a VMEM load right before or after the chain
+            vmem_idx = -1
+            if chain_start > 0:
+                prev_mn = instructions[chain_start - 1].mnemonic
+                if prev_mn.startswith(("global_load", "buffer_load")):
+                    vmem_idx = chain_start - 1
+            if vmem_idx < 0 and chain_end + 1 < len(instructions):
+                next_mn = instructions[chain_end + 1].mnemonic
+                if next_mn.startswith(("global_load", "buffer_load")):
+                    vmem_idx = chain_end + 1
+
+            if vmem_idx < 0:
+                i = chain_end + 1
+                continue
+
+            # Target: move the load to the middle of the chain
+            target_slot = chain_start + chain_len // 2
+            vmem_instr = instructions[vmem_idx]
+            target_instr = instructions[target_slot]
+
+            # Check register dependency: the load's dest must not be used by the target MFMA
+            load_dest = _extract_vgpr_indices(
+                vmem_instr.operands.split(",")[0] if "," in (vmem_instr.operands or "") else (vmem_instr.operands or ""))
+            mfma_srcs = set()
+            mfma_ops = target_instr.operands or ""
+            parts = mfma_ops.split(",")
+            for p in parts[1:]:
+                mfma_srcs.update(_extract_vgpr_indices(p))
+
+            if load_dest.intersection(mfma_srcs):
+                i = chain_end + 1
+                continue
+
+            # Swap: replace the two instructions with each other's content
+            result.edits.append(EditOperation(
+                target_index=vmem_idx,
+                new_mnemonic=target_instr.mnemonic,
+                new_operands=target_instr.operands or "",
+                comment=f"MFMA_INTERLEAVE: swap VMEM load with MFMA at [{target_slot}] "
+                        f"to hide memory latency in {chain_len}-deep chain",
+            ))
+            result.edits.append(EditOperation(
+                target_index=target_slot,
+                new_mnemonic=vmem_instr.mnemonic,
+                new_operands=vmem_instr.operands or "",
+                comment=f"MFMA_INTERLEAVE: VMEM load moved from [{vmem_idx}] into MFMA chain",
+            ))
+
+            i = chain_end + 1
 
     # ── DPP / Cross-Lane Analysis ────────────────────────────────────
 
-    def _analyze_dpp_opportunities(self, instructions: list[AsmInstruction],
+    def _analyze_dpp_opportunities(self, instructions: list[Instruction],
                                     result: OptimizationResult,
                                     profile: dict) -> None:
         """Detect patterns where DPP could replace LDS-based communication.
@@ -497,7 +749,7 @@ class AsmOptimizer:
         self._detect_reduction_via_lds(instructions, result)
 
     def _find_lds_write_barrier_read_patterns(
-            self, instructions: list[AsmInstruction]) -> list[tuple]:
+            self, instructions: list[Instruction]) -> list[tuple]:
         """Find ds_write -> s_barrier -> ds_read sequences."""
         patterns = []
         i = 0
@@ -521,7 +773,7 @@ class AsmOptimizer:
             i += 1
         return patterns
 
-    def _detect_reduction_via_lds(self, instructions: list[AsmInstruction],
+    def _detect_reduction_via_lds(self, instructions: list[Instruction],
                                    result: OptimizationResult) -> None:
         """Detect wavefront-local reductions done via LDS that could use DPP.
 
@@ -570,7 +822,7 @@ class AsmOptimizer:
                     "reduces": reduces,
                 })
 
-    def _analyze_lds_to_dpp_replacement(self, instructions: list[AsmInstruction],
+    def _analyze_lds_to_dpp_replacement(self, instructions: list[Instruction],
                                          result: OptimizationResult,
                                          profile: dict) -> None:
         """Check if kernel does intra-wavefront communication via LDS
@@ -605,7 +857,7 @@ class AsmOptimizer:
 
     # ── Software Pipelining Analysis ─────────────────────────────────
 
-    def _analyze_software_pipelining(self, instructions: list[AsmInstruction],
+    def _analyze_software_pipelining(self, instructions: list[Instruction],
                                       result: OptimizationResult,
                                       profile: dict) -> None:
         """Analyze software pipelining depth and quality.
@@ -688,7 +940,7 @@ class AsmOptimizer:
 
     # ── MFMA Scheduling Analysis ─────────────────────────────────────
 
-    def _analyze_mfma_scheduling(self, instructions: list[AsmInstruction],
+    def _analyze_mfma_scheduling(self, instructions: list[Instruction],
                                   result: OptimizationResult,
                                   profile: dict) -> None:
         """Analyze MFMA chain interleaving with memory operations.
@@ -766,7 +1018,7 @@ class AsmOptimizer:
 
     # ── Register Pressure Analysis ───────────────────────────────────
 
-    def _analyze_register_pressure(self, instructions: list[AsmInstruction],
+    def _analyze_register_pressure(self, instructions: list[Instruction],
                                     result: OptimizationResult,
                                     profile: dict) -> None:
         """Analyze register pressure and its impact on occupancy.
@@ -809,7 +1061,7 @@ class AsmOptimizer:
 
     # ── Barrier Efficiency Analysis ──────────────────────────────────
 
-    def _analyze_barrier_efficiency(self, instructions: list[AsmInstruction],
+    def _analyze_barrier_efficiency(self, instructions: list[Instruction],
                                      result: OptimizationResult,
                                      profile: dict) -> None:
         """Analyze s_barrier placement for double/triple buffering efficiency.
@@ -851,7 +1103,7 @@ class AsmOptimizer:
 
     # ── Non-DPP Reduction Detection ─────────────────────────────────
 
-    def _analyze_non_dpp_reduction(self, instructions: list[AsmInstruction],
+    def _analyze_non_dpp_reduction(self, instructions: list[Instruction],
                                     result: OptimizationResult,
                                     profile: dict) -> None:
         """Detect reductions using __shfl_xor (ds_bpermute) instead of DPP.
@@ -935,7 +1187,7 @@ class AsmOptimizer:
 
     # ── FMHA-Pattern Awareness ────────────────────────────────────────
 
-    def _analyze_fmha_patterns(self, instructions: list[AsmInstruction],
+    def _analyze_fmha_patterns(self, instructions: list[Instruction],
                                 result: OptimizationResult,
                                 profile: dict) -> None:
         """Check for FMHA-like kernels and compare against known optimal patterns.
@@ -989,9 +1241,144 @@ class AsmOptimizer:
                     "estimated_cycle_savings": barrier_count * 20,
                 })
 
+    # ── KB-Driven Analysis ──────────────────────────────────────────
+
+    def _analyze_kb_dpp_patterns(self, instructions: list[Instruction],
+                                  result: OptimizationResult,
+                                  profile: dict) -> None:
+        """Use KB dpp_crosslane_patterns to enhance DPP analysis with technique
+        recommendations for the kernel type."""
+        if self.kb is None:
+            return
+        dpp = self.kb.dpp_crosslane_patterns
+        techniques = dpp.get("optimization_techniques_by_kernel_type", {})
+        if not techniques:
+            return
+
+        kernel_type = profile.get("kernel_type", "")
+        if kernel_type not in techniques:
+            return
+
+        entry = techniques[kernel_type]
+        key_techniques = entry.get("key_techniques", [])
+        dpp_type = entry.get("dpp_type", "")
+        scheduling = entry.get("scheduling_pattern", "")
+
+        for tech in key_techniques:
+            result.recommendations.append({
+                "type": "kb_dpp_technique",
+                "severity": "info",
+                "description": f"[{kernel_type}] {tech}",
+                "estimated_cycle_savings": 0,
+                "technique_name": tech,
+                "kernel_type": kernel_type,
+                "source": "dpp_crosslane_patterns",
+            })
+        if dpp_type:
+            result.recommendations.append({
+                "type": "kb_dpp_type",
+                "severity": "info",
+                "description": f"[{kernel_type}] DPP pattern: {dpp_type}",
+                "estimated_cycle_savings": 0,
+                "dpp_type": dpp_type,
+                "kernel_type": kernel_type,
+                "source": "dpp_crosslane_patterns",
+            })
+        if scheduling:
+            result.recommendations.append({
+                "type": "kb_scheduling",
+                "severity": "info",
+                "description": f"[{kernel_type}] Scheduling: {scheduling}",
+                "estimated_cycle_savings": 0,
+                "scheduling_pattern": scheduling,
+                "kernel_type": kernel_type,
+                "source": "dpp_crosslane_patterns",
+            })
+
+    def _analyze_kb_fmha_techniques(self, instructions: list[Instruction],
+                                    result: OptimizationResult,
+                                    profile: dict) -> None:
+        """Use KB fmha_asm_patterns to check which FMHA techniques are
+        applied and recommend missing ones."""
+        if self.kb is None:
+            return
+        fmha = self.kb.fmha_asm_patterns
+        techniques = fmha.get("key_optimization_techniques", {})
+        if not techniques:
+            return
+
+        if profile["mfma_count"] < 50:
+            return
+        has_bf16 = any("bf16" in t for t in profile.get("mfma_types", {}))
+        has_f16 = any(
+            "f16" in t and "bf16" not in t
+            for t in profile.get("mfma_types", {})
+        )
+        if not (has_bf16 or has_f16):
+            return
+
+        dpp_count = profile.get("dpp_count", 0)
+        quad_perm = profile.get("dpp_modifiers", {}).get("quad_perm", 0)
+        agpr_used = profile.get("agpr_used", 0)
+        lds_direct = profile.get("lds_direct_loads", 0)
+
+        max_vmcnt = 0
+        for instr in instructions:
+            if instr.mnemonic == "s_waitcnt":
+                m = re.search(r'vmcnt\((\d+)\)', instr.operands or "")
+                if m:
+                    max_vmcnt = max(max_vmcnt, int(m.group(1)))
+
+        perm_b32_count = profile.get("perm_b32_count", 0)
+
+        for key, tech_entry in techniques.items():
+            desc = tech_entry.get("description", "")
+            applicable = True
+            applied = False
+            reason = ""
+
+            if "dpp" in key.lower() or "quad_perm" in desc.lower():
+                if dpp_count > 20 and quad_perm > 10:
+                    applied = True
+                elif dpp_count == 0:
+                    reason = "No DPP instructions; FMHA backward uses quad_perm for softmax gradient."
+            elif "agpr" in key.lower() or "agpr" in desc.lower():
+                if agpr_used >= 200:
+                    applied = True
+                elif agpr_used < 128:
+                    reason = f"Only {agpr_used} AGPRs used; production FMHA backward uses full a[0:255]."
+            elif "lds" in key.lower() or "direct" in desc.lower():
+                if lds_direct > 0:
+                    applied = True
+                else:
+                    reason = "No direct-to-LDS loads; production FMHA uses buffer_load_dword ... lds for K tiles."
+            elif "waitcnt" in key.lower() or "vmcnt" in desc.lower():
+                if max_vmcnt > 10:
+                    applied = True
+                else:
+                    reason = f"vmcnt max {max_vmcnt}; production uses vmcnt(32) for deeper pipelining."
+            elif "perm" in key.lower() or "v_perm" in desc.lower():
+                if perm_b32_count > 0:
+                    applied = True
+                else:
+                    reason = "No v_perm_b32 for BF16 packing between MFMA stages."
+            elif "interleav" in key.lower() or "mfma" in desc.lower():
+                applied = True
+
+            if applicable and not applied and reason:
+                result.recommendations.append({
+                    "type": "kb_fmha_missing_technique",
+                    "severity": "medium",
+                    "description": f"FMHA technique '{key}': {desc}. {reason}",
+                    "estimated_cycle_savings": 50,
+                    "technique_key": key,
+                    "technique_details": tech_entry,
+                    "source": "fmha_asm_patterns",
+                })
+
     # ── Load Vectorization Analysis ──────────────────────────────────
 
-    def _analyze_load_vectorization(self, instructions: list[AsmInstruction],
+    def _analyze_load_vectorization(self, instructions: list[Instruction],
                                      result: OptimizationResult,
                                      profile: dict) -> None:
         """Check for scalar load opportunities.

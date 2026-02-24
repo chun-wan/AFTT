@@ -10,7 +10,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Optional
 
-from .parser import ParsedKernel, AsmInstruction
+from .instruction import Instruction, ParsedKernel
 from .knowledge_base import KnowledgeBase
 
 
@@ -107,6 +107,10 @@ class Analyzer:
         self._check_wavefront_size_alignment(kernel, arch, result)
         self._check_flat_vs_global_addressing(kernel, result)
         self._check_mfma_utilization_ratio(kernel, result)
+
+        self._check_kb_anti_patterns(kernel, result)
+        self._check_kb_best_practices(kernel, result)
+        self._check_kb_dpp_opportunities(kernel, arch, result)
 
         self._compute_summary(kernel, arch, result)
 
@@ -1192,6 +1196,176 @@ class Analyzer:
                 metrics={"mfma_ratio": mfma_ratio, "mfma_count": kernel.mfma_count,
                          "valu_count": kernel.valu_count},
             ))
+
+    def _check_kb_anti_patterns(self, kernel: ParsedKernel, result: AnalysisResult):
+        """Match kernel against KB anti-patterns via asm_signature regex."""
+        full_text = "\n".join(i.raw_text for i in kernel.instructions)
+        if not full_text:
+            return
+
+        for pattern in self.kb.anti_patterns:
+            asm_sig = pattern.get("asm_signature")
+            if not asm_sig:
+                continue
+            try:
+                rx = re.compile(asm_sig, re.MULTILINE | re.DOTALL)
+                if rx.search(full_text):
+                    severity = pattern.get("severity", "warning")
+                    result.findings.append(Finding(
+                        finding_id=self._next_id(),
+                        severity=severity,
+                        category=pattern.get("category", "general"),
+                        title=pattern.get("name", "KB Anti-Pattern Detected"),
+                        description=pattern.get("description", ""),
+                        suggestion=pattern.get("suggestion", ""),
+                        pattern_id=pattern.get("pattern_id", ""),
+                        reference=pattern.get("reference", ""),
+                    ))
+            except re.error:
+                continue
+
+    def _check_kb_best_practices(self, kernel: ParsedKernel, result: AnalysisResult):
+        """Check kernel against KB best practices via asm_indicators."""
+        full_text = "\n".join(i.raw_text for i in kernel.instructions)
+        if not full_text:
+            return
+
+        kernel_name = (kernel.metadata.name or "").lower()
+
+        def _is_applicable(applicable_to: list) -> bool:
+            if not applicable_to:
+                return True
+            for app in applicable_to:
+                app_lower = app.lower()
+                if "all" in app_lower:
+                    return True
+                if "gemm" in app_lower and kernel.mfma_count > 0:
+                    return True
+                if "reduction" in app_lower and kernel.lds_count > 4:
+                    return True
+                if "layernorm" in app_lower and ("layernorm" in kernel_name or "norm" in kernel_name):
+                    return True
+                if "attention" in app_lower and ("attention" in kernel_name or "fmha" in kernel_name):
+                    return True
+                if "convolution" in app_lower and ("conv" in kernel_name or "convolution" in kernel_name):
+                    return True
+                if "memory-bound" in app_lower:
+                    mem = kernel.vmem_count + kernel.lds_count
+                    compute = kernel.valu_count + kernel.mfma_count
+                    if mem > 0 and mem >= compute:
+                        return True
+            return False
+
+        for bp in self.kb.best_practices:
+            indicators = bp.get("asm_indicators") or []
+            if not indicators:
+                continue
+            if not _is_applicable(bp.get("applicable_to") or []):
+                continue
+
+            matched = 0
+            for ind in indicators:
+                try:
+                    rx = re.compile(ind)
+                    if rx.search(full_text):
+                        matched += 1
+                except re.error:
+                    continue
+
+            total = len(indicators)
+            if matched == 0:
+                result.findings.append(Finding(
+                    finding_id=self._next_id(),
+                    severity="info",
+                    category=bp.get("category", "optimization"),
+                    title=f"Best Practice Suggestion: {bp.get('name', 'Unknown')}",
+                    description=bp.get("description", ""),
+                    suggestion=bp.get("implementation_notes", bp.get("reference", "")),
+                    pattern_id=bp.get("pattern_id", ""),
+                    reference=bp.get("reference", ""),
+                ))
+            elif matched >= (total + 1) // 2 and total > 0:
+                result.findings.append(Finding(
+                    finding_id=self._next_id(),
+                    severity="info",
+                    category=bp.get("category", "optimization"),
+                    title=f"Best Practice Followed: {bp.get('name', 'Unknown')}",
+                    description=f"Kernel appears to follow this practice ({matched}/{total} indicators matched).",
+                    suggestion="No action needed.",
+                    pattern_id=bp.get("pattern_id", ""),
+                ))
+
+    def _check_kb_dpp_opportunities(self, kernel: ParsedKernel, arch: str, result: AnalysisResult):
+        """Suggest DPP optimizations when kernel has LDS reductions but no DPP."""
+        dpp_data = self.kb.dpp_crosslane_patterns or {}
+        opt_by_type = dpp_data.get("optimization_techniques_by_kernel_type") or {}
+        anti_patterns = dpp_data.get("anti_patterns") or {}
+        kernel_name = (kernel.metadata.name or "").lower()
+
+        has_lds = kernel.lds_count > 0
+        has_dpp = any("_dpp" in i.mnemonic for i in kernel.instructions)
+        has_reduction_like = False
+        full_text = "\n".join(i.raw_text for i in kernel.instructions)
+        if has_lds and re.search(r"ds_write.*\n.*s_barrier.*\n.*ds_read", full_text, re.DOTALL):
+            has_reduction_like = True
+
+        if not has_lds or has_dpp:
+            return
+
+        if has_reduction_like:
+            lds_anti = anti_patterns.get("lds_when_dpp_possible") or anti_patterns.get(
+                "reduction_via_lds_within_wavefront"
+            )
+            desc = ""
+            sugg = ""
+            if lds_anti:
+                desc = lds_anti.get("description", "")
+                sugg = lds_anti.get("fix", "")
+            else:
+                desc = "Kernel uses LDS write + barrier + read for intra-wavefront communication."
+                sugg = "Consider DPP (row_newbcast, quad_perm, row_shr) to avoid LDS round-trip."
+
+            result.findings.append(Finding(
+                finding_id=self._next_id(),
+                severity="info",
+                category="optimization",
+                title="DPP Opportunity: LDS-Based Reduction",
+                description=desc,
+                suggestion=sugg,
+                reference="dpp_crosslane_patterns",
+            ))
+
+        kernel_type = None
+        if "layernorm" in kernel_name or "layer_norm" in kernel_name:
+            kernel_type = "layernorm"
+        elif "topk" in kernel_name or "sort" in kernel_name:
+            kernel_type = "topk_sorting"
+        elif "fmha" in kernel_name and "bwd" in kernel_name:
+            kernel_type = "fmha_backward"
+        elif "fp8" in kernel_name and kernel.mfma_count > 0:
+            kernel_type = "gemm_fp8_blockscale"
+        elif "moe" in kernel_name:
+            kernel_type = "moe_fused"
+        elif kernel.mfma_count > 0:
+            kernel_type = "gemm_bf16"
+
+        if kernel_type and kernel_type in opt_by_type:
+            tech = opt_by_type[kernel_type]
+            if tech.get("dpp_used") and not has_dpp:
+                dpp_type = tech.get("dpp_type", "DPP")
+                key_tech = tech.get("key_techniques") or []
+                sugg = f"Use {dpp_type}. " + (
+                    "; ".join(key_tech[:3]) if key_tech else "See dpp_crosslane_patterns."
+                )
+                result.findings.append(Finding(
+                    finding_id=self._next_id(),
+                    severity="info",
+                    category="optimization",
+                    title=f"DPP Optimization for {kernel_type}",
+                    description=f"Kernel type suggests {dpp_type} could improve performance.",
+                    suggestion=sugg,
+                    reference="dpp_crosslane_patterns",
+                ))
 
     def _compute_summary(self, kernel: ParsedKernel, arch: str, result: AnalysisResult):
         """Compute summary statistics for the analysis."""

@@ -270,6 +270,7 @@ def optimize(co_path, arch, kernel_name, aggressive, output, json_output):
     from src.asm_editor import AsmEditor
     from src.asm_optimizer import AsmOptimizer
     from src.cycle_estimator import CycleEstimator
+    from src.instruction import EditOperation
 
     editor = AsmEditor(arch)
     info, instrs = editor.disassemble(co_path)
@@ -313,6 +314,52 @@ def optimize(co_path, arch, kernel_name, aggressive, output, json_output):
         for p in patch_result["applied"]:
             click.echo(f"    {p['address']}: {p['original']} -> {p['replacement']}")
         click.echo(f"  Cycle reduction: {comparison['cycle_reduction']:,} ({comparison['improvement_pct']:.2f}%)")
+
+
+@main.command()
+@click.argument("source", type=click.Path(exists=True))
+@click.option("--arch", default="gfx942", help="Target GPU architecture")
+@click.option("--no-cpp-swap", is_flag=True, help="Disable C++ template swap")
+@click.option("--no-asm-replace", is_flag=True, help="Disable ASM pattern replacement")
+@click.option("--no-asm-optimize", is_flag=True, help="Disable ASM optimization passes")
+@click.option("--max-level", default=3, type=int, help="Max replacement safety level (1-6)")
+@click.option("--aggressive", is_flag=True, help="Aggressive optimization")
+@click.option("--json-output", is_flag=True, help="Output as JSON")
+@click.option("--report", type=click.Path(), help="Save detailed report to file")
+def transform(source, arch, no_cpp_swap, no_asm_replace, no_asm_optimize,
+              max_level, aggressive, json_output, report):
+    """Transform a HIP C++ kernel through the full optimization pipeline.
+
+    Analyzes the input, matches against production templates, applies
+    C++ and ASM-level optimizations, and reports estimated improvements.
+    """
+    from src.pipeline import OptimizationPipeline
+
+    source_code = Path(source).read_text()
+
+    log = click.echo if not json_output else (lambda msg, **kw: click.echo(msg, err=True, **kw))
+    log(f"Running AFTT v2 pipeline on {source} for {arch}...")
+
+    pipeline = OptimizationPipeline(arch=arch)
+    result = pipeline.run(
+        source_code,
+        source_path=source,
+        enable_cpp_swap=not no_cpp_swap,
+        enable_asm_replace=not no_asm_replace,
+        enable_asm_optimize=not no_asm_optimize,
+        max_replacement_level=max_level,
+        aggressive=aggressive,
+    )
+
+    if json_output:
+        click.echo(json.dumps(result.to_dict(), indent=2))
+    else:
+        click.echo(result.summary())
+
+    if report:
+        report_data = result.to_dict()
+        Path(report).write_text(json.dumps(report_data, indent=2))
+        log(f"Report saved to {report}")
 
 
 if __name__ == "__main__":

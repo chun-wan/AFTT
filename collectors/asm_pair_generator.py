@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 from datetime import datetime
 
-HIPCC = os.environ.get("HIPCC", "/opt/rocm-7.1.1/bin/hipcc")
+HIPCC = os.environ.get("HIPCC", "/opt/rocm/bin/hipcc")
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "db" / "cpp_asm_pairs"
 

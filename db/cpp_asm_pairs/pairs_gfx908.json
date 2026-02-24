@@ -11,7 +11,7 @@
         "-O0"
       ],
       "flag_set_name": "O0",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:13.714452"
     },
     {
@@ -24,7 +24,7 @@
         "-O1"
       ],
       "flag_set_name": "O1",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:14.403536"
     },
     {
@@ -37,7 +37,7 @@
         "-O2"
       ],
       "flag_set_name": "O2",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:15.091674"
     },
     {
@@ -50,7 +50,7 @@
         "-O3"
       ],
       "flag_set_name": "O3",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:15.780520"
     },
     {
@@ -63,7 +63,7 @@
         "-Ofast"
       ],
       "flag_set_name": "Ofast",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:16.466947"
     },
     {
@@ -77,7 +77,7 @@
         "-funroll-loops"
       ],
       "flag_set_name": "O3_unroll",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:17.156732"
     },
     {
@@ -91,7 +91,7 @@
         "-ffast-math"
       ],
       "flag_set_name": "O3_fast_math",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:17.845554"
     },
     {
@@ -104,7 +104,7 @@
         "-O0"
       ],
       "flag_set_name": "O0",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:28.164529"
     },
     {
@@ -117,7 +117,7 @@
         "-O1"
       ],
       "flag_set_name": "O1",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:28.851309"
     },
     {
@@ -130,7 +130,7 @@
         "-O2"
       ],
       "flag_set_name": "O2",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:29.551064"
     },
     {
@@ -143,7 +143,7 @@
         "-O3"
       ],
       "flag_set_name": "O3",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:30.245646"
     },
     {
@@ -156,7 +156,7 @@
         "-Ofast"
       ],
       "flag_set_name": "Ofast",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:30.943674"
     },
     {
@@ -170,7 +170,7 @@
         "-funroll-loops"
       ],
       "flag_set_name": "O3_unroll",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:31.638716"
     },
     {
@@ -184,7 +184,7 @@
         "-ffast-math"
       ],
       "flag_set_name": "O3_fast_math",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:32.328165"
     },
     {
@@ -197,7 +197,7 @@
         "-O0"
       ],
       "flag_set_name": "O0",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:42.738429"
     },
     {
@@ -210,7 +210,7 @@
         "-O1"
       ],
       "flag_set_name": "O1",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:43.435002"
     },
     {
@@ -223,7 +223,7 @@
         "-O2"
       ],
       "flag_set_name": "O2",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:44.140804"
     },
     {
@@ -236,7 +236,7 @@
         "-O3"
       ],
       "flag_set_name": "O3",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:44.839718"
     },
     {
@@ -249,7 +249,7 @@
         "-Ofast"
       ],
       "flag_set_name": "Ofast",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:45.546457"
     },
     {
@@ -263,7 +263,7 @@
         "-funroll-loops"
       ],
       "flag_set_name": "O3_unroll",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:46.239276"
     },
     {
@@ -277,7 +277,7 @@
         "-ffast-math"
       ],
       "flag_set_name": "O3_fast_math",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:46.936559"
     },
     {
@@ -290,7 +290,7 @@
         "-O0"
       ],
       "flag_set_name": "O0",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:57.417013"
     },
     {
@@ -303,7 +303,7 @@
         "-O1"
       ],
       "flag_set_name": "O1",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:58.105471"
     },
     {
@@ -316,7 +316,7 @@
         "-O2"
       ],
       "flag_set_name": "O2",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:58.808783"
     },
     {
@@ -329,7 +329,7 @@
         "-O3"
       ],
       "flag_set_name": "O3",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:35:59.515885"
     },
     {
@@ -342,7 +342,7 @@
         "-Ofast"
       ],
       "flag_set_name": "Ofast",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:00.210058"
     },
     {
@@ -356,7 +356,7 @@
         "-funroll-loops"
       ],
       "flag_set_name": "O3_unroll",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:00.910253"
     },
     {
@@ -370,7 +370,7 @@
         "-ffast-math"
       ],
       "flag_set_name": "O3_fast_math",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:01.606438"
     },
     {
@@ -383,7 +383,7 @@
         "-O0"
       ],
       "flag_set_name": "O0",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:12.040591"
     },
     {
@@ -396,7 +396,7 @@
         "-O1"
       ],
       "flag_set_name": "O1",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:12.727710"
     },
     {
@@ -409,7 +409,7 @@
         "-O2"
       ],
       "flag_set_name": "O2",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:13.438388"
     },
     {
@@ -422,7 +422,7 @@
         "-O3"
       ],
       "flag_set_name": "O3",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:14.141796"
     },
     {
@@ -435,7 +435,7 @@
         "-Ofast"
       ],
       "flag_set_name": "Ofast",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:14.842023"
     },
     {
@@ -449,7 +449,7 @@
         "-funroll-loops"
       ],
       "flag_set_name": "O3_unroll",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:15.556895"
     },
     {
@@ -463,7 +463,7 @@
         "-ffast-math"
       ],
       "flag_set_name": "O3_fast_math",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:16.257860"
     },
     {
@@ -476,7 +476,7 @@
         "-O0"
       ],
       "flag_set_name": "O0",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:26.871314"
     },
     {
@@ -489,7 +489,7 @@
         "-O1"
       ],
       "flag_set_name": "O1",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:27.578911"
     },
     {
@@ -502,7 +502,7 @@
         "-O2"
       ],
       "flag_set_name": "O2",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:28.283317"
     },
     {
@@ -515,7 +515,7 @@
         "-O3"
       ],
       "flag_set_name": "O3",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:28.987663"
     },
     {
@@ -528,7 +528,7 @@
         "-Ofast"
       ],
       "flag_set_name": "Ofast",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:29.693393"
     },
     {
@@ -542,7 +542,7 @@
         "-funroll-loops"
       ],
       "flag_set_name": "O3_unroll",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:30.395369"
     },
     {
@@ -556,7 +556,7 @@
         "-ffast-math"
       ],
       "flag_set_name": "O3_fast_math",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:31.096357"
     },
     {
@@ -569,7 +569,7 @@
         "-O0"
       ],
       "flag_set_name": "O0",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:41.633462"
     },
     {
@@ -582,7 +582,7 @@
         "-O1"
       ],
       "flag_set_name": "O1",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:42.326432"
     },
     {
@@ -595,7 +595,7 @@
         "-O2"
       ],
       "flag_set_name": "O2",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:43.022779"
     },
     {
@@ -608,7 +608,7 @@
         "-O3"
       ],
       "flag_set_name": "O3",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:43.730936"
     },
     {
@@ -621,7 +621,7 @@
         "-Ofast"
       ],
       "flag_set_name": "Ofast",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:44.416187"
     },
     {
@@ -635,7 +635,7 @@
         "-funroll-loops"
       ],
       "flag_set_name": "O3_unroll",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:45.112678"
     },
     {
@@ -649,7 +649,7 @@
         "-ffast-math"
       ],
       "flag_set_name": "O3_fast_math",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:45.805621"
     },
     {
@@ -662,7 +662,7 @@
         "-O0"
       ],
       "flag_set_name": "O0",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:56.249559"
     },
     {
@@ -675,7 +675,7 @@
         "-O1"
       ],
       "flag_set_name": "O1",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:56.933421"
     },
     {
@@ -688,7 +688,7 @@
         "-O2"
       ],
       "flag_set_name": "O2",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:57.623031"
     },
     {
@@ -701,7 +701,7 @@
         "-O3"
       ],
       "flag_set_name": "O3",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:58.313393"
     },
     {
@@ -714,7 +714,7 @@
         "-Ofast"
       ],
       "flag_set_name": "Ofast",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:59.005422"
     },
     {
@@ -728,7 +728,7 @@
         "-funroll-loops"
       ],
       "flag_set_name": "O3_unroll",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:36:59.705199"
     },
     {
@@ -742,7 +742,7 @@
         "-ffast-math"
       ],
       "flag_set_name": "O3_fast_math",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:37:00.390938"
     },
     {
@@ -755,7 +755,7 @@
         "-O0"
       ],
       "flag_set_name": "O0",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:37:10.850651"
     },
     {
@@ -768,7 +768,7 @@
         "-O1"
       ],
       "flag_set_name": "O1",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:37:11.557835"
     },
     {
@@ -781,7 +781,7 @@
         "-O2"
       ],
       "flag_set_name": "O2",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:37:12.259886"
     },
     {
@@ -794,7 +794,7 @@
         "-O3"
       ],
       "flag_set_name": "O3",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:37:12.960698"
     },
     {
@@ -807,7 +807,7 @@
         "-Ofast"
       ],
       "flag_set_name": "Ofast",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:37:13.672399"
     },
     {
@@ -821,7 +821,7 @@
         "-funroll-loops"
       ],
       "flag_set_name": "O3_unroll",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:37:14.374291"
     },
     {
@@ -835,7 +835,7 @@
         "-ffast-math"
       ],
       "flag_set_name": "O3_fast_math",
-      "compiler": "/opt/rocm-7.1.1/bin/hipcc",
+      "compiler": "/opt/rocm/bin/hipcc",
       "timestamp": "2026-02-23T02:37:15.085071"
     }
   ],

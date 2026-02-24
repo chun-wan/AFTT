@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-LLVM_OBJDUMP = os.environ.get("LLVM_OBJDUMP", "/opt/rocm-7.1.1/llvm/bin/llvm-objdump")
+LLVM_OBJDUMP = os.environ.get("LLVM_OBJDUMP", "/opt/rocm/llvm/bin/llvm-objdump")
 AITER_HSA = Path(os.environ.get("AITER_HSA", "/home/root123/aiter/hsa"))
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "db" / "disassembly"
 

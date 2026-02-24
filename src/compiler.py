@@ -14,9 +14,11 @@ from pathlib import Path
 from typing import Optional
 
 
-HIPCC = os.environ.get("HIPCC", "/opt/rocm-7.1.1/bin/hipcc")
-AMDCLANG = os.environ.get("AMDCLANG", "/opt/rocm-7.1.1/llvm/bin/amdclang++")
-LLVM_OBJDUMP = os.environ.get("LLVM_OBJDUMP", "/opt/rocm-7.1.1/llvm/bin/llvm-objdump")
+HIPCC = os.environ.get("HIPCC", "/opt/rocm/bin/hipcc")
+AMDCLANG = os.environ.get("AMDCLANG", "/opt/rocm/llvm/bin/amdclang++")
+LLVM_OBJDUMP = os.environ.get("LLVM_OBJDUMP", "/opt/rocm/llvm/bin/llvm-objdump")
+CLANG_OFFLOAD_BUNDLER = os.environ.get(
+    "CLANG_OFFLOAD_BUNDLER", "/opt/rocm/llvm/bin/clang-offload-bundler")
 
 DEFAULT_ARCH = "gfx942"
 DEFAULT_OPT_LEVEL = "-O3"
@@ -158,6 +160,129 @@ class Compiler:
             return result
         finally:
             os.unlink(src_path)
+
+    def compile_to_co(
+        self,
+        source: str | Path,
+        arch: Optional[str] = None,
+        opt_level: Optional[str] = None,
+        extra_flags: Optional[list[str]] = None,
+        output_path: Optional[str] = None,
+    ) -> CompilationResult:
+        """Compile a HIP/C++ source file to a loadable .co code object.
+
+        Uses hipcc --genco which produces a fat binary that can be loaded
+        via hipModuleLoadData. Host code in the source is ignored.
+
+        Args:
+            source: Path to source file, or source code string
+            arch: Target GPU architecture (e.g., "gfx942")
+            opt_level: Optimization level (e.g., "-O3")
+            extra_flags: Additional compiler flags
+            output_path: Where to write the .co file (auto-generated if None)
+
+        Returns:
+            CompilationResult with asm_output set to the .co file path
+        """
+        arch = arch or self.default_arch
+        opt_level = opt_level or self.default_opt
+        extra_flags = extra_flags or []
+
+        # Handle source as string
+        tmp_src = None
+        if isinstance(source, str) and not os.path.exists(source):
+            tmp_src = tempfile.NamedTemporaryFile(
+                suffix=".hip", delete=False, mode="w")
+            tmp_src.write(source)
+            tmp_src.close()
+            src_path = Path(tmp_src.name)
+        else:
+            src_path = Path(source)
+            if not src_path.exists():
+                return CompilationResult(
+                    success=False, stderr=f"Source file not found: {src_path}")
+
+        if output_path is None:
+            tmp_out = tempfile.NamedTemporaryFile(suffix=".co", delete=False)
+            output_path = tmp_out.name
+            tmp_out.close()
+
+        bundle_path = output_path + ".bundle"
+
+        cmd = [
+            self.compiler_path,
+            "--genco",
+            f"--offload-arch={arch}",
+            opt_level,
+            *extra_flags,
+            str(src_path),
+            "-o", bundle_path,
+        ]
+
+        try:
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=self.timeout
+            )
+            if result.returncode != 0 or not os.path.exists(bundle_path):
+                return CompilationResult(
+                    success=False,
+                    stderr=result.stderr,
+                    return_code=result.returncode,
+                    source_path=str(src_path),
+                    arch=arch,
+                    flags=["--genco", opt_level] + extra_flags,
+                    compiler=self.compiler_path,
+                )
+
+            # hipcc --genco produces a Clang offload bundle; extract the
+            # raw device ELF so it works with both hipModuleLoadData and
+            # llvm-objdump / AsmEditor.
+            unbundle_ok = self._unbundle_co(bundle_path, output_path, arch)
+            if not unbundle_ok:
+                # Fallback: keep the bundle as-is (hipModuleLoadData still
+                # handles it, but llvm-objdump won't work directly).
+                os.rename(bundle_path, output_path)
+
+            if os.path.exists(bundle_path):
+                os.unlink(bundle_path)
+
+            return CompilationResult(
+                success=True,
+                asm_output=output_path,
+                stderr=result.stderr,
+                return_code=result.returncode,
+                source_path=str(src_path),
+                arch=arch,
+                flags=["--genco", opt_level] + extra_flags,
+                compiler=self.compiler_path,
+            )
+        except subprocess.TimeoutExpired:
+            return CompilationResult(
+                success=False, stderr="Compilation timed out",
+                source_path=str(src_path), arch=arch,
+            )
+        finally:
+            if tmp_src is not None:
+                os.unlink(tmp_src.name)
+
+    @staticmethod
+    def _unbundle_co(bundle_path: str, output_path: str, arch: str) -> bool:
+        """Extract device ELF from a Clang offload bundle."""
+        target = f"hipv4-amdgcn-amd-amdhsa--{arch}"
+        cmd = [
+            CLANG_OFFLOAD_BUNDLER,
+            "--unbundle",
+            f"--input={bundle_path}",
+            f"--output={output_path}",
+            "--type=o",
+            f"--targets={target}",
+        ]
+        try:
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=30)
+            return result.returncode == 0 and os.path.exists(output_path)
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            return False
 
     def compile_multiple_flags(
         self,

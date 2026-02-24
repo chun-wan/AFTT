@@ -21,7 +21,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from src.asm_editor import AsmEditor, EditOperation
+from src.asm_editor import AsmEditor
+from src.instruction import EditOperation
 from src.asm_optimizer import AsmOptimizer
 from src.cycle_estimator import CycleEstimator
 

@@ -2,106 +2,23 @@
 
 Parses AMDGPU assembly output into a structured representation with
 instructions, basic blocks, register usage, and memory access patterns.
+
+Uses the unified Instruction model from instruction.py.
 """
 
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
 from typing import Optional
 
-
-@dataclass
-class AsmInstruction:
-    """Represents a single AMDGPU assembly instruction."""
-    line_number: int
-    raw_text: str
-    mnemonic: str
-    operands: list[str] = field(default_factory=list)
-    category: str = ""
-    encoding: str = ""
-
-    # Register tracking
-    dst_registers: list[str] = field(default_factory=list)
-    src_registers: list[str] = field(default_factory=list)
-
-    # Metadata
-    label: str = ""
-    comment: str = ""
-    is_memory_op: bool = False
-    is_lds_op: bool = False
-    is_barrier: bool = False
-    is_waitcnt: bool = False
-    is_branch: bool = False
-    is_mfma: bool = False
-
-    @property
-    def is_vector(self) -> bool:
-        return self.mnemonic.startswith("v_")
-
-    @property
-    def is_scalar(self) -> bool:
-        return self.mnemonic.startswith("s_")
-
-
-@dataclass
-class BasicBlock:
-    """A basic block of sequential instructions."""
-    label: str
-    instructions: list[AsmInstruction] = field(default_factory=list)
-    successors: list[str] = field(default_factory=list)
-
-    @property
-    def instruction_count(self) -> int:
-        return len(self.instructions)
-
-
-@dataclass
-class KernelMetadata:
-    """Kernel metadata extracted from AMDGPU assembly."""
-    name: str = ""
-    arch: str = ""
-    vgpr_count: int = 0
-    sgpr_count: int = 0
-    agpr_count: int = 0
-    lds_size: int = 0
-    scratch_size: int = 0
-    wavefront_size: int = 64
-    max_flat_workgroup_size: int = 0
-    kernarg_size: int = 0
-
-
-@dataclass
-class RegisterUsage:
-    """Register usage analysis."""
-    vgpr_used: set = field(default_factory=set)
-    sgpr_used: set = field(default_factory=set)
-    agpr_used: set = field(default_factory=set)
-    max_vgpr: int = 0
-    max_sgpr: int = 0
-    max_agpr: int = 0
-
-
-@dataclass
-class ParsedKernel:
-    """Fully parsed kernel representation."""
-    metadata: KernelMetadata = field(default_factory=KernelMetadata)
-    instructions: list[AsmInstruction] = field(default_factory=list)
-    basic_blocks: list[BasicBlock] = field(default_factory=list)
-    register_usage: RegisterUsage = field(default_factory=RegisterUsage)
-
-    # Summary statistics
-    total_instructions: int = 0
-    valu_count: int = 0
-    salu_count: int = 0
-    vmem_count: int = 0
-    smem_count: int = 0
-    lds_count: int = 0
-    mfma_count: int = 0
-    branch_count: int = 0
-    waitcnt_count: int = 0
-    barrier_count: int = 0
-    nop_count: int = 0
+from .instruction import (
+    Instruction,
+    BasicBlock,
+    KernelMetadata,
+    RegisterUsage,
+    ParsedKernel,
+    _classify_mnemonic as classify_instruction,
+)
 
 
 # Regex patterns for parsing
@@ -122,27 +39,6 @@ RE_SCRATCH_SIZE = re.compile(r'\.private_segment_fixed_size:\s*(\d+)')
 RE_KERNEL_NAME = re.compile(r'\.name:\s*(\S+)')
 RE_WAVEFRONT_SIZE = re.compile(r'\.wavefront_size:\s*(\d+)')
 RE_WORKGROUP_SIZE = re.compile(r'\.max_flat_workgroup_size:\s*(\d+)')
-
-
-def classify_instruction(mnemonic: str) -> str:
-    """Classify an instruction by its category."""
-    if mnemonic.startswith("v_mfma") or mnemonic.startswith("v_smfma"):
-        return "MFMA"
-    if mnemonic.startswith("v_pk_"):
-        return "VOP3P"
-    if mnemonic.startswith("v_"):
-        return "VALU"
-    if mnemonic.startswith("s_load") or mnemonic.startswith("s_buffer_load"):
-        return "SMEM"
-    if mnemonic.startswith("s_"):
-        return "SALU"
-    if mnemonic.startswith("ds_"):
-        return "LDS"
-    if mnemonic.startswith("global_") or mnemonic.startswith("buffer_"):
-        return "VMEM"
-    if mnemonic.startswith("flat_"):
-        return "FLAT"
-    return "MISC"
 
 
 def extract_registers(operand_text: str) -> tuple[list[str], list[str], list[str]]:
@@ -181,8 +77,8 @@ def extract_registers(operand_text: str) -> tuple[list[str], list[str], list[str
     return vgprs, sgprs, agprs
 
 
-def parse_instruction_line(line: str, line_number: int) -> Optional[AsmInstruction]:
-    """Parse a single instruction line."""
+def parse_instruction_line(line: str, line_number: int) -> Optional[Instruction]:
+    """Parse a single instruction line into a unified Instruction."""
     m = RE_INSTRUCTION.match(line)
     if not m:
         return None
@@ -191,7 +87,6 @@ def parse_instruction_line(line: str, line_number: int) -> Optional[AsmInstructi
     operands_raw = m.group(2).strip() if m.group(2) else ""
     comment = m.group(3) or ""
 
-    # Skip directives that look like instructions
     if mnemonic.startswith("."):
         return None
 
@@ -200,7 +95,7 @@ def parse_instruction_line(line: str, line_number: int) -> Optional[AsmInstructi
 
     vgprs, sgprs, agprs = extract_registers(operands_raw)
 
-    instr = AsmInstruction(
+    instr = Instruction.from_parser_line(
         line_number=line_number,
         raw_text=line.strip(),
         mnemonic=mnemonic,
@@ -215,10 +110,9 @@ def parse_instruction_line(line: str, line_number: int) -> Optional[AsmInstructi
         is_mfma="mfma" in mnemonic,
     )
 
-    # Assign src/dst registers (first operand is usually dst)
+    # Assign src/dst registers
     all_regs = vgprs + sgprs + agprs
     if operands and all_regs:
-        # First operand group is typically destination
         first_comma = operands_raw.find(",")
         if first_comma > 0:
             dst_text = operands_raw[:first_comma]
@@ -303,7 +197,6 @@ def parse_asm(asm_text: str) -> ParsedKernel:
             kernel.instructions.append(instr)
             current_block.instructions.append(instr)
 
-            # Update register usage
             for r in instr.dst_registers + instr.src_registers:
                 if r.startswith("v"):
                     idx = int(r[1:])
@@ -324,9 +217,8 @@ def parse_asm(asm_text: str) -> ParsedKernel:
                         kernel.register_usage.max_agpr, idx
                     )
 
-            # Track instruction branches
-            if instr.is_branch and instr.operands:
-                target = instr.operands[-1]
+            if instr.is_branch and instr.operands_list:
+                target = instr.operands_list[-1]
                 current_block.successors.append(target)
 
     if current_block.instructions:

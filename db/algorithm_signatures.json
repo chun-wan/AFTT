@@ -1,0 +1,192 @@
+{
+  "version": "1.0",
+  "algorithms": {
+    "gemm_bf16": {
+      "cpp_indicators": ["multiply-accumulate", "shared memory tile", "K-loop", "__shared__", "bfloat16", "hip_bfloat16"],
+      "cpp_function_hints": ["gemm", "matmul", "mm_"],
+      "asm_signatures": {
+        "mfma_types": ["v_mfma_f32_16x16x16_bf16", "v_mfma_f32_32x32x8_bf16"],
+        "min_mfma_count": 4,
+        "has_dpp": false
+      },
+      "corpus_categories": ["gemm"],
+      "parameters": ["M", "N", "K", "tile_m", "tile_n"],
+      "optimized_templates": {
+        "cpp": ["templates/gemm_tiled.hip"],
+        "asm_corpus_dirs": ["gfx942/gemm/", "gfx950/gemm/"]
+      }
+    },
+    "gemm_fp8": {
+      "cpp_indicators": ["fp8", "FP8", "block_scale", "dequant"],
+      "cpp_function_hints": ["fp8gemm", "f8gemm"],
+      "asm_signatures": {
+        "mfma_types": ["v_mfma_f32_16x16x32_fp8_fp8", "v_mfma_f32_16x16x32_fp8_bf8"],
+        "min_mfma_count": 4,
+        "has_dpp": true,
+        "dpp_types": ["row_newbcast"]
+      },
+      "corpus_categories": ["gemm", "moe"],
+      "parameters": ["M", "N", "K"],
+      "optimized_templates": {
+        "asm_corpus_dirs": ["gfx942/gemm/", "gfx942/moe/"]
+      }
+    },
+    "gemm_fp8_blockscale": {
+      "cpp_indicators": ["fp8", "FP8", "block_scale", "blockscale", "scale_A", "scale_B", "fp8e4m3", "dequant"],
+      "cpp_function_hints": ["fp8gemm_blockscale", "blockscale_gemm", "a8w8_blockscale"],
+      "asm_signatures": {
+        "min_mfma_count": 0,
+        "has_dpp": false,
+        "has_barrier": true
+      },
+      "corpus_categories": ["gemm"],
+      "parameters": ["M", "N", "K"],
+      "optimized_templates": {
+        "cpp": ["templates/fp8gemm_blockscale_optimized.hip"],
+        "asm_corpus_dirs": ["gfx942/gemm/"]
+      }
+    },
+    "fmha_forward": {
+      "cpp_indicators": ["attention", "Q", "K", "V", "softmax", "causal_mask", "flash"],
+      "cpp_function_hints": ["fmha", "flash_attention", "attention_forward", "mha"],
+      "asm_signatures": {
+        "mfma_types": ["v_mfma_f32_16x16x16_bf16", "v_mfma_f32_16x16x4_f16"],
+        "min_mfma_count": 50,
+        "has_dpp": false,
+        "min_barrier_count": 10
+      },
+      "corpus_categories": ["fmha", "attention"],
+      "parameters": ["batch", "seq_len", "head_dim", "num_heads"],
+      "optimized_templates": {
+        "asm_corpus_dirs": ["gfx942/fmha/", "gfx942/attention/"]
+      }
+    },
+    "fmha_backward": {
+      "cpp_indicators": ["attention", "backward", "dQ", "dK", "dV", "gradient"],
+      "cpp_function_hints": ["fmha_bwd", "attention_backward"],
+      "asm_signatures": {
+        "mfma_types": ["v_mfma_f32_16x16x16_bf16"],
+        "min_mfma_count": 100,
+        "has_dpp": true,
+        "dpp_types": ["quad_perm"],
+        "min_agpr": 128
+      },
+      "corpus_categories": ["fmha"],
+      "parameters": ["batch", "seq_len", "head_dim", "num_heads"],
+      "optimized_templates": {
+        "asm_corpus_dirs": ["gfx942/fmha/"]
+      }
+    },
+    "layernorm": {
+      "cpp_indicators": ["mean", "variance", "gamma", "beta", "epsilon", "layer_norm", "LayerNorm"],
+      "cpp_function_hints": ["layernorm", "layer_norm", "ln_"],
+      "asm_signatures": {
+        "min_mfma_count": 0,
+        "has_reduction": true,
+        "has_barrier": true
+      },
+      "corpus_categories": ["norm"],
+      "parameters": ["hidden_size", "epsilon"],
+      "optimized_templates": {
+        "cpp": ["templates/layernorm.hip"],
+        "asm_corpus_dirs": ["gfx942/norm/"]
+      }
+    },
+    "rmsnorm": {
+      "cpp_indicators": ["rms", "rsqrt", "epsilon", "weight", "RMSNorm"],
+      "cpp_function_hints": ["rmsnorm", "rms_norm"],
+      "asm_signatures": {
+        "min_mfma_count": 0,
+        "has_reduction": true,
+        "has_barrier": true
+      },
+      "corpus_categories": ["norm"],
+      "parameters": ["hidden_size", "epsilon"],
+      "optimized_templates": {
+        "cpp": ["templates/rmsnorm_optimized.hip"],
+        "asm_corpus_dirs": ["gfx942/norm/"]
+      }
+    },
+    "softmax": {
+      "cpp_indicators": ["exp", "max_val", "sum_exp", "softmax", "__expf"],
+      "cpp_function_hints": ["softmax", "safe_softmax", "online_softmax"],
+      "asm_signatures": {
+        "min_mfma_count": 0,
+        "has_reduction": true
+      },
+      "corpus_categories": ["topk"],
+      "parameters": ["batch", "seq_len"],
+      "optimized_templates": {
+        "cpp": ["templates/softmax.hip"],
+        "asm_corpus_dirs": ["gfx942/topk/"]
+      }
+    },
+    "topk": {
+      "cpp_indicators": ["topk", "top_k", "partial_sort", "heap", "bitonic"],
+      "cpp_function_hints": ["topk", "top_k", "argmax"],
+      "asm_signatures": {
+        "min_mfma_count": 0,
+        "has_branch": true
+      },
+      "corpus_categories": ["topk"],
+      "parameters": ["k", "batch"],
+      "optimized_templates": {
+        "asm_corpus_dirs": ["gfx942/topk/"]
+      }
+    },
+    "moe": {
+      "cpp_indicators": ["expert", "gate", "routing", "scatter", "gather", "MoE", "mixture"],
+      "cpp_function_hints": ["moe", "fmoe", "mixture_of_experts"],
+      "asm_signatures": {
+        "min_mfma_count": 4,
+        "has_dpp": true
+      },
+      "corpus_categories": ["moe"],
+      "parameters": ["num_experts", "top_k", "hidden_size"],
+      "optimized_templates": {
+        "asm_corpus_dirs": ["gfx942/moe/", "gfx950/moe/"]
+      }
+    },
+    "reduction": {
+      "cpp_indicators": ["__syncthreads", "reduce", "block_reduce", "warp_reduce", "atomicAdd"],
+      "cpp_function_hints": ["reduce", "sum", "block_reduce"],
+      "asm_signatures": {
+        "min_mfma_count": 0,
+        "has_barrier": true,
+        "has_reduction": true
+      },
+      "corpus_categories": [],
+      "parameters": ["size"],
+      "optimized_templates": {
+        "cpp": ["templates/reduction_sum.hip"]
+      }
+    },
+    "transpose": {
+      "cpp_indicators": ["__shared__", "tile", "TILE_DIM", "BLOCK_ROWS", "transpose"],
+      "cpp_function_hints": ["transpose"],
+      "asm_signatures": {
+        "min_mfma_count": 0,
+        "has_lds": true
+      },
+      "corpus_categories": [],
+      "parameters": ["rows", "cols"],
+      "optimized_templates": {
+        "cpp": ["templates/matrix_transpose.hip"]
+      }
+    },
+    "elementwise": {
+      "cpp_indicators": ["idx", "blockIdx", "threadIdx", "blockDim"],
+      "cpp_function_hints": ["add", "mul", "scale", "elementwise", "vector_add"],
+      "asm_signatures": {
+        "min_mfma_count": 0,
+        "has_barrier": false,
+        "max_instructions": 100
+      },
+      "corpus_categories": [],
+      "parameters": ["size"],
+      "optimized_templates": {
+        "cpp": ["templates/vector_add.hip"]
+      }
+    }
+  }
+}

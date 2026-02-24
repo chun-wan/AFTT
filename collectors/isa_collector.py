@@ -12,7 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-LLVM_MC = os.environ.get("LLVM_MC", "/opt/rocm-7.1.1/llvm/bin/llvm-mc")
+LLVM_MC = os.environ.get("LLVM_MC", "/opt/rocm/llvm/bin/llvm-mc")
 DB_DIR = Path(__file__).resolve().parent.parent / "db" / "isa"
 
 TARGET_ARCHS = ["gfx900", "gfx906", "gfx908", "gfx90a", "gfx940", "gfx942", "gfx950"]

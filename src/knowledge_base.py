@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from .isa_db import ISADatabase, Instruction
+from .isa_db import ISADatabase, Instruction as ISAInstruction
 
 
 DB_ROOT = Path(__file__).resolve().parent.parent / "db"
@@ -190,10 +190,10 @@ class KnowledgeBase:
                 return r
         return None
 
-    def lookup_instruction(self, mnemonic: str) -> Optional[Instruction]:
+    def lookup_instruction(self, mnemonic: str) -> Optional[ISAInstruction]:
         return self.isa.lookup(mnemonic)
 
-    def search_instructions(self, pattern: str) -> list[Instruction]:
+    def search_instructions(self, pattern: str) -> list[ISAInstruction]:
         return self.isa.search(pattern)
 
     def get_cycle_estimator(self, arch: str = "gfx942"):

@@ -389,3 +389,8 @@ class CycleEstimator:
                 "instr_count_diff": original.instruction_count - modified.instruction_count,
             },
         }
+
+    def estimate_from_instructions(self, instructions) -> CycleEstimate:
+        """Estimate cycles directly from Instruction objects (convenience wrapper)."""
+        lines = [instr.full_text for instr in instructions]
+        return self.estimate(lines)

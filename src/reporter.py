@@ -7,8 +7,7 @@ line references, and actionable suggestions.
 from __future__ import annotations
 
 from .analyzer import AnalysisResult, Finding
-from .parser import ParsedKernel
-from .isa_db import Instruction
+from .isa_db import Instruction as ISAInstruction
 
 
 SEVERITY_SYMBOLS = {
@@ -212,7 +211,7 @@ def format_report_rich(result: AnalysisResult) -> str:
         return format_report_plain(result)
 
 
-def format_instruction_info(instr: Instruction) -> str:
+def format_instruction_info(instr: ISAInstruction) -> str:
     """Format ISA instruction information for display."""
     lines = []
     lines.append(f"Instruction: {instr.mnemonic}")
